@@ -60,7 +60,7 @@ class TrayIcon : public QSystemTrayIcon
 
 
     private slots:
-        // Updates the icon, this is called in blinking and snooze
+        // Updates the icon, this is called when blinking
         void    updateIcon();
 
         // Set or reset blinking. Each timeoutms the opacity changes by percentagechange
@@ -76,8 +76,6 @@ class TrayIcon : public QSystemTrayIcon
         // Context menu actions
         static void actionQuit();
         void    actionActivate();
-        void    actionSnoozeFor();
-        void    actionUnsnooze();
         void    actionNewEmail();
 
         void    actionSystrayIconActivated( QSystemTrayIcon::ActivationReason reason );
@@ -131,9 +129,6 @@ class TrayIcon : public QSystemTrayIcon
         // Show/hide Thunderbird menu item (we modify its text)
         QAction *       mMenuShowHideThunderbird;
 
-        // Unsnooze menu item
-        QAction *       mMenuUnsnooze;
-        QDateTime       mSnoozedUntil;
 
         // Unread counter thread
         UnreadMonitor * mUnreadMonitor = nullptr;

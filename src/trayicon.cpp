@@ -159,22 +159,14 @@ void TrayIcon::updateIcon()
     // How many unread messages are here?
     unsigned int unread = mUnreadCounter;
 
-    // If we are snoozed, ignore the unread messages
-    if ( !mSnoozedUntil.isNull() )
-    {
-        // Hide the unreads
-        unread = 0;
+    // Are we blinking, and if not, should we be?
+    if (unread > 0 && settings->mBlinkSpeed > 0 && mBlinkingTimeout == 0) {
+        enableBlinking(true);
     }
-    else
-    {
-        // Are we blinking, and if not, should we be?
-        if (unread > 0 && settings->mBlinkSpeed > 0 && mBlinkingTimeout == 0) {
-            enableBlinking(true);
-        }
 
-        if ( unread == 0 && mBlinkingTimeout != 0 )
-            enableBlinking( false );
-    }
+    if ( unread == 0 && mBlinkingTimeout != 0 )
+        enableBlinking( false );
+
     if (settings->onlyShowIconOnUnreadMessages && unread == 0) {
         this->hide();
         return;
@@ -189,9 +181,7 @@ void TrayIcon::updateIcon()
     // We use 0.75 opacity if we have unread count and non-blinking.
     // We use blinking opacity if we have unread count and blinking.
     // And we use 1.0 if we have zero unread count
-    if ( !mSnoozedUntil.isNull() )
-        p.setOpacity( 0.5 );
-    else if ( unread == 0 )
+    if ( unread == 0 )
         p.setOpacity( 1.0 );
     else
         p.setOpacity( mBlinkingIconOpacity );
@@ -297,12 +287,6 @@ void TrayIcon::enableBlinking(bool enabled)
 
 void TrayIcon::updateState()
 {
-    if ( !mSnoozedUntil.isNull() && mSnoozedUntil < QDateTime::currentDateTimeUtc() )
-    {
-        // We are unsnoozed now
-        actionUnsnooze(); // this will call updateIcon again, but with empty mSnoozedUntil
-    }
-
     if ( mWinTools )
     {
         mThunderbirdWindowExists = mWinTools->lookup();
@@ -429,33 +413,6 @@ void TrayIcon::actionActivate()
     }
 }
 
-void TrayIcon::actionSnoozeFor()
-{
-    // Snoozing time is added as QAction's userdata
-    QAction * action = (QAction *) sender();
-    mSnoozedUntil = QDateTime::currentDateTimeUtc().addSecs( action->data().toInt() );
-
-    Log::debug( "Snoozed until %s UTC", qPrintable(mSnoozedUntil.toString() ) );
-
-    // Unhide the unsnoozer
-    mMenuUnsnooze->setVisible( true );
-
-    // Reset the blinker
-    enableBlinking( false );
-
-    updateIcon();
-}
-
-void TrayIcon::actionUnsnooze()
-{
-    mSnoozedUntil = QDateTime();
-
-    // Hide the snooze menu
-    mMenuUnsnooze->setVisible( false );
-
-    updateIcon();
-}
-
 void TrayIcon::actionNewEmail() {
     Settings* settings = BirdtrayApp::get()->getSettings();
 
@@ -497,40 +454,6 @@ void TrayIcon::createMenu()
         mSystrayMenu->addAction(tr("New Email"), this, SLOT(actionNewEmail()));
         mSystrayMenu->addSeparator();
     }
-
-    // Snoozer times map, for easy editing. The first parameter is in seconds
-    QMap< unsigned int, QString > snoozingTimes;
-
-    snoozingTimes.insert( 360, tr( "5 minutes") );
-    snoozingTimes.insert( 600, tr( "10 minutes") );
-    snoozingTimes.insert( 1800, tr( "30 minutes") );
-    snoozingTimes.insert( 3600, tr( "1 hour") );
-    snoozingTimes.insert( 3600 * 4, tr( "4 hours") );
-
-    // And add them all
-    QMenu * snooze = new QMenu( tr("Snooze for ...") );
-
-    for ( unsigned int snoozingseconds : snoozingTimes.keys() )
-    {
-        QAction * a = new QAction( snoozingTimes[snoozingseconds], this );
-        connect( a, &QAction::triggered, this, &TrayIcon::actionSnoozeFor );
-
-        // Remember the delay in the action itself
-        a->setData( snoozingseconds );
-        snooze->addAction( a );
-    }
-
-    // And add snoozing menu itself
-    mSystrayMenu->addMenu( snooze );
-
-    // Unsnooze menu item is unvisible by default
-    mMenuUnsnooze = new QAction( tr("Unsnooze"), this );
-    connect( mMenuUnsnooze, &QAction::triggered, this, &TrayIcon::actionUnsnooze );
-
-    mSystrayMenu->addAction( mMenuUnsnooze );
-    mMenuUnsnooze->setVisible( false );
-
-    mSystrayMenu->addSeparator();
 
     // Some generic actions
     mSystrayMenu->addAction( tr("Settings..."), this, SLOT(showSettings()) );
