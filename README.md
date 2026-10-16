@@ -10,12 +10,20 @@ This fork is meant for my personal use on Fedora KDE Wayland and comes with no g
 - Keep dependencies to a minimum.
 - Clean up code I will never use.
 
-## Build
+## Install
 
 ```bash
 sudo dnf install cmake gcc-c++ qt6-qtbase-devel qt6-qtsvg-devel &&
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release &&
-cmake --build build
+gh repo clone vegiii/birdtray-lite ~/Documents/Git/birdtray-lite &&
+~/Documents/Git/birdtray-lite/install.sh
+```
+
+## Update
+
+```bash
+cd ~/Documents/Git/birdtray-lite &&
+git pull --ff-only &&
+./install.sh
 ```
 
 Settings are stored in `~/.config/birdtray-lite/config.json`.
