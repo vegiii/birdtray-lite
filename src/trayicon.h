@@ -7,9 +7,6 @@
 #include <QImage>
 #include <QProcess>
 #include <QSystemTrayIcon>
-#ifdef Q_OS_WIN
-#  include "processhandle.h"
-#endif /* Q_OS_WIN */
 #include "dialogsettings.h"
 
 class UnreadMonitor;
@@ -94,25 +91,10 @@ class TrayIcon : public QSystemTrayIcon
          */
         void    tbProcessError( QProcess::ProcessError error);
         void    tbProcessFinished( int exitCode, QProcess::ExitStatus exitStatus );
-#ifdef Q_OS_WIN
-        /**
-         * Callback if the Thunderbird updater exits.
-         * @param exitReason The reason for the exit.
-         */
-        void    tbUpdaterProcessFinished(const ProcessHandle::ExitReason& exitReason);
-#endif /* Q_OS_WIN */
         /**
          * Callback that is called when we are about to quit.
          */
         void    onQuit();
-        
-        /**
-         * Called when the auto update finished.
-         *
-         * @param hasUpdate true if a new update was found.
-         * @param errorMessage A message indicating an error during the check, or a null string.
-         */
-        void    onAutoUpdateCheckFinished(bool foundUpdate, const QString& errorMessage);
         
         /**
          * Called when the Thunderbird window is shown.
@@ -136,11 +118,6 @@ class TrayIcon : public QSystemTrayIcon
          *                   should result in an update of the tray icon.
          */
         void    setIgnoredUnreadMails(unsigned int ignoredMails, bool updateIcon = true);
-        
-        /**
-         * Do an automatic check for a new version of Birdtray.
-         */
-        void    doAutoUpdateCheck();
         
         /**
          * Draw the warning indicator.
@@ -215,10 +192,6 @@ class TrayIcon : public QSystemTrayIcon
          */
         DialogSettings* settingsDialog = nullptr;
 
-#ifdef Q_OS_WIN
-        // A reference to a Thunderbird updater process.
-        ProcessHandle* mThunderbirdUpdaterProcess;
-#endif /* Q_OS_WIN */
                
         /**
          * Whether we have received data about unread emails yet.

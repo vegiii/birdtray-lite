@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.vegiii.BirdtrayLite</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>Birdtray Lite</name>
+  <summary>System tray new mail notification for Thunderbird</summary>
+  <description>
+    <p>
+      Birdtray Lite shows the unread email count from Thunderbird in the system tray, and can
+      hide and show the Thunderbird window. It reads Thunderbird's mail index files directly,
+      so no extension is needed. It is a fork of Birdtray by George Yunaev.
+    </p>
+  </description>
+  <url type="homepage">https://github.com/vegiii/birdtray-lite</url>
+  <launchable type="desktop-id">io.github.vegiii.BirdtrayLite.desktop</launchable>
+  <content_rating type="oars-1.1"/>
+</component>

@@ -318,45 +318,6 @@ static bool checkWindowState( Display * display, Window w, const char * state )
     return false;
 }
 
-#if 0
-/*
- * Have events associated with mask for the window set in the X11 Event loop
- * to the application.
- */
-static void subscribe(Display *display, Window w, long mask) {
-    Window root = RootWindow(display, DefaultScreen(display));
-    XWindowAttributes attr;
-
-    XGetWindowAttributes(display, w == None ? root : w, &attr);
-
-    XSelectInput(display, w == None ? root : w, attr.your_event_mask | mask);
-    XSync(display, false);
-}
-
-static void unSubscribe(Display *display, Window w) {
-    XSelectInput(display, w, NoEventMask);
-    XSync(display, false);
-}
-
-/*
- * Sets data to the value of the requested window property.
- */
-static bool getCardinalProperty(Display *display, Window w, Atom prop, long *data) {
-    Atom type;
-    int format;
-    unsigned long nitems, bytes;
-    unsigned char *d = NULL;
-
-    if (XGetWindowProperty(display, w, prop, 0, 1, false, XA_CARDINAL, &type, &format, &nitems, &bytes, &d) == Success && d) {
-        if (data) {
-            *data = *reinterpret_cast<long *> (d);
-        }
-        XFree(d);
-        return true;
-    }
-    return false;
-}
-#endif
 
 
 WindowTools_X11::WindowTools_X11()
@@ -646,7 +607,7 @@ void WindowTools_X11::kwinScriptMinimize( bool minimize )
             "}\n"
           ).arg(QString(searchStr).replace("\"", "\\\""));
 
-    const QString scriptPath = QDir::tempPath() + "/birdtray_kwin_minimize.js";
+    const QString scriptPath = QDir::tempPath() + "/birdtray-lite_kwin_minimize.js";
     QFile f( scriptPath );
     if ( !f.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
     {

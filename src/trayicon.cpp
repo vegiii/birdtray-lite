@@ -9,7 +9,6 @@
 #include "unreadmonitor.h"
 #include "windowtools.h"
 #include "utils.h"
-#include "autoupdater.h"
 #include "birdtrayapp.h"
 #include "log.h"
 
@@ -28,11 +27,6 @@ TrayIcon::TrayIcon(bool showSettings)
     mMenuShowHideThunderbird = 0;
     mMenuIgnoreUnreads = 0;
     mThunderbirdProcess = nullptr;
-#ifdef Q_OS_WIN
-    mThunderbirdUpdaterProcess = ProcessHandle::create("updater.exe");
-    connect( mThunderbirdUpdaterProcess, &ProcessHandle::finished,
-            this, &TrayIcon::tbUpdaterProcessFinished );
-#endif /* Q_OS_WIN */
     
     mThunderbirdWindowExists = false;
     mThunderbirdWindowExisted = false;
@@ -63,14 +57,10 @@ TrayIcon::TrayIcon(bool showSettings)
     updateIcon();
     show();
     
-    if (settings->mUpdateOnStartup) {
-        doAutoUpdateCheck();
-    }
-    
     // If the settings are not yet configure, pop up the message
     if (!showSettings && settings->showDialogIfNoAccountsConfigured
         && settings->watchedMorkFiles.isEmpty()) {
-        QMessageBox questionDialog(QMessageBox::Question, tr("Would you like to set up Birdtray?"),
+        QMessageBox questionDialog(QMessageBox::Question, tr("Would you like to set up Birdtray Lite?"),
                 tr("You have not yet configured any email folders to monitor. "
                    "Would you like to do it now?"), QMessageBox::Yes | QMessageBox::No);
         QPushButton* dontAskAgainButton = questionDialog.addButton(
@@ -90,9 +80,6 @@ TrayIcon::~TrayIcon() {
     if (settingsDialog != nullptr) {
         settingsDialog->deleteLater();
     }
-#ifdef Q_OS_WIN
-    mThunderbirdUpdaterProcess->deleteLater();
-#endif /* Q_OS_WIN */
     if (mUnreadMonitor != nullptr) {
         if (mUnreadMonitor->isRunning()) {
             mUnreadMonitor->quit();
@@ -700,21 +687,13 @@ void TrayIcon::startThunderbird()
     mThunderbirdProcess = new QProcess();
     connect( mThunderbirdProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(tbProcessFinished(int,QProcess::ExitStatus)) );
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     connect( mThunderbirdProcess, &QProcess::errorOccurred, this, &TrayIcon::tbProcessError );
-#endif
 
     mThunderbirdProcess->start(executable, args);
 }
 
 void TrayIcon::tbProcessError(QProcess::ProcessError error)
 {
-#ifdef Q_OS_WIN
-    if (mThunderbirdUpdaterProcess->attach() == AttachResult::SUCCESS)
-    {
-        return;
-    }
-#endif /* Q_OS_WIN */
     if (mThunderbirdProcess == nullptr) {
         Log::debug("Got Thunderbird process error %s, but mThunderbirdProcess was null", qPrintable(QVariant::fromValue(error).toString()));
         return;
@@ -736,34 +715,12 @@ void TrayIcon::tbProcessFinished(int, QProcess::ExitStatus)
     // in which case it is restarted in updateState(), or that we started TB
     // and the active instance was activated (and our instance exited).
     // Thus we just destroy the process later, to let updateState() make decision
-#ifdef Q_OS_WIN
-    if (mThunderbirdUpdaterProcess->attach() == AttachResult::SUCCESS) {
-        return;
-    }
-#endif /* Q_OS_WIN */
     if (mThunderbirdProcess != nullptr) {
         mThunderbirdProcess->deleteLater();
         mThunderbirdProcess = nullptr;
     }
 }
 
-#ifdef Q_OS_WIN
-void TrayIcon::tbUpdaterProcessFinished(const ProcessHandle::ExitReason& exitReason)
-{
-    if (exitReason.isError()) {
-        QMessageBox::critical(
-                nullptr, tr("Cannot start Thunderbird"),
-                tr("Error starting Thunderbird, because we could not attach to the updater:\n\n%1")
-                .arg( exitReason.getErrorDescription() ) );
-        return;
-    }
-    // The updater will start Thunderbird automatically
-    if (mThunderbirdProcess != nullptr) {
-        mThunderbirdProcess->deleteLater();
-        mThunderbirdProcess = nullptr;
-    }
-}
-#endif /* Q_OS_WIN */
 
 void TrayIcon::onQuit() {
     if (mWinTools && mWinTools->isHidden()) {
@@ -773,15 +730,6 @@ void TrayIcon::onQuit() {
         if (mWinTools) {
             mWinTools->closeWindow();
         }
-    }
-}
-
-void TrayIcon::onAutoUpdateCheckFinished(bool foundUpdate, const QString &errorMessage) {
-    Q_UNUSED(foundUpdate)
-    AutoUpdater* autoUpdater = BirdtrayApp::get()->getAutoUpdater();
-    if (errorMessage.isNull()) {
-        disconnect(autoUpdater, &AutoUpdater::onCheckUpdateFinished,
-                   this, &TrayIcon::onAutoUpdateCheckFinished);
     }
 }
 
@@ -826,13 +774,6 @@ void TrayIcon::setIgnoredUnreadMails(unsigned int ignoredMails, bool updateIcon)
     if (updateIcon) {
         this->updateIcon();
     }
-}
-
-void TrayIcon::doAutoUpdateCheck() {
-    AutoUpdater* autoUpdater = BirdtrayApp::get()->getAutoUpdater();
-    connect(autoUpdater, &AutoUpdater::onCheckUpdateFinished,
-            this, &TrayIcon::onAutoUpdateCheckFinished);
-    autoUpdater->checkForUpdates();
 }
 
 void TrayIcon::drawWarningIndicator(QPainter &painter, const QSize &iconSize) {

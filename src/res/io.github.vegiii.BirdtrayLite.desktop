@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Birdtray Lite
+Comment=System tray new mail notification for Thunderbird
+Keywords=Email;E-mail;Thunderbird;Tray;Notification;
+Exec=birdtray-lite
+Terminal=false
+Type=Application
+Icon=io.github.vegiii.BirdtrayLite
+Categories=Network;Email;
+StartupNotify=false

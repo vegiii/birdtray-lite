@@ -1,4 +1,1 @@
 * text=auto
-src/translations/main_*.ts text eol=lf
-src/translations/dynamic_*.ts text eol=lf
-src/translations/installer_*.ts text eol=crlf

@@ -9,13 +9,6 @@
 
 #include "ui_dialogsettings.h"
 
-#ifdef Q_OS_WIN
-#  define THUNDERBIRD_PROFILES_PATH "%AppData%\\Thunderbird\\Profiles"
-#else
-#  define THUNDERBIRD_PROFILES_PATH "~/Library/Thunderbird/Profiles"
-#endif
-
-
 class ModelAccountTree;
 class ModelNewEmails;
 
@@ -28,21 +21,6 @@ class DialogSettings : public QDialog, public Ui::DialogSettings
 
     public slots:
         void    accept() override;
-        
-        /**
-         * Called once the update check finished.
-         *
-         * @param hasUpdate true if a new update was found.
-         * @param errorMessage A message indicating an error during the check, or a null string.
-         */
-        void    onCheckUpdateFinished(bool foundUpdate, const QString &errorString);
-
-        /**
-         * Called when the currently viewed tab changes
-         *
-         * @param tabIndex The index of the tab that is now displayed.
-         */
-        void    activateTab(int tabIndex );
 
         // Account buttons
         /**
@@ -62,7 +40,6 @@ class DialogSettings : public QDialog, public Ui::DialogSettings
         void    newEmailRemoveIndex( const QModelIndex& index );
         
         // Advanced buttons
-        void    onCheckUpdateButton();
         void    onShowLogWindow();
 
         // Icon change
@@ -86,11 +63,6 @@ class DialogSettings : public QDialog, public Ui::DialogSettings
          * @param value The new minimum font size.
          */
         void onMinimumFontSizeChanged(int value);
-        
-        /**
-         * Show the translators dialog.
-         */
-        static void onTranslatorsDialog();
 
         void onKeyPressedOnTreeAccount(QKeyEvent * event);
 

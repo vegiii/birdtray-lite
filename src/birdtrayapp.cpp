@@ -1,18 +1,13 @@
-#include <QtCore/QLibraryInfo>
-#include <QtCore/QStandardPaths>
 #include <QtCore/QThread>
 
 #include "birdtrayapp.h"
-#ifdef Q_OS_WIN
-#  include "birdtrayeventfilter.h"
-#endif /* Q_OS_WIN */
 #include "utils.h"
 #include "morkparser.h"
 #include "windowtools.h"
 #include "version.h"
 #include "log.h"
 
-#define SINGLE_INSTANCE_SERVER_NAME "birdtray.ulduzsoft.single.instance.server.socket"
+#define SINGLE_INSTANCE_SERVER_NAME "birdtray-lite.single.instance"
 #define TOGGLE_THUNDERBIRD_COMMAND "toggle-tb"
 #define SHOW_THUNDERBIRD_COMMAND "show-tb"
 #define HIDE_THUNDERBIRD_COMMAND "hide-tb"
@@ -21,23 +16,13 @@
 
 BirdtrayApp::BirdtrayApp(int &argc, char** argv) : QApplication(argc, argv)
 {
-    QApplication::setWindowIcon(QIcon(QString::fromUtf8(":/res/birdtray.ico")));
-    QCoreApplication::setOrganizationName("ulduzsoft");
-    QCoreApplication::setOrganizationDomain("ulduzsoft.com");
-    QCoreApplication::setApplicationName("birdtray");
+    QApplication::setWindowIcon(QIcon(QString::fromUtf8(":/res/birdtray.svg")));
+    QCoreApplication::setApplicationName("birdtray-lite");
+    QGuiApplication::setDesktopFileName("io.github.vegiii.BirdtrayLite");
     QCoreApplication::setApplicationVersion(Utils::getBirdtrayVersion());
     // This prevents exiting the application when the dialogs are closed on Gnome/XFCE
     QApplication::setQuitOnLastWindowClosed(false);
-    
-    bool translationLoadedSuccessfully = loadTranslations();
-    QCoreApplication::installTranslator(&qtTranslator);
-    QCoreApplication::installTranslator(&dynamicTranslator);
-    QCoreApplication::installTranslator(&mainTranslator);
 
-#ifdef Q_OS_WIN
-    BirdtrayEventFilter filter;
-    installNativeEventFilter(&filter);
-#endif /* Q_OS_WIN */
     
     parseCmdArguments();
     
@@ -60,7 +45,7 @@ BirdtrayApp::BirdtrayApp(int &argc, char** argv) : QApplication(argc, argv)
     
     Log::initialize(commandLineParser.value("log"));
 
-    Log::debug( "Birdtray version %d.%d.%d started", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH );
+    Log::debug( "Birdtray Lite version %d.%d.%d started", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH );
 
     ensureSystemTrayAvailable();
     // Load settings
@@ -71,10 +56,6 @@ BirdtrayApp::BirdtrayApp(int &argc, char** argv) : QApplication(argc, argv)
         settings->load();
     }
 
-    if (!translationLoadedSuccessfully) {
-        Log::debug("Failed to load translation for %s", qPrintable(QLocale::system().name()));
-    }
-    autoUpdater = new AutoUpdater();
     trayIcon = new TrayIcon(commandLineParser.isSet("settings"));
 }
 
@@ -85,7 +66,6 @@ BirdtrayApp::~BirdtrayApp() {
         singleInstanceServer = nullptr;
     }
     delete trayIcon;
-    delete autoUpdater;
     delete settings;
 }
 
@@ -97,22 +77,8 @@ Settings* BirdtrayApp::getSettings() const {
     return settings;
 }
 
-AutoUpdater* BirdtrayApp::getAutoUpdater() const {
-    return autoUpdater;
-}
-
 TrayIcon* BirdtrayApp::getTrayIcon() const {
     return trayIcon;
-}
-
-bool BirdtrayApp::event(QEvent* event) {
-    if (event->type() == QEvent::LocaleChange) {
-        if (!loadTranslations()) {
-            Log::debug("Failed to load translation for %s", qPrintable(QLocale::system().name()));
-        }
-        return true;
-    }
-    return QApplication::event(event);
 }
 
 void BirdtrayApp::onSecondInstanceAttached() {
@@ -121,39 +87,6 @@ void BirdtrayApp::onSecondInstanceAttached() {
         connect(clientSocket, &QLocalSocket::readyRead,
                 this, [=]() { onSecondInstanceCommand(clientSocket); });
     }
-}
-
-bool BirdtrayApp::loadTranslations() {
-    QStringList locations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
-    locations.prepend(QCoreApplication::applicationDirPath());
-    std::transform(locations.begin(), locations.end(), locations.begin(),
-            [](QString path) { return path.append("/translations"); });
-    QLocale locale = QLocale::system();
-    bool success = loadTranslation(
-            qtTranslator, locale, "qt", {QLibraryInfo::path(QLibraryInfo::TranslationsPath)});
-    success &= loadTranslation(dynamicTranslator, locale, "dynamic", locations);
-    success &= loadTranslation(mainTranslator, locale, "main", locations);
-    return success;
-}
-
-bool BirdtrayApp::loadTranslation(QTranslator &translator, QLocale &locale,
-                                  const QString &translationName, const QStringList &paths) {
-    QLocale languageWithoutCountry(locale.language());
-    for (const QString &path : paths) {
-        if (translator.load(locale, translationName, "_", path)) {
-            return true;
-        }
-        // On Ubuntu, when switching to another language, the LANGUAGE environment variable
-        // does not include the base language, only the language with country,
-        // e.g. LANGUAGE=de_DE:en_US:en
-        // instead of LANGUAGE=de_DE:de:en_US:en
-        // As a result, the translator does not find the <translationName>_de.qm files.
-        // That's why we try to load the translation without the country appendix.
-        if (translator.load(languageWithoutCountry, translationName, "_", path)) {
-            return true;
-        }
-    }
-    return false;
 }
 
 void BirdtrayApp::parseCmdArguments() {
@@ -188,17 +121,6 @@ bool BirdtrayApp::startSingleInstanceServer() {
         serverListening = singleInstanceServer->listen(SINGLE_INSTANCE_SERVER_NAME);
     }
 
-#if defined(Q_OS_WIN)
-    // On Windows, binding to the same address as the other instance doesn't fail,
-    // so we use a mutex to detect if there is another Birdtray instance.
-    if (serverListening) {
-        CreateMutex(nullptr, true, TEXT(SINGLE_INSTANCE_SERVER_NAME));
-        if (GetLastError() == ERROR_ALREADY_EXISTS) {
-            singleInstanceServer->close(); // Disable our new server instance
-            serverListening = false;
-        }
-    }
-#endif
     if (!serverListening) {
         return !connectToRunningInstance();
     }

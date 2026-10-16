@@ -7,13 +7,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QBuffer>
 
-#if defined (Q_OS_WIN)
-#  include <windows.h>
-#elif defined (Q_OS_MAC)
-#else
-#  include <wordexp.h>
-#endif
-
+#include <wordexp.h>
 
 QString Utils::decodeIMAPutf7(const QString &param)
 {
@@ -131,27 +125,6 @@ QString Utils::expandPath(const QString &path) {
     } else {
         rawPath = path;
     }
-#if defined (Q_OS_WIN)
-    TCHAR buffer[MAX_PATH];
-#if defined(UNICODE)
-    std::wstring originalPath = qToStdWString(rawPath);
-#else
-    std::string originalPath = rawPath.toStdString();
-#endif /* defined(UNICODE) */
-    DWORD resultSize = ExpandEnvironmentStrings(
-            originalPath.data(), buffer, sizeof(buffer) / sizeof(buffer[0]));
-    if (resultSize == 0 || resultSize > sizeof(buffer) / sizeof(buffer[0])) {
-        return rawPath;
-    }
-#if defined(UNICODE)
-    return QString::fromWCharArray(buffer, static_cast<int>(resultSize - 1));
-#else
-    return QString(buffer);
-#endif /* defined(UNICODE) */
-
-#elif defined (Q_OS_MAC)
-    return rawPath;
-#else
     wordexp_t result;
     if (wordexp(rawPath.toStdString().data(), &result, WRDE_NOCMD) != 0) {
         return rawPath;
@@ -159,7 +132,6 @@ QString Utils::expandPath(const QString &path) {
     QString expandedPath(result.we_wordv[0]);
     wordfree(&result);
     return expandedPath;
-#endif
 }
 
 QString Utils::getBirdtrayVersion() {
@@ -167,28 +139,16 @@ QString Utils::getBirdtrayVersion() {
 }
 
 QString Utils::stdWToQString(const std::wstring &str) {
-#ifdef _MSC_VER
-    return QString::fromUtf16((const ushort*) str.c_str());
-#else
     return QString::fromStdWString(str);
-#endif
 }
 
 std::wstring Utils::qToStdWString(const QString &str) {
-#ifdef _MSC_VER
-    return std::wstring((const wchar_t*) str.utf16());
-#else
     return str.toStdWString();
-#endif
 }
 
 QStringList Utils::getThunderbirdProfilesPaths() {
 #if defined (OPT_THUNDERBIRD_PROFILE)
     return { OPT_THUNDERBIRD_PROFILE };
-#elif defined (Q_OS_WIN)
-    return {"%APPDATA%\\Thunderbird\\Profiles"};
-#elif defined (Q_OS_MAC)
-    return {"~/Library/Thunderbird/Profiles"};
 #else // Linux
     return {"~/.thunderbird", "~/snap/thunderbird/common/.thunderbird", "~/.var/app/org.mozilla.Thunderbird/.thunderbird"};
 #endif /* Platform */
@@ -197,12 +157,6 @@ QStringList Utils::getThunderbirdProfilesPaths() {
 QStringList Utils::getDefaultThunderbirdCommand() {
 #if defined (OPT_THUNDERBIRD_CMDLINE)
     return Utils::splitCommandLine( OPT_THUNDERBIRD_CMDLINE );
-#elif defined (Q_OS_WIN)
-    if (QFile::exists(Utils::expandPath(
-            R"("%ProgramFiles%\Mozilla Thunderbird\thunderbird.exe")"))) {
-        return {R"("%ProgramFiles%\Mozilla Thunderbird\thunderbird.exe")"};
-    }
-    return {R"("%ProgramFiles(x86)%\Mozilla Thunderbird\thunderbird.exe")"};
 #else
     return { "/usr/bin/thunderbird" };
 #endif
@@ -280,19 +234,6 @@ QString Utils::getMailAccountName(const QFileInfo &morkFile) {
         }
     }
     return name;
-}
-
-QString Utils::formatGithubMarkdown(const QString& markdown) {
-    QString input = markdown;
-    static QRegularExpression githubMentionRegex(
-            R"((?<!\w)@([a-z\d\-]+))", QRegularExpression::CaseInsensitiveOption);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-    return input.replace(githubMentionRegex, R"([@\1](https://github.com/\1))");
-#else
-    static QRegularExpression markdownLinksRegex(R"(\[(.+?)\]\((\S+?)\))");
-    return input.replace(githubMentionRegex, R"(@\1 (https://github.com/\1))")
-                .replace(markdownLinksRegex, R"(\1 (\2))");
-#endif
 }
 
 QString Utils::pixmapToString(const QPixmap &pixmap) {

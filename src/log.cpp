@@ -50,7 +50,7 @@ void Log::fatal( const QString& str )
     self->add( str );
 
     // Write the whole log buffer into a file log.txt
-    QFile file( QStandardPaths::writableLocation( QStandardPaths::TempLocation ) + QDir::separator() + "birdtray-log.txt" );
+    QFile file( QStandardPaths::writableLocation( QStandardPaths::TempLocation ) + QDir::separator() + "birdtray-lite-log.txt" );
 
     // Show the dialog
     QMessageBox::critical(nullptr, QCoreApplication::translate("Log", "Fatal"),

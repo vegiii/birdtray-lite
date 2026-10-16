@@ -12,7 +12,6 @@
 #include "modelaccounttree.h"
 #include "modelnewemails.h"
 #include "utils.h"
-#include "autoupdater.h"
 #include "mailaccountdialog.h"
 #include "birdtrayapp.h"
 #include "log.h"
@@ -29,7 +28,6 @@ DialogSettings::DialogSettings( QWidget *parent)
 
     connect( buttonBox, &QDialogButtonBox::accepted, this, &DialogSettings::accept );
     connect( buttonBox, &QDialogButtonBox::rejected, this, &DialogSettings::reject );
-    connect( tabWidget, &QTabWidget::currentChanged, this, &DialogSettings::activateTab );
 
     connect( btnNotificationIcon, &QPushButton::clicked, this, &DialogSettings::buttonChangeIcon );
     connect( btnNotificationIconUnread, &QPushButton::clicked, this, &DialogSettings::buttonChangeUnreadIcon );
@@ -48,14 +46,8 @@ DialogSettings::DialogSettings( QWidget *parent)
     connect( btnNewEmailAdd, &QPushButton::clicked, this, &DialogSettings::newEmailAdd );
     connect( btnNewEmailEdit, &QPushButton::clicked, this, &DialogSettings::newEmailEdit );
     connect( btnNewEmailDelete, &QPushButton::clicked, this, &DialogSettings::newEmailRemove );
-    
-    connect( checkUpdateButton, &QPushButton::clicked,
-            this, &DialogSettings::onCheckUpdateButton );
-    connect( app->getAutoUpdater(), &AutoUpdater::onCheckUpdateFinished,
-            this, &DialogSettings::onCheckUpdateFinished );
 
     connect( btnShowLogWindow, &QPushButton::clicked, this, &DialogSettings::onShowLogWindow );
-    connect( translatorsButton, &QPushButton::clicked, &DialogSettings::onTranslatorsDialog );
 
     // Setup parameters
     btnNotificationColor->setColor( settings->mNotificationDefaultColor );
@@ -84,7 +76,6 @@ DialogSettings::DialogSettings( QWidget *parent)
     boxHideWindowAfterManualStart->setChecked( settings->hideWhenStartedManually );
     boxEnableNewEmail->setChecked( settings->mNewEmailMenuEnabled );
     boxBlinkingUsesAlpha->setChecked( settings->mBlinkingUseAlphaTransition );
-    checkUpdateOnStartup->setChecked( settings->mUpdateOnStartup );
     boxAllowSuppression->setChecked( settings->mAllowSuppressingUnreads );
     spinUnreadOpacityLevel->setValue( settings->mUnreadOpacityLevel * 100 );
     spinThunderbirdStartDelay->setValue( settings->mLaunchThunderbirdDelay );
@@ -150,14 +141,8 @@ DialogSettings::DialogSettings( QWidget *parent)
         btnNotificationIconUnread->setDisabled(true);
     }
 
-#if defined (Q_OS_WINDOWS)
-    leThunderbirdWindowMatch->hide();
-    labelWindowNamePattern->hide();
-    boxSupportNonNetwmCompliant->hide();
-#else
     processNameLabel->hide();
     leThunderbirdProcessName->hide();
-#endif
 }
 
 void DialogSettings::onKeyPressedOnTreeAccount(QKeyEvent * event)
@@ -201,7 +186,6 @@ void DialogSettings::accept()
     settings->hideWhenStartedManually = boxHideWindowAfterManualStart->isChecked();
     settings->mNewEmailMenuEnabled = boxEnableNewEmail->isChecked();
     settings->mBlinkingUseAlphaTransition = boxBlinkingUsesAlpha->isChecked();
-    settings->mUpdateOnStartup = checkUpdateOnStartup->isChecked();
     settings->mUnreadOpacityLevel = (double) spinUnreadOpacityLevel->value() / 100.0;
     settings->mLaunchThunderbirdDelay = spinThunderbirdStartDelay->value();
     settings->mShowUnreadEmailCount = boxShowUnreadCount->isChecked();
@@ -233,22 +217,6 @@ void DialogSettings::accept()
     mAccountModel->applySettings();
 
     QDialog::accept();
-}
-
-void DialogSettings::onCheckUpdateFinished(bool foundUpdate, const QString &errorString) {
-    if (checkUpdateButton->isEnabled()) {
-        return; // We received an error that was not initiated by us. Ignore it.
-    }
-    checkUpdateButton->setText(tr("Check now"));
-    checkUpdateButton->setEnabled(true);
-    if (!errorString.isNull()) {
-        QMessageBox::warning(
-                nullptr, tr("Version check failed"),
-                tr("Failed to check for a new Birdtray version:\n") + errorString,
-                QMessageBox::StandardButton::Ok);
-    } else {
-        noUpdateIndicator->setVisible(!foundUpdate);
-    }
 }
 
 void DialogSettings::accountAdd()
@@ -345,12 +313,6 @@ void DialogSettings::newEmailRemoveIndex(const QModelIndex &index)
     mModelNewEmails->remove( index );
 }
 
-void DialogSettings::onCheckUpdateButton() {
-    checkUpdateButton->setText(tr("Checking..."));
-    checkUpdateButton->setEnabled(false);
-    BirdtrayApp::get()->getAutoUpdater()->checkForUpdates();
-}
-
 void DialogSettings::onShowLogWindow()
 {
     Log::showLogger();
@@ -387,29 +349,6 @@ void DialogSettings::onMaximumFontSizeChanged(int value) {
 
 void DialogSettings::onMinimumFontSizeChanged(int value) {
     spinMaximumFontSize->setMinimum(value + 1);
-}
-
-void DialogSettings::onTranslatorsDialog() {
-    QFile translatorsListFile(":/res/translators.md");
-    translatorsListFile.open(QFile::ReadOnly);
-    QString translatorsList = QTextStream(&translatorsListFile).readAll();
-    translatorsListFile.close();
-    translatorsList.replace("# Active maintainers", "# " + tr("Active maintainers"))
-                   .replace("# Contributors", "# " + tr("Contributors"));
-    QDialog translatorsDialog;
-    translatorsDialog.resize(400, 300);
-    translatorsDialog.setWindowTitle(tr("Translators"));
-    QHBoxLayout layout(&translatorsDialog);
-    QTextBrowser content(&translatorsDialog);
-    content.setOpenExternalLinks(true);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-    content.setMarkdown(Utils::formatGithubMarkdown(translatorsList));
-#else
-    content.setText(Utils::formatGithubMarkdown(translatorsList));
-#endif
-    layout.addWidget(&content);
-    translatorsDialog.setLayout(&layout);
-    translatorsDialog.exec();
 }
 
 
@@ -463,12 +402,4 @@ void DialogSettings::changeIcon(QToolButton *button)
                     Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }
     button->setIcon(icon);
-}
-
-void DialogSettings::activateTab(int tabIndex)
-{
-    // #1 is the Accounts tab
-    if (tabIndex == 4) {
-        noUpdateIndicator->hide();
-    }
 }

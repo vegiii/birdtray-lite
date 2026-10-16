@@ -6,12 +6,10 @@
 #include <QColor>
 #include <QMap>
 #include <QPixmap>
-#include <QSettings>
 
 #include "setting_newemail.h"
 #include "utils.h"
 
-class QSettings;
 
 class Settings
 {
@@ -106,12 +104,6 @@ class Settings
         // Whether to use alpha transition when blinking
         bool    mBlinkingUseAlphaTransition;
         
-        // Whether to check for a new Birdtray version on startup or not.
-        bool    mUpdateOnStartup;
-        
-        // The new Birdtray version that the user selected to ignore.
-        QString mIgnoreUpdateVersion;
-
         // Whether to allow suppression of unread emails
         bool    mAllowSuppressingUnreads;
 
@@ -198,19 +190,11 @@ class Settings
         // Loading from either storage
         void    fromJSON( const QJsonObject& settings );
 
-        // TODO: remove this on March 23, 2022
-        void    fromQSettings(QSettings * settings);
-
         // Notification icon
         QPixmap     mNotificationIcon;
     
         // Settings filename
         QString     mSettingsFilename;
-
-        /**
-         * At first start, load the configuration configured during installation of Birdtray.
-         */
-        void loadInstallerConfiguration();
 };
 
 #endif // SETTINGS_H
