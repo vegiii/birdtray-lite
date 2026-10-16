@@ -781,51 +781,6 @@ QString MorkParser::getColumn( int oid )
     return *foundIter;
 }
 
-int MorkParser::dumpMorkFile( const QString& filename )
-{
-    MorkParser p;
-
-    if ( !p.open( filename ) )
-        qFatal( "Error opening mork file." );
-
-    for ( TableScopeMap::iterator tit = p.mork_.begin(); tit != p.mork_.end(); ++tit )
-    {
-        printf("Table scope %02X (%s)\n", tit.key(), qPrintable(p.getColumn(tit.key())) );
-        const MorkTableMap& map = tit.value();
-
-        for ( MorkTableMap::const_iterator mit = map.begin(); mit != map.end(); ++mit )
-        {
-            printf("  Table ID %d\n", mit.key() );
-
-            const RowScopeMap& rowscopemap = mit.value();
-
-            for ( RowScopeMap::const_iterator rsit = rowscopemap.begin(); rsit != rowscopemap.end(); ++rsit )
-            {
-                printf("    Row scope %02X (%s)\n", rsit.key(), qPrintable(p.getColumn(rsit.key())) );
-
-                const MorkRowMap& rows = rsit.value();
-
-                for ( MorkRowMap::const_iterator rit = rows.begin(); rit != rows.cend(); rit++ )
-                {
-                    printf("      Row id %d\n", rit.key() );
-                    MorkCells cells = rit.value();
-
-                    for ( int colid : cells.keys() )
-                    {
-                        printf("          cell %s, value %s\n", qPrintable(p.getColumn(colid)), qPrintable(p.getValue(cells[colid ])) );
-                    }
-                }
-
-                printf("\n\n" );
-            }
-        }
-
-        printf("\n\n" );
-    }
-
-    return EXIT_SUCCESS;
-}
-
 unsigned int MailMorkParser::getNumUnreadMessages() {
     const int scopeId = this->columns_.key(MorkDbFolderInfoScope);
     if (!scopeId) {

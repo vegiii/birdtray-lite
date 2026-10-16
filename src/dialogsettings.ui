@@ -503,36 +503,6 @@
            </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Policy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="boxHideWhenMinimized">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Hide Thunderbird window when it is minimized</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
            <widget class="QCheckBox" name="boxMonitorThunderbirdWindow">
             <property name="enabled">
              <bool>true</bool>
@@ -919,16 +889,6 @@
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QCheckBox" name="boxSupportNonNetwmCompliant">
-              <property name="whatsThis">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If your desktop manager is not fully NETWM compliant, you may need to check this checkbox so it can detect Thunderbird window and is able to minimise and hide it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="text">
-               <string>Support non-NETWM compliant WMs</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
           <item>
@@ -1201,7 +1161,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>boxHideWindowAtStart</tabstop>
   <tabstop>boxStopThunderbirdOnExit</tabstop>
   <tabstop>boxShowHideThunderbird</tabstop>
-  <tabstop>boxHideWhenMinimized</tabstop>
   <tabstop>boxMonitorThunderbirdWindow</tabstop>
   <tabstop>boxRestartThunderbird</tabstop>
   <tabstop>boxHideWindowAtRestart</tabstop>
@@ -1216,7 +1175,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>leThunderbirdWindowMatch</tabstop>
   <tabstop>spinMinimumFontSize</tabstop>
   <tabstop>boxBlinkingUsesAlpha</tabstop>
-  <tabstop>boxSupportNonNetwmCompliant</tabstop>
   <tabstop>spinUnreadOpacityLevel</tabstop>
   <tabstop>onlyShowIconOnNewMail</tabstop>
   <tabstop>btnShowLogWindow</tabstop>

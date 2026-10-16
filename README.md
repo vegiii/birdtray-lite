@@ -13,7 +13,7 @@ This fork is meant for my personal use on Fedora KDE Wayland and comes with no g
 ## Build
 
 ```bash
-sudo dnf install cmake gcc-c++ qt6-qtbase-devel qt6-qtsvg-devel libX11-devel &&
+sudo dnf install cmake gcc-c++ qt6-qtbase-devel qt6-qtsvg-devel &&
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release &&
 cmake --build build
 ```

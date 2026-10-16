@@ -44,7 +44,6 @@ Settings::Settings()
     mBlinkSpeed = 0;
     mShowHideThunderbird = false;
     mLaunchThunderbird = false;
-    mHideWhenMinimized = false;
     mExitThunderbirdWhenQuit = false;
     mNotificationFontWeight = 50;
     mMonitorThunderbirdWindow = false;
@@ -71,7 +70,6 @@ Settings::Settings()
     mNewEmailMenuEnabled = false;
     mIndexFilesRereadIntervalSec = 0;
     mThunderbirdCmdLine = Utils::getDefaultThunderbirdCommand();
-    mIgnoreNETWMhints = false;
 }
 
 Settings::~Settings()
@@ -91,7 +89,6 @@ void Settings::save()
     out[ "common/blinkspeed" ] = static_cast<int>( mBlinkSpeed );
     out[ "common/showhidethunderbird" ] = mShowHideThunderbird;
     out[ "common/launchthunderbird" ] = mLaunchThunderbird;
-    out[ "common/hidewhenminimized" ] = mHideWhenMinimized;
     out[ "common/exitthunderbirdonquit" ] = mExitThunderbirdWhenQuit;
     out[ "common/restartthunderbird" ] = mRestartThunderbird;
     out[ "common/notificationfontweight" ] = static_cast<int>( mNotificationFontWeight );
@@ -119,7 +116,6 @@ void Settings::save()
     out[ ONLY_SHOW_ICON_ON_UNREAD_MESSAGES_KEY ] = onlyShowIconOnUnreadMessages;
     out[ "advanced/forcedRereadInterval" ] = static_cast<int>( mIndexFilesRereadIntervalSec );
     out[ "advanced/runProcessOnChange" ] = mProcessRunOnCountChange;
-    out[ "advanced/ignoreNetWMhints" ] = mIgnoreNETWMhints;
 
     // Store the account map
     QJsonArray accounts;
@@ -221,7 +217,6 @@ void Settings::fromJSON( const QJsonObject& settings )
     mBlinkSpeed = settings.value("common/blinkspeed").toInt();
     mShowHideThunderbird = settings.value("common/showhidethunderbird").toBool();
     mLaunchThunderbird = settings.value("common/launchthunderbird").toBool();
-    mHideWhenMinimized = settings.value("common/hidewhenminimized").toBool();
     mExitThunderbirdWhenQuit = settings.value("common/exitthunderbirdonquit").toBool();
     mNotificationFontWeight = qMin(99, settings.value("common/notificationfontweight").toInt());
     mMonitorThunderbirdWindow = settings.value("common/monitorthunderbirdwindow").toBool();
@@ -251,7 +246,6 @@ void Settings::fromJSON( const QJsonObject& settings )
     onlyShowIconOnUnreadMessages = settings.value(ONLY_SHOW_ICON_ON_UNREAD_MESSAGES_KEY).toBool();
     mIndexFilesRereadIntervalSec = settings.value("advanced/forcedRereadInterval").toInt();
     mProcessRunOnCountChange = settings.value( "advanced/runProcessOnChange" ).toString();
-    mIgnoreNETWMhints = settings.value( "advanced/ignoreNetWMhints").toBool();
 
     QStringList thunderbirdCommand = settings.value("advanced/tbcmdline").toVariant().toStringList();
     if ( !thunderbirdCommand.isEmpty() && !thunderbirdCommand[0].isEmpty() )

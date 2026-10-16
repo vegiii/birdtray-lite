@@ -121,8 +121,6 @@ public:
 
     QString getColumn( int oid );
 
-    static int dumpMorkFile( const QString& filename );
-
 protected: // Members
     void    initVars();
 

@@ -71,9 +71,6 @@ class Settings
         // Whether to show/hide Thunderbird on button click
         bool    mShowHideThunderbird;
 
-        // Whether to hide Thunderbird when its window is minimized
-        bool    mHideWhenMinimized;
-
         // Whether to launch Thunderbird when the app starts
         bool    mLaunchThunderbird;
 
@@ -157,9 +154,6 @@ class Settings
 
         // When the number of unread emails changes, Birdtray can start this process
         QString                   mProcessRunOnCountChange;
-
-        // Whether to support non-compliant NetWM WMs by ignoring NETWM hints
-        bool                      mIgnoreNETWMhints;
 
         // Load and save them
         void    save();

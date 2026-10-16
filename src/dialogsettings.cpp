@@ -61,7 +61,6 @@ DialogSettings::DialogSettings( QWidget *parent)
             0 : sliderBlinkingSpeed->maximum() + 1 - static_cast<int>(settings->mBlinkSpeed) );
     boxLaunchThunderbirdAtStart->setChecked( settings->mLaunchThunderbird );
     boxShowHideThunderbird->setChecked( settings->mShowHideThunderbird );
-    boxHideWhenMinimized->setChecked( settings->mHideWhenMinimized );
     boxMonitorThunderbirdWindow->setChecked( settings->mMonitorThunderbirdWindow );
     boxRestartThunderbird->setChecked( settings->mRestartThunderbird );
     leThunderbirdProcessName->setText( settings->mThunderbirdProcessName );
@@ -85,7 +84,6 @@ DialogSettings::DialogSettings( QWidget *parent)
     ignoreMailCountOnHideBox->setChecked(settings->ignoreUnreadCountOnHide);
     onlyShowIconOnNewMail->setChecked(settings->onlyShowIconOnUnreadMessages);
     leProcessRunOnCountChange->setText( settings->mProcessRunOnCountChange );
-    boxSupportNonNetwmCompliant->setChecked( settings->mIgnoreNETWMhints );
 
     if ( settings->mIndexFilesRereadIntervalSec > 0 )
     {
@@ -140,9 +138,6 @@ DialogSettings::DialogSettings( QWidget *parent)
         boxNotificationIconUnread->setChecked(false);
         btnNotificationIconUnread->setDisabled(true);
     }
-
-    processNameLabel->hide();
-    leThunderbirdProcessName->hide();
 }
 
 void DialogSettings::onKeyPressedOnTreeAccount(QKeyEvent * event)
@@ -171,7 +166,6 @@ void DialogSettings::accept()
     settings->mThunderbirdCmdLine = Utils::splitCommandLine( leThunderbirdCmdLine->text() );
     settings->mThunderbirdProcessName = leThunderbirdProcessName->text();
     settings->mThunderbirdWindowMatch = leThunderbirdWindowMatch->text();
-    settings->mHideWhenMinimized = boxHideWhenMinimized->isChecked();
     settings->mNotificationFontWeight = qMin(99, (int) (notificationFontWeight->value() / 2));
     settings->mExitThunderbirdWhenQuit = boxStopThunderbirdOnExit->isChecked();
     settings->mAllowSuppressingUnreads = boxAllowSuppression->isChecked();
@@ -197,7 +191,6 @@ void DialogSettings::accept()
             ignoreMailCountOnHideBox->isChecked();
     settings->onlyShowIconOnUnreadMessages = onlyShowIconOnNewMail->isChecked();
     settings->mProcessRunOnCountChange = leProcessRunOnCountChange->text();
-    settings->mIgnoreNETWMhints = boxSupportNonNetwmCompliant->isChecked();
 
     settings->setNotificationIcon(btnNotificationIcon->icon().pixmap( settings->mIconSize ));
 
