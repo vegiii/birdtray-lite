@@ -1,6 +1,6 @@
 # Birdtray Lite
 
-This fork is meant for my personal use on Fedora KDE Wayland and comes with no guarantee that it will work on other computers. I recommend using the upstream repositories instead.
+This fork is meant for my personal use on Fedora KDE Wayland and comes with no guarantee that it will work on other systems. This project is developed with the help of AI coding agents.
 
 ## Why this fork
 
