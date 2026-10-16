@@ -13,14 +13,11 @@ add_definitions(-DQT_DEPRECATED_WARNINGS)
 add_executable(birdtray-lite
         src/main.cpp
         src/birdtrayapp.cpp
-        src/colorbutton.cpp
         src/dialoglogoutput.cpp
         src/dialogsettings.cpp
+        src/foldertree.cpp
         src/log.cpp
-        src/mailaccountdialog.cpp
-        src/modelaccounttree.cpp
         src/morkparser.cpp
-        src/qtcomponents.cpp
         src/settings.cpp
         src/thunderbird.cpp
         src/trayicon.cpp
@@ -29,7 +26,6 @@ add_executable(birdtray-lite
         src/windowtools.cpp
         src/dialoglogoutput.ui
         src/dialogsettings.ui
-        src/mailaccountdialog.ui
         src/resources.qrc)
 target_include_directories(birdtray-lite PRIVATE src)
 target_link_libraries(birdtray-lite PRIVATE

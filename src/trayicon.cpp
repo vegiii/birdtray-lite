@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QProcess>
 #include <QMessageBox>
+#include <QPainterPath>
 
 #include "trayicon.h"
 #include "unreadmonitor.h"
@@ -144,22 +145,26 @@ void TrayIcon::updateIcon()
     p.begin( &temp );
     p.setRenderHint( QPainter::Antialiasing );
 
+    // Dim the icon behind a bold unread count
+    bool thunderbirdMissing = !mThunderbirdWindowExists;
+    bool showCount = unread > 0 && settings->mShowUnreadEmailCount && !thunderbirdMissing;
+    p.setOpacity( showCount && !settings->mCountBadge ? 0.55 : 1.0 );
     p.drawPixmap(settings->getNotificationIcon().rect(), settings->getNotificationIcon());
 
     // Do we need to draw error sign?
-    if (settings->mMonitorThunderbirdWindow && !mThunderbirdWindowExists) {
+    if (thunderbirdMissing) {
         p.setOpacity( 1.0 );
         QPen pen( Qt::red );
         pen.setWidth( (temp.width() * 10) / 100 );
         p.setPen( pen );
         p.drawLine( 2, 2, temp.width() - 3, temp.height() - 3 );
         p.drawLine( temp.width() - 3, 2, 2, temp.height() - 3 );
-        unread = 0;
     }
 
-    // Do we need to draw the unread counter?
-    if (unread > 0 && settings->mShowUnreadEmailCount) {
+    if (showCount && settings->mCountBadge) {
         drawCountBadge(p, temp.size(), unread, settings->mCountColor);
+    } else if (showCount) {
+        drawCount(p, temp.size(), unread, settings->mCountColor);
     }
     const QMap<QString, QString> warnings = mUnreadMonitor->getWarnings();
     if (warnings.isEmpty()) {
@@ -230,27 +235,14 @@ void TrayIcon::updateState()
         else
         {
             Settings* settings = BirdtrayApp::get()->getSettings();
-            // Thunderbird is not running. Has it run before?
-            if (!mThunderbirdWindowExisted) {
-                // No. Shall we start it?
-                if (settings->mLaunchThunderbird && !mThunderbirdProcess &&
-                    mThunderbirdStartTime < QDateTime::currentDateTime()) {
-                    startThunderbird();
+            // Thunderbird is not running. Start it, or restart it if it has run before
+            if (settings->mKeepThunderbirdRunning && !mThunderbirdProcess &&
+                (mThunderbirdWindowExisted || mThunderbirdStartTime < QDateTime::currentDateTime())) {
+                startThunderbird();
 
-                    // Hide after?
-                    if (settings->mStartThunderbirdHidden) {
-                        mThunderbirdWindowHide = true;
-                    }
-                }
-            } else {
-                // It has run before, but not running now. Should we restart?
-                if (settings->mRestartThunderbird && !mThunderbirdProcess) {
-                    startThunderbird();
-
-                    // Hide after?
-                    if (settings->mStartThunderbirdHidden) {
-                        mThunderbirdWindowHide = true;
-                    }
+                // Hide after?
+                if (settings->mStartThunderbirdHidden) {
+                    mThunderbirdWindowHide = true;
                 }
             }
         }
@@ -299,12 +291,9 @@ void TrayIcon::actionActivate()
     if ( !mWinTools )
         return;
 
-    Settings* settings = BirdtrayApp::get()->getSettings();
-    if ( settings->startClosedThunderbird && !mWinTools->lookup() && mThunderbirdProcess == nullptr ) {
+    // Start Thunderbird if it is closed, and show it since the user asked for it
+    if ( !mWinTools->lookup() && mThunderbirdProcess == nullptr ) {
         startThunderbird();
-        if (settings->mStartThunderbirdHidden) {
-            mThunderbirdWindowHide = true;
-        }
     } else if ( mWinTools->isHidden() ) {
         showThunderbird();
     } else {
@@ -328,7 +317,7 @@ void TrayIcon::actionNewEmail() {
 void TrayIcon::actionSystrayIconActivated(QSystemTrayIcon::ActivationReason reason) {
     if (reason == QSystemTrayIcon::Trigger) {
         Settings* settings = BirdtrayApp::get()->getSettings();
-        if (settings->mShowHideThunderbird || (!mThunderbirdWindowExists && settings->startClosedThunderbird)) {
+        if (settings->mShowHideThunderbird) {
             actionActivate();
         }
     }
@@ -459,6 +448,31 @@ void TrayIcon::showThunderbird()
     mWinTools->show();
 }
 
+void TrayIcon::drawCount(QPainter &painter, const QSize &iconSize, unsigned int count,
+                         const QColor &color) {
+    QFont font = QApplication::font();
+    font.setWeight(QFont::ExtraBold);
+    font.setPixelSize(100);
+    QPainterPath path;
+    path.addText(0, 0, font, QString::number(count));
+
+    // Scale the number to fill the icon and center it
+    QRectF bounds = path.boundingRect();
+    double scale = std::min(iconSize.width() * 0.92 / bounds.width(),
+                            iconSize.height() * 0.62 / bounds.height());
+    QTransform transform;
+    transform.translate(iconSize.width() / 2.0, iconSize.height() / 2.0);
+    transform.scale(scale, scale);
+    transform.translate(-bounds.center().x(), -bounds.center().y());
+    path = transform.map(path);
+
+    painter.setOpacity(1.0);
+    QPen outline(QColor(17, 17, 17), iconSize.width() * 0.09);
+    outline.setJoinStyle(Qt::RoundJoin);
+    painter.strokePath(path, outline);
+    painter.fillPath(path, color);
+}
+
 void TrayIcon::drawCountBadge(QPainter &painter, const QSize &iconSize, unsigned int count,
                               const QColor &color) {
     // A pill in the bottom right corner that grows with the number of digits
@@ -468,8 +482,11 @@ void TrayIcon::drawCountBadge(QPainter &painter, const QSize &iconSize, unsigned
     QRectF badge(iconSize.width() - width, iconSize.height() - height, width, height);
     badge.adjust(2, 2, -2, -2);
 
+    // Dark text on light badge colors, white text on dark ones
+    QColor textColor = color.lightnessF() > 0.6 ? QColor(17, 17, 17) : QColor(Qt::white);
+
     painter.setOpacity(1.0);
-    painter.setPen(QPen(Qt::white, iconSize.width() * 0.05));
+    painter.setPen(QPen(textColor, iconSize.width() * 0.05));
     painter.setBrush(color);
     painter.drawRoundedRect(badge, badge.height() / 2, badge.height() / 2);
 
@@ -477,7 +494,7 @@ void TrayIcon::drawCountBadge(QPainter &painter, const QSize &iconSize, unsigned
     font.setWeight(QFont::ExtraBold);
     font.setPixelSize(static_cast<int>(height * (text.length() > 2 ? 0.6 : 0.78)));
     painter.setFont(font);
-    painter.setPen(Qt::white);
+    painter.setPen(textColor);
     painter.drawText(badge, Qt::AlignCenter, text);
 }
 

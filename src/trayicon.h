@@ -113,6 +113,16 @@ class TrayIcon : public QSystemTrayIcon
         static void drawWarningIndicator(QPainter &painter, const QSize &iconSize);
 
         /**
+         * Draw the unread count in bold over the icon.
+         * @param painter The painter to use when drawing.
+         * @param iconSize The size of the icon image to draw on in pixel.
+         * @param count The unread count.
+         * @param color The color of the number.
+         */
+        static void drawCount(QPainter &painter, const QSize &iconSize, unsigned int count,
+                              const QColor &color);
+
+        /**
          * Draw the unread count in a badge in the bottom right corner.
          * @param painter The painter to use when drawing.
          * @param iconSize The size of the icon image to draw on in pixel.

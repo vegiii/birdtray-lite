@@ -14,8 +14,11 @@ class Settings
     public:
         Settings();
 
-        // Color of the unread count badge
+        // Color of the unread count
         QColor  mCountColor;
+
+        // Whether to draw the unread count in a badge instead of over the whole icon
+        bool    mCountBadge;
 
         // Whether to show the unread email count
         bool    mShowUnreadEmailCount;
@@ -35,29 +38,20 @@ class Settings
         // Thunderbird window match
         QString mThunderbirdWindowMatch;
 
-        // Whether to show/hide Thunderbird on button click
+        // Whether clicking the tray icon shows/hides Thunderbird, or starts it if it is closed
         bool    mShowHideThunderbird;
 
-        // Whether to launch Thunderbird when the app starts
-        bool    mLaunchThunderbird;
+        // Whether to start Thunderbird with the app and restart it if it was closed
+        bool    mKeepThunderbirdRunning;
 
         // The delay in seconds to launch Thunderbird
         int     mLaunchThunderbirdDelay;
-
-        // Whether to restart Thunderbird if it was closed
-        bool    mRestartThunderbird;
-
-        // Whether to start Thunderbird if it is closed and the user clicks on the tray icon
-        bool    startClosedThunderbird;
 
         // Whether to hide the Thunderbird window when we start Thunderbird
         bool    mStartThunderbirdHidden;
 
         // Whether to quit Thunderbird when the app quits
         bool    mExitThunderbirdWhenQuit;
-
-        // Whether to show a red X when Thunderbird is not running
-        bool    mMonitorThunderbirdWindow;
 
         // Enables or disables the dialog on startup that shows if no accounts were configured
         bool    showDialogIfNoAccountsConfigured;

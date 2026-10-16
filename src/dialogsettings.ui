@@ -28,113 +28,16 @@
        <string>General</string>
       </attribute>
       <layout class="QVBoxLayout" name="layoutGeneral">
-      <item>
-       <widget class="QCheckBox" name="boxAutostart">
-        <property name="text">
-         <string>Start Birdtray Lite at login</string>
-        </property>
-       </widget>
-      </item>
        <item>
-        <widget class="QGroupBox" name="groupThunderbird">
+        <widget class="QGroupBox" name="groupBirdtray">
          <property name="title">
-          <string>Thunderbird</string>
+          <string>Birdtray Lite</string>
          </property>
-         <layout class="QVBoxLayout" name="layoutThunderbird">
+         <layout class="QVBoxLayout" name="layoutBirdtray">
           <item>
-           <widget class="QCheckBox" name="boxLaunchThunderbirdAtStart">
+           <widget class="QCheckBox" name="boxAutostart">
             <property name="text">
-             <string>Start Thunderbird with Birdtray Lite</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="boxRestartThunderbird">
-            <property name="text">
-             <string>Restart Thunderbird if it is closed</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="boxStartThunderbirdOnTrayIconClick">
-            <property name="text">
-             <string>Start Thunderbird when clicking the tray icon if it is closed</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="boxStartThunderbirdHidden">
-            <property name="text">
-             <string>Start Thunderbird hidden</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="boxShowHideThunderbird">
-            <property name="text">
-             <string>Hide/show Thunderbird when clicking the tray icon</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="boxStopThunderbirdOnExit">
-            <property name="text">
-             <string>Close Thunderbird when quitting Birdtray Lite</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="boxMonitorThunderbirdWindow">
-            <property name="text">
-             <string>Show a red X when Thunderbird is not running</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupTrayIcon">
-         <property name="title">
-          <string>Tray icon</string>
-         </property>
-         <layout class="QVBoxLayout" name="layoutTrayIcon">
-          <item>
-           <widget class="QCheckBox" name="boxShowUnreadCount">
-            <property name="text">
-             <string>Show unread count</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="layoutCountColor">
-            <item>
-             <widget class="QLabel" name="labelCountColor">
-              <property name="text">
-               <string>Count color:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="ColorButton" name="btnCountColor">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="spacerCountColor">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="onlyShowIconOnNewMail">
-            <property name="text">
-             <string>Hide the icon when there is no unread mail</string>
+             <string>Start at login</string>
             </property>
            </widget>
           </item>
@@ -144,6 +47,114 @@
              <string>Show &quot;New Email&quot; in the tray menu</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="onlyShowIconOnNewMail">
+            <property name="text">
+             <string>Hide the tray icon when there is no unread mail</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupThunderbird">
+         <property name="title">
+          <string>Thunderbird</string>
+         </property>
+         <layout class="QVBoxLayout" name="layoutThunderbird">
+          <item>
+           <widget class="QCheckBox" name="boxKeepThunderbirdRunning">
+            <property name="toolTip">
+             <string>Starts Thunderbird with Birdtray Lite and restarts it if it is closed.</string>
+            </property>
+            <property name="text">
+             <string>Keep running</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="boxStartThunderbirdHidden">
+            <property name="text">
+             <string>Start hidden</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="boxShowHideThunderbird">
+            <property name="toolTip">
+             <string>Starts Thunderbird first if it is not running.</string>
+            </property>
+            <property name="text">
+             <string>Show or hide when clicking the tray icon</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="boxStopThunderbirdOnExit">
+            <property name="text">
+             <string>Close when quitting Birdtray Lite</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupUnreadCount">
+         <property name="title">
+          <string>Unread count</string>
+         </property>
+         <layout class="QVBoxLayout" name="layoutUnreadCount">
+          <item>
+           <widget class="QCheckBox" name="boxShowUnreadCount">
+            <property name="text">
+             <string>Show unread count</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="layoutCountStyle">
+            <item>
+             <widget class="QLabel" name="labelCountStyle">
+              <property name="text">
+               <string>Style:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboCountStyle">
+              <item>
+               <property name="text">
+                <string>Number</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Badge</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelCountColor">
+              <property name="text">
+               <string>Color:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboCountColor"/>
+            </item>
+            <item>
+             <spacer name="spacerCountStyle">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -161,59 +172,58 @@
       <attribute name="title">
        <string>Monitoring</string>
       </attribute>
-      <layout class="QHBoxLayout" name="layoutMonitoring">
+      <layout class="QVBoxLayout" name="layoutMonitoring">
        <item>
-        <widget class="QTreeViewWithKeyEvents" name="treeAccounts">
-         <property name="rootIsDecorated">
-          <bool>false</bool>
-         </property>
-         <property name="itemsExpandable">
-          <bool>false</bool>
-         </property>
-         <property name="expandsOnDoubleClick">
-          <bool>false</bool>
+        <layout class="QHBoxLayout" name="layoutProfile">
+         <item>
+          <widget class="QLabel" name="labelProfile">
+           <property name="text">
+            <string>Thunderbird profile:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="editProfile">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnProfileChange">
+           <property name="text">
+            <string>Change…</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelFolders">
+         <property name="text">
+          <string>Select which folders to monitor for unread mail.</string>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="layoutAccountButtons">
-        <item>
-         <widget class="QPushButton" name="btnAccountAdd">
-          <property name="toolTip">
-           <string>Choose the mail folders to monitor.&lt;br/&gt;&lt;br/&gt;Ctrl + Shift click to add any mork file.</string>
-          </property>
-          <property name="text">
-           <string>Add</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnAccountAddInboxes">
-          <property name="toolTip">
-           <string>Add the inboxes of all Thunderbird accounts that are not monitored yet.</string>
-          </property>
-          <property name="text">
-           <string>Add inboxes</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnAccountRemove">
-          <property name="toolTip">
-           <string>You can also remove folders with Delete or Backspace.</string>
-          </property>
-          <property name="text">
-           <string>Remove</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="spacerAccountButtons">
-          <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
-          </property>
-         </spacer>
-        </item>
+        <widget class="FolderTree" name="folderTree"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="layoutFolderButtons">
+         <item>
+          <widget class="QPushButton" name="btnOnlyInboxes">
+           <property name="text">
+            <string>Select only inboxes</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="spacerFolderButtons">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </item>
       </layout>
@@ -223,23 +233,110 @@
        <string>About</string>
       </attribute>
       <layout class="QVBoxLayout" name="layoutAbout">
+       <property name="spacing">
+        <number>14</number>
+       </property>
        <item>
-        <widget class="QLabel" name="labelAbout">
+        <layout class="QVBoxLayout" name="layoutAboutTitle">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="labelTitle">
+           <property name="text">
+            <string>Birdtray Lite</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelDescription">
+           <property name="text">
+            <string>Shows Thunderbird's unread mail count in the system tray.</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="layoutAboutDetails">
+         <property name="labelAlignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+         <property name="horizontalSpacing">
+          <number>16</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>6</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="labelSourceName">
+           <property name="text">
+            <string>Source</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="labelSource">
+           <property name="text">
+            <string>&lt;a href=&quot;https://github.com/vegiii/birdtray-lite&quot;&gt;github.com/vegiii/birdtray-lite&lt;/a&gt;</string>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="labelSettingsName">
+           <property name="text">
+            <string>Settings</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="labelSettings">
+           <property name="textInteractionFlags">
+            <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="labelBuiltName">
+           <property name="text">
+            <string>Built</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="labelBuilt">
+           <property name="textInteractionFlags">
+            <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelCredits">
          <property name="text">
-          <string>&lt;p&gt;&lt;b&gt;Birdtray Lite version [VERSION] compiled at [DATE] using Qt [QT_VERSION].&lt;/b&gt;&lt;/p&gt;
-&lt;p&gt;Birdtray Lite is a fork of &lt;a href=&quot;https://github.com/gyunaev/birdtray&quot;&gt;Birdtray&lt;/a&gt;, copyright (C) 2018 by George Yunaev, and &lt;a href=&quot;https://github.com/stark1tty/birdtray-wayland&quot;&gt;birdtray-wayland&lt;/a&gt; by Nika Shilobod.&lt;/p&gt;
-&lt;p&gt;It is free software, licensed under the GNU General Public License v3.&lt;/p&gt;</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::TextFormat::RichText</enum>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignTop</set>
+          <string>Based on &lt;a href=&quot;https://github.com/gyunaev/birdtray&quot;&gt;Birdtray&lt;/a&gt; by George Yunaev and contributors, and &lt;a href=&quot;https://github.com/stark1tty/birdtray-wayland&quot;&gt;birdtray&amp;#8209;wayland&lt;/a&gt; by Nika Shilobod.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
          </property>
          <property name="openExternalLinks">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelLicense">
+         <property name="text">
+          <string>Licensed under the GNU General Public License v3.</string>
+         </property>
+         <property name="wordWrap">
           <bool>true</bool>
          </property>
         </widget>
@@ -284,14 +381,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ColorButton</class>
-   <extends>QPushButton</extends>
-   <header>colorbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QTreeViewWithKeyEvents</class>
-   <extends>QTreeView</extends>
-   <header>qtcomponents.h</header>
+   <class>FolderTree</class>
+   <extends>QTreeWidget</extends>
+   <header>foldertree.h</header>
   </customwidget>
  </customwidgets>
  <resources>

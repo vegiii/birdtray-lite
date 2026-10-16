@@ -29,7 +29,8 @@ Settings are stored in `~/.config/birdtray-lite/config.json`.
 ### Added
 
 - Monitors all Thunderbird inboxes on the first start.
-- Fixed unread count on the tray icon.
+- Fixed unread count on the tray icon, shown as a number or a badge.
+- Simpler settings, with the mail folders selected directly in the Monitoring tab.
 - Option to start at login.
 - Closing Thunderbird on quit works on Wayland.
 - Install script.
@@ -38,7 +39,7 @@ Settings are stored in `~/.config/birdtray-lite/config.json`.
 
 - Windows, macOS and X11 support: Thunderbird is controlled through KWin only.
 - Auto-updater, translations, snooze, email templates and blinking.
-- Per-folder notification colors: one count color is used for all folders.
+- Per-folder notification colors and the free color picker: the count uses one of six preset colors.
 - Advanced settings, such as custom icons, fonts and running a command on new mail.
 - Ignoring the current unread emails.
 - Command line options `--dump-mork` and `--decode`.
@@ -52,12 +53,12 @@ Settings are stored in `~/.config/birdtray-lite/config.json`.
 |---|---:|---:|
 | Tests and test data | 17 | 34,898 |
 | Translations | 42 | 17,251 |
-| Source files | 28 | 2,879 |
+| Source files | 37 | 3,781 |
 | Windows installer | 11 | 2,039 |
 | CI, IDE files, contrib and screenshots | 16 | 1,354 |
-| **Total** | **114** | **58,421** |
+| **Total** | **123** | **59,323** |
 
-In total 62,326 lines were removed and 1,008 added. The repository went from 159 to 50 files, and the C++ code from 8,173 to 4,283 lines.
+In total 63,205 lines were removed and 1,277 added. The repository went from 159 to 43 files, and the C++ code from 8,173 to 3,713 lines.
 
 ## Credits and license
 

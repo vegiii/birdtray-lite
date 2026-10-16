@@ -2,11 +2,8 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
-#include <QKeyEvent>
 
 #include "ui_dialogsettings.h"
-
-class ModelAccountTree;
 
 class DialogSettings : public QDialog, public Ui::DialogSettings
 {
@@ -24,22 +21,14 @@ class DialogSettings : public QDialog, public Ui::DialogSettings
         // Saves the settings and updates the tray icon
         void    apply();
 
-        // Account buttons
-        /**
-         * Add one or multiple accounts.
-         */
-        void    accountAdd();
-        void    accountAddInboxes();
-        void    accountRemove();
-        void    accountRemoveIndex( const QModelIndex& index );
+        // Lets the user choose another Thunderbird profile
+        void    changeProfile();
 
         void    onShowLogWindow();
 
-        void onKeyPressedOnTreeAccount(QKeyEvent * event);
-
     private:
-        // Model to show the accounts
-        ModelAccountTree    *   mAccountModel;
+        // The Thunderbird profile whose folders are shown
+        QString mProfileDir;
 };
 
 #endif // SETTINGSDIALOG_H

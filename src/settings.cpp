@@ -21,7 +21,8 @@ Settings::Settings()
     if ( !apppath.exists() )
         apppath.mkpath( apppath.absolutePath() );
 
-    mCountColor = QColor("#2A5BD7");
+    mCountColor = QColor(Qt::white);
+    mCountBadge = false;
     mShowUnreadEmailCount = true;
     onlyShowIconOnUnreadMessages = false;
     mNewEmailMenuEnabled = true;
@@ -29,13 +30,10 @@ Settings::Settings()
     mThunderbirdProcessName = "thunderbird";
     mThunderbirdWindowMatch = " Mozilla Thunderbird";
     mShowHideThunderbird = true;
-    mLaunchThunderbird = true;
+    mKeepThunderbirdRunning = true;
     mLaunchThunderbirdDelay = 0;
-    mRestartThunderbird = true;
-    startClosedThunderbird = true;
     mStartThunderbirdHidden = true;
     mExitThunderbirdWhenQuit = true;
-    mMonitorThunderbirdWindow = true;
     showDialogIfNoAccountsConfigured = true;
     isFirstRun = false;
 }
@@ -45,17 +43,15 @@ void Settings::save()
     QJsonObject out;
 
     out[ "common/countcolor" ] = mCountColor.name();
+    out[ "common/countstyle" ] = mCountBadge ? "badge" : "number";
     out[ "common/showunreademailcount" ] = mShowUnreadEmailCount;
     out[ "advanced/onlyShowIconOnUnreadMessages" ] = onlyShowIconOnUnreadMessages;
     out[ "common/newemailEnabled" ] = mNewEmailMenuEnabled;
     out[ "common/showhidethunderbird" ] = mShowHideThunderbird;
-    out[ "common/launchthunderbird" ] = mLaunchThunderbird;
+    out[ "common/keepthunderbirdrunning" ] = mKeepThunderbirdRunning;
     out[ "common/launchthunderbirddelay" ] = mLaunchThunderbirdDelay;
-    out[ "common/restartthunderbird" ] = mRestartThunderbird;
-    out[ "common/startClosedThunderbird" ] = startClosedThunderbird;
     out[ "common/startThunderbirdHidden" ] = mStartThunderbirdHidden;
     out[ "common/exitthunderbirdonquit" ] = mExitThunderbirdWhenQuit;
-    out[ "common/monitorthunderbirdwindow" ] = mMonitorThunderbirdWindow;
     out[ "common/showDialogIfNoAccountsConfigured" ] = showDialogIfNoAccountsConfigured;
 
     out[ "advanced/tbcmdline" ] = QJsonArray::fromStringList( mThunderbirdCmdLine );
@@ -120,19 +116,17 @@ void Settings::fromJSON( const QJsonObject& settings )
 {
     // Missing keys keep their default value
     mCountColor = QColor( settings.value( "common/countcolor" ).toString( mCountColor.name() ) );
+    mCountBadge = settings.value( "common/countstyle" ).toString() == "badge";
     mShowUnreadEmailCount = settings.value( "common/showunreademailcount" ).toBool( mShowUnreadEmailCount );
     onlyShowIconOnUnreadMessages = settings.value( "advanced/onlyShowIconOnUnreadMessages" ).toBool(
             onlyShowIconOnUnreadMessages );
     mNewEmailMenuEnabled = settings.value( "common/newemailEnabled" ).toBool( mNewEmailMenuEnabled );
     mShowHideThunderbird = settings.value( "common/showhidethunderbird" ).toBool( mShowHideThunderbird );
-    mLaunchThunderbird = settings.value( "common/launchthunderbird" ).toBool( mLaunchThunderbird );
+    mKeepThunderbirdRunning = settings.value( "common/keepthunderbirdrunning" ).toBool( mKeepThunderbirdRunning );
     mLaunchThunderbirdDelay = settings.value( "common/launchthunderbirddelay" ).toInt( mLaunchThunderbirdDelay );
-    mRestartThunderbird = settings.value( "common/restartthunderbird" ).toBool( mRestartThunderbird );
-    startClosedThunderbird = settings.value( "common/startClosedThunderbird" ).toBool( startClosedThunderbird );
     mStartThunderbirdHidden = settings.value( "common/startThunderbirdHidden" ).toBool(
             settings.value( "common/hidewhenstarted" ).toBool( mStartThunderbirdHidden ) );
     mExitThunderbirdWhenQuit = settings.value( "common/exitthunderbirdonquit" ).toBool( mExitThunderbirdWhenQuit );
-    mMonitorThunderbirdWindow = settings.value( "common/monitorthunderbirdwindow" ).toBool( mMonitorThunderbirdWindow );
     showDialogIfNoAccountsConfigured = settings.value( "common/showDialogIfNoAccountsConfigured" ).toBool(
             showDialogIfNoAccountsConfigured );
 
