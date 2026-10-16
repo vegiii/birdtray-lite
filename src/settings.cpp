@@ -22,8 +22,9 @@ Settings::Settings()
     if ( !apppath.exists() )
         apppath.mkpath( apppath.absolutePath() );
 
-    mCountColor = QColor(Qt::white);
-    mCountBadge = false;
+    mCountColor = QColor("#f44336");
+    mCountBadge = true;
+    mThemeTrayIcon = false;
     mShowUnreadEmailCount = true;
     onlyShowIconOnUnreadMessages = false;
     mNewEmailMenuEnabled = true;
@@ -41,6 +42,7 @@ void Settings::save()
 
     out[ "common/countcolor" ] = mCountColor.name();
     out[ "common/countstyle" ] = mCountBadge ? "badge" : "number";
+    out[ "common/trayicon" ] = mThemeTrayIcon ? "theme" : "birdtray";
     out[ "common/showunreademailcount" ] = mShowUnreadEmailCount;
     out[ "advanced/onlyShowIconOnUnreadMessages" ] = onlyShowIconOnUnreadMessages;
     out[ "common/newemailEnabled" ] = mNewEmailMenuEnabled;
@@ -108,6 +110,7 @@ void Settings::fromJSON( const QJsonObject& settings )
     // Missing keys keep their default value
     mCountColor = QColor( settings.value( "common/countcolor" ).toString( mCountColor.name() ) );
     mCountBadge = settings.value( "common/countstyle" ).toString() == "badge";
+    mThemeTrayIcon = settings.value( "common/trayicon" ).toString() == "theme";
     mShowUnreadEmailCount = settings.value( "common/showunreademailcount" ).toBool( mShowUnreadEmailCount );
     onlyShowIconOnUnreadMessages = settings.value( "advanced/onlyShowIconOnUnreadMessages" ).toBool(
             onlyShowIconOnUnreadMessages );
@@ -139,17 +142,21 @@ void Settings::getStartThunderbirdCmdline( QString& executable, QStringList &arg
 }
 
 const QPixmap &Settings::getNotificationIcon() {
-    // Use the icon theme's Thunderbird icon so the tray matches the other icons,
-    // and the bundled one if the theme has none
+    // Use the icon theme's Thunderbird icon if chosen, and the Birdtray Lite icon otherwise
+    // or if the theme has none
     for (const QString &name : {QString("thunderbird"), QString("org.mozilla.Thunderbird")}) {
-        if (mNotificationIcon.isNull() && QIcon::hasThemeIcon(name)) {
+        if (mThemeTrayIcon && mNotificationIcon.isNull() && QIcon::hasThemeIcon(name)) {
             mNotificationIcon = QIcon::fromTheme(name).pixmap(QSize(128, 128), 1.0);
         }
     }
     if (mNotificationIcon.isNull()) {
-        if (!mNotificationIcon.load(":res/thunderbird.png")) {
+        if (!mNotificationIcon.load(":res/birdtray.png")) {
             Log::fatal( tr("Cannot load default system tray icon.") );
         }
     }
     return mNotificationIcon;
+}
+
+void Settings::resetNotificationIcon() {
+    mNotificationIcon = QPixmap();
 }

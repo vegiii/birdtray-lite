@@ -125,10 +125,8 @@ void TrayIcon::updateIcon()
     p.begin( &temp );
     p.setRenderHint( QPainter::Antialiasing );
 
-    // Dim the icon behind a bold unread count
     bool thunderbirdMissing = !mThunderbirdWindowExists;
     bool showCount = unread > 0 && settings->mShowUnreadEmailCount && !thunderbirdMissing;
-    p.setOpacity( showCount && !settings->mCountBadge ? 0.55 : 1.0 );
     p.drawPixmap(settings->getNotificationIcon().rect(), settings->getNotificationIcon());
 
     // Do we need to draw error sign?
@@ -274,6 +272,7 @@ void TrayIcon::showSettings()
 void TrayIcon::applySettings()
 {
     BirdtrayApp::get()->getSettings()->save();
+    BirdtrayApp::get()->getSettings()->resetNotificationIcon();
     createMenu();
     updateIcon();
     emit settingsChanged();
@@ -462,24 +461,23 @@ void TrayIcon::drawCount(QPainter &painter, const QSize &iconSize, unsigned int 
 
 void TrayIcon::drawCountBadge(QPainter &painter, const QSize &iconSize, unsigned int count,
                               const QColor &color) {
-    // A pill in the bottom right corner that grows with the number of digits
+    // A dot in the top right corner that grows into a pill with the number of digits
     QString text = count > 99 ? QString("99+") : QString::number(count);
-    double height = iconSize.height() * 0.56;
-    double width = height + (text.length() - 1) * iconSize.width() * 0.23;
-    QRectF badge(iconSize.width() - width, iconSize.height() - height, width, height);
-    badge.adjust(2, 2, -2, -2);
+    double height = iconSize.height() * 0.5;
+    double width = height + (text.length() - 1) * iconSize.width() * 0.2;
+    QRectF badge(iconSize.width() - width, 0, width, height);
 
     // Dark text on light badge colors, white text on dark ones
     QColor textColor = color.lightnessF() > 0.6 ? QColor(17, 17, 17) : QColor(Qt::white);
 
     painter.setOpacity(1.0);
-    painter.setPen(QPen(textColor, iconSize.width() * 0.05));
+    painter.setPen(Qt::NoPen);
     painter.setBrush(color);
     painter.drawRoundedRect(badge, badge.height() / 2, badge.height() / 2);
 
     QFont font = QApplication::font();
-    font.setWeight(QFont::ExtraBold);
-    font.setPixelSize(static_cast<int>(height * (text.length() > 2 ? 0.6 : 0.78)));
+    font.setWeight(QFont::Bold);
+    font.setPixelSize(static_cast<int>(height * (text.length() > 2 ? 0.55 : 0.72)));
     painter.setFont(font);
     painter.setPen(textColor);
     painter.drawText(badge, Qt::AlignCenter, text);

@@ -93,6 +93,7 @@ DialogSettings::DialogSettings( QWidget *parent)
     boxStopThunderbirdOnExit->setChecked( settings->mExitThunderbirdWhenQuit );
     boxShowUnreadCount->setChecked( settings->mShowUnreadEmailCount );
     comboCountStyle->setCurrentIndex( settings->mCountBadge ? 1 : 0 );
+    boxThemeTrayIcon->setChecked( settings->mThemeTrayIcon );
     // The preset colors, each shown with a colored dot. A color from an older config gets the closest preset.
     int closest = 0;
     int closestDistance = INT_MAX;
@@ -142,6 +143,7 @@ DialogSettings::DialogSettings( QWidget *parent)
     // About tab
     QString settingsFile = QStandardPaths::writableLocation( QStandardPaths::AppConfigLocation ) + "/config.json";
     settingsFile.replace( QRegularExpression( "^" + QRegularExpression::escape( QDir::homePath() ) ), "~" );
+    labelIcon->setPixmap( QApplication::windowIcon().pixmap( 48, 48 ) );
     labelTitle->setText( tr("Birdtray Lite %1").arg( Utils::getBirdtrayVersion() ) );
     QFont titleFont = labelTitle->font();
     titleFont.setBold( true );
@@ -151,7 +153,7 @@ DialogSettings::DialogSettings( QWidget *parent)
     labelBuilt->setText( tr("%1 with Qt %2").arg( QLocale().toString( QDate::fromString( QString(__DATE__).simplified(), "MMM d yyyy" ), "d MMMM yyyy" ), QT_VERSION_STR ) );
 
     // The detail names are dimmed like in KDE's own About pages
-    for ( QLabel* name : { labelSourceName, labelSettingsName, labelBuiltName } )
+    for ( QLabel* name : { labelSourceName, labelSettingsName, labelBuiltName, labelLicenseName, labelIconCreditName } )
     {
         QPalette palette = name->palette();
         palette.setColor( QPalette::WindowText, palette.color( QPalette::PlaceholderText ) );
@@ -177,6 +179,7 @@ void DialogSettings::apply()
     settings->mExitThunderbirdWhenQuit = boxStopThunderbirdOnExit->isChecked();
     settings->mShowUnreadEmailCount = boxShowUnreadCount->isChecked();
     settings->mCountBadge = comboCountStyle->currentIndex() == 1;
+    settings->mThemeTrayIcon = boxThemeTrayIcon->isChecked();
     settings->mCountColor = comboCountColor->currentData().value<QColor>();
     settings->onlyShowIconOnUnreadMessages = onlyShowIconOnNewMail->isChecked();
     settings->mNewEmailMenuEnabled = boxEnableNewEmail->isChecked();

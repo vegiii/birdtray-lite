@@ -122,7 +122,7 @@ class TrayIcon : public QSystemTrayIcon
                               const QColor &color);
 
         /**
-         * Draw the unread count in a badge in the bottom right corner.
+         * Draw the unread count in a badge in the top right corner.
          * @param painter The painter to use when drawing.
          * @param iconSize The size of the icon image to draw on in pixel.
          * @param count The unread count.

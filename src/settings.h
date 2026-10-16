@@ -20,6 +20,9 @@ class Settings
         // Whether to draw the unread count in a badge instead of over the whole icon
         bool    mCountBadge;
 
+        // Whether the tray shows the icon theme's Thunderbird icon instead of the Birdtray Lite icon
+        bool    mThemeTrayIcon;
+
         // Whether to show the unread email count
         bool    mShowUnreadEmailCount;
 
@@ -64,6 +67,9 @@ class Settings
          * @return The icon to use for the system tray.
          */
         const QPixmap& getNotificationIcon();
+
+        // Forget the loaded tray icon, so the next call loads it again
+        void    resetNotificationIcon();
 
     private:
         Q_DECLARE_TR_FUNCTIONS(Settings)

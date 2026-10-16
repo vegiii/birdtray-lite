@@ -49,6 +49,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="boxThemeTrayIcon">
+            <property name="text">
+             <string>Use the Thunderbird icon from the icon theme</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="onlyShowIconOnNewMail">
             <property name="text">
              <string>Hide the tray icon when there is no unread mail</string>
@@ -237,26 +244,43 @@
         <number>14</number>
        </property>
        <item>
-        <layout class="QVBoxLayout" name="layoutAboutTitle">
+        <layout class="QHBoxLayout" name="layoutAboutHeader" stretch="0,1">
          <property name="spacing">
-          <number>2</number>
+          <number>14</number>
          </property>
          <item>
-          <widget class="QLabel" name="labelTitle">
-           <property name="text">
-            <string>Birdtray Lite</string>
+          <widget class="QLabel" name="labelIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="labelDescription">
-           <property name="text">
-            <string>Shows Thunderbird's unread mail count in the system tray.</string>
+          <layout class="QVBoxLayout" name="layoutAboutTitle">
+           <property name="spacing">
+            <number>2</number>
            </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
+           <item>
+            <widget class="QLabel" name="labelTitle">
+             <property name="text">
+              <string>Birdtray Lite</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="labelDescription">
+             <property name="text">
+              <string>Shows Thunderbird's unread mail count in the system tray.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
@@ -316,30 +340,99 @@
            </property>
           </widget>
          </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="labelLicenseName">
+           <property name="text">
+            <string>License</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLabel" name="labelLicense">
+           <property name="text">
+            <string>GNU General Public License v3</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
-        <widget class="QLabel" name="labelCredits">
-         <property name="text">
-          <string>Based on &lt;a href=&quot;https://github.com/gyunaev/birdtray&quot;&gt;Birdtray&lt;/a&gt; by George Yunaev and contributors, and &lt;a href=&quot;https://github.com/stark1tty/birdtray-wayland&quot;&gt;birdtray&amp;#8209;wayland&lt;/a&gt; by Nika Shilobod.</string>
+        <layout class="QVBoxLayout" name="layoutCredits">
+         <property name="spacing">
+          <number>6</number>
          </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-         <property name="openExternalLinks">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="labelLicense">
-         <property name="text">
-          <string>Licensed under the GNU General Public License v3.</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
+         <item>
+          <widget class="QLabel" name="labelCreditsTitle">
+           <property name="text">
+            <string>&lt;b&gt;Credits&lt;/b&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QFormLayout" name="layoutCreditsList">
+           <property name="labelAlignment">
+            <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignVCenter</set>
+           </property>
+           <property name="horizontalSpacing">
+            <number>16</number>
+           </property>
+           <property name="verticalSpacing">
+            <number>6</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="labelBirdtrayName">
+             <property name="text">
+              <string>&lt;a href=&quot;https://github.com/gyunaev/birdtray&quot;&gt;Birdtray&lt;/a&gt;</string>
+             </property>
+             <property name="openExternalLinks">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="labelBirdtray">
+             <property name="text">
+              <string>George Yunaev and contributors</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="labelWaylandName">
+             <property name="text">
+              <string>&lt;a href=&quot;https://github.com/stark1tty/birdtray-wayland&quot;&gt;birdtray&amp;#8209;wayland&lt;/a&gt;</string>
+             </property>
+             <property name="openExternalLinks">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="labelWayland">
+             <property name="text">
+              <string>Nika Shilobod</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="labelIconCreditName">
+             <property name="text">
+              <string>Icon</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="labelIconCredit">
+             <property name="text">
+              <string>Based on the &lt;a href=&quot;https://github.com/PapirusDevelopmentTeam/papirus-icon-theme&quot;&gt;Papirus icon theme&lt;/a&gt;</string>
+             </property>
+             <property name="openExternalLinks">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </item>
        <item>
         <spacer name="spacerAbout">

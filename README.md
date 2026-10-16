@@ -1,5 +1,7 @@
 # Birdtray Lite
 
+A fork of [birdtray-wayland](https://github.com/stark1tty/birdtray-wayland), which is based on [Birdtray](https://github.com/gyunaev/birdtray).
+
 This fork is meant for my personal use on Fedora KDE Wayland and comes with no guarantee that it will work on other systems. This project is developed with the help of AI coding agents.
 
 ## Why this fork
@@ -32,6 +34,7 @@ Settings are stored in `~/.config/birdtray-lite/config.json`.
 - Fixed unread count on the tray icon, shown as a number or a badge.
 - Simpler settings, with the mail folders selected directly in the Monitoring tab.
 - Option to start at login.
+- Own icon, with an option to use the icon theme's Thunderbird icon in the tray.
 - Closing Thunderbird on quit works on Wayland.
 - Install script.
 
@@ -56,12 +59,15 @@ Settings are stored in `~/.config/birdtray-lite/config.json`.
 | Source files | 37 | 3,781 |
 | Windows installer | 11 | 2,039 |
 | CI, IDE files, contrib and screenshots | 16 | 1,354 |
-| **Total** | **123** | **59,323** |
+| Icons | 5 | – |
+| **Total** | **128** | **59,323** |
 
-In total 63,396 lines were removed and 1,298 added. The repository went from 159 to 43 files, and the C++ code from 8,173 to 3,543 lines.
+In total 63,558 lines were removed and 1,409 added. The repository went from 159 to 43 files, and the C++ code from 8,173 to 3,557 lines.
 
 ## Credits and license
 
 Based on [Birdtray](https://github.com/gyunaev/birdtray) by George Yunaev and contributors, and [birdtray-wayland](https://github.com/stark1tty/birdtray-wayland) by Nika Shilobod, which added hide/show support for KDE Plasma Wayland and Flatpak Thunderbird.
+
+The icon is based on the Thunderbird icon from the [Papirus icon theme](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme) (GPL v3).
 
 Licensed under the [GNU General Public License v3](LICENSE.txt).
