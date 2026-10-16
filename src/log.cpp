@@ -4,43 +4,12 @@
 #include <QDateTime>
 #include <QStandardPaths>
 #include <QMessageBox>
-#include <QTextStream>
+#include <QFile>
 
 #include "log.h"
 #include "dialoglogoutput.h"
 
 Log * Log::mLog;
-
-void Log::initialize(const QString& path )
-{
-    if (mLog != nullptr)
-        Log::fatal("Attempt to initialize initialized log");
-
-    Log * self = g();
-
-    if ( path.isEmpty() )
-        return;
-
-    QMutexLocker l( &(self->mMutex) );
-    bool opened = false;
-
-    if ( path == "stderr" )
-    {
-        opened = self->mOutputFile.open( stderr, QIODevice::OpenModeFlag::WriteOnly );
-    }
-    else
-    {
-        self->mOutputFile.setFileName( path );
-        opened = self->mOutputFile.open(QIODevice::OpenModeFlag::WriteOnly);
-    }
-
-    if ( !opened )
-    {
-        l.unlock();
-        Log::fatal(QCoreApplication::translate("Log", "Failed to open log file %1: %2")
-                .arg(path, self->mOutputFile.errorString()));
-    }
-}
 
 void Log::fatal( const QString& str )
 {
@@ -126,10 +95,4 @@ void Log::add(const QString &text)
     // Add it to the open log window, if any
     if ( !mDialog.isNull() )
         mDialog.data()->add( logline );
-
-    // if log file is open, append to log file
-    if (mOutputFile.isOpen()) {
-        mOutputFile.write( (logline + "\r\n").toUtf8() );
-        mOutputFile.flush();
-    }
 }

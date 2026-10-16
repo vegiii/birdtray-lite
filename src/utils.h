@@ -22,22 +22,6 @@ class Utils
         static QString getBirdtrayVersion();
 
         /**
-         * Convert a std::wstring to a QString.
-         *
-         * @param str The std:wstring.
-         * @return The QString with the contents of the original string.
-         */
-        static QString stdWToQString(const std::wstring &str);
-
-        /**
-         * Convert a QString to a std::wstring.
-         *
-         * @param str The QString.
-         * @return The std::wstring with the contents of the original string.
-         */
-        static std::wstring qToStdWString(const QString &str);
-
-        /**
          * @return A list of possible locations of the directory
          *         that contains the Thunderbird profiles.
          * @see https://support.mozilla.org/en-US/kb/profiles-where-thunderbird-stores-user-data#w_profile-location-summary
@@ -48,9 +32,6 @@ class Utils
          * @return The default Thunderbird command for the current platform.
          */
         static QStringList getDefaultThunderbirdCommand();
-
-        // Splits the string into stringlist using space as separator, but ignoring spaces inside quoted content
-        static QStringList splitCommandLine( const QString& src );
         
         /**
          * Get the mail folder name from the mork path.

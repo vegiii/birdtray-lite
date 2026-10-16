@@ -31,19 +31,13 @@ BirdtrayApp::BirdtrayApp(int &argc, char** argv) : QApplication(argc, argv)
         QTimer::singleShot(0, &BirdtrayApp::quit);
         return;
     }
-    
-    Log::initialize(commandLineParser.value("log"));
 
     Log::debug( "Birdtray Lite version %d.%d.%d started", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH );
 
     ensureSystemTrayAvailable();
     // Load settings
     settings = new Settings();
-    if (commandLineParser.isSet("reset-settings")) {
-        settings->save(); // Saving without loading will reset the values
-    } else {
-        settings->load();
-    }
+    settings->load();
 
     trayIcon = new TrayIcon(commandLineParser.isSet("settings"));
 }
@@ -86,7 +80,7 @@ void BirdtrayApp::runCommand(const QString &command) {
 
 void BirdtrayApp::parseCmdArguments() {
     commandLineParser.setApplicationDescription(
-            tr("A free system tray notification for new mail for Thunderbird."));
+            tr("Shows Thunderbird's unread mail count in the system tray."));
     commandLineParser.addHelpOption();
     commandLineParser.addVersionOption();
     commandLineParser.addOptions({
@@ -94,8 +88,6 @@ void BirdtrayApp::parseCmdArguments() {
             {{"t", TOGGLE_THUNDERBIRD_COMMAND}, tr("Toggle the Thunderbird window.")},
             {{"s", SHOW_THUNDERBIRD_COMMAND}, tr("Show the Thunderbird window.")},
             {{"H", HIDE_THUNDERBIRD_COMMAND}, tr("Hide the Thunderbird window.")},
-            {{"r", "reset-settings"}, tr("Reset the settings to the defaults.")},
-            {{"l", "log"}, tr("Write log to a file."), tr("file")}
     });
     commandLineParser.process(*this);
 }

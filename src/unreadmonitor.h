@@ -29,8 +29,8 @@ class UnreadMonitor : public QThread
         const QMap<QString, QString> &getWarnings() const;
 
     signals:
-        // Unread counter changed
-        void    unreadUpdated( unsigned int total );
+        // The unread count of a monitored folder changed. Maps each folder's index file to its count.
+        void    unreadUpdated( const QMap<QString, quint32>& counts );
 
         /**
          * A warning was added or removed for the given watched path.
@@ -45,7 +45,7 @@ class UnreadMonitor : public QThread
         void    updateUnread();
 
     private:
-        int     getUnreadCount_Mork();
+        void    updateMorkUnreadCounts();
         int     getMorkUnreadCount( const QString& path );
     
         /**
@@ -82,8 +82,8 @@ class UnreadMonitor : public QThread
         // List of changed files (for MSF monitoring)
         QList<QString>      mChangedMSFfiles;
 
-        // Last reported unread
-        int    mLastReportedUnread;
+        // Last reported unread counts
+        QMap<QString, quint32> mLastReportedCounts;
     
         /**
          * This contains mappings from watched paths to warning messages for that path.

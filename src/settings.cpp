@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 #include <QSaveFile>
 #include <QtCore/QStandardPaths>
+#include <QIcon>
 #include <QMessageBox>
 
 #include "settings.h"
@@ -27,14 +28,10 @@ Settings::Settings()
     onlyShowIconOnUnreadMessages = false;
     mNewEmailMenuEnabled = true;
     mThunderbirdCmdLine = Utils::getDefaultThunderbirdCommand();
-    mThunderbirdProcessName = "thunderbird";
-    mThunderbirdWindowMatch = " Mozilla Thunderbird";
     mShowHideThunderbird = true;
     mKeepThunderbirdRunning = true;
-    mLaunchThunderbirdDelay = 0;
     mStartThunderbirdHidden = true;
     mExitThunderbirdWhenQuit = true;
-    showDialogIfNoAccountsConfigured = true;
     isFirstRun = false;
 }
 
@@ -49,14 +46,8 @@ void Settings::save()
     out[ "common/newemailEnabled" ] = mNewEmailMenuEnabled;
     out[ "common/showhidethunderbird" ] = mShowHideThunderbird;
     out[ "common/keepthunderbirdrunning" ] = mKeepThunderbirdRunning;
-    out[ "common/launchthunderbirddelay" ] = mLaunchThunderbirdDelay;
     out[ "common/startThunderbirdHidden" ] = mStartThunderbirdHidden;
     out[ "common/exitthunderbirdonquit" ] = mExitThunderbirdWhenQuit;
-    out[ "common/showDialogIfNoAccountsConfigured" ] = showDialogIfNoAccountsConfigured;
-
-    out[ "advanced/tbcmdline" ] = QJsonArray::fromStringList( mThunderbirdCmdLine );
-    out[ "advanced/tbprocessname" ] = mThunderbirdProcessName;
-    out[ "advanced/tbwindowmatch" ] = mThunderbirdWindowMatch;
 
     // Store the account map
     QJsonArray accounts;
@@ -123,20 +114,9 @@ void Settings::fromJSON( const QJsonObject& settings )
     mNewEmailMenuEnabled = settings.value( "common/newemailEnabled" ).toBool( mNewEmailMenuEnabled );
     mShowHideThunderbird = settings.value( "common/showhidethunderbird" ).toBool( mShowHideThunderbird );
     mKeepThunderbirdRunning = settings.value( "common/keepthunderbirdrunning" ).toBool( mKeepThunderbirdRunning );
-    mLaunchThunderbirdDelay = settings.value( "common/launchthunderbirddelay" ).toInt( mLaunchThunderbirdDelay );
     mStartThunderbirdHidden = settings.value( "common/startThunderbirdHidden" ).toBool(
             settings.value( "common/hidewhenstarted" ).toBool( mStartThunderbirdHidden ) );
     mExitThunderbirdWhenQuit = settings.value( "common/exitthunderbirdonquit" ).toBool( mExitThunderbirdWhenQuit );
-    showDialogIfNoAccountsConfigured = settings.value( "common/showDialogIfNoAccountsConfigured" ).toBool(
-            showDialogIfNoAccountsConfigured );
-
-    mThunderbirdProcessName = settings.value( "advanced/tbprocessname" ).toString( mThunderbirdProcessName );
-    mThunderbirdWindowMatch = settings.value( "advanced/tbwindowmatch" ).toString( mThunderbirdWindowMatch );
-
-    QStringList thunderbirdCommand = settings.value("advanced/tbcmdline").toVariant().toStringList();
-    if ( !thunderbirdCommand.isEmpty() && !thunderbirdCommand[0].isEmpty() )
-        mThunderbirdCmdLine = thunderbirdCommand;
-
     watchedMorkFiles.clear();
 
     // Convert the map into settings
@@ -152,19 +132,20 @@ void Settings::fromJSON( const QJsonObject& settings )
     }
 }
 
-bool Settings::getStartThunderbirdCmdline( QString& executable, QStringList &arguments )
+void Settings::getStartThunderbirdCmdline( QString& executable, QStringList &arguments )
 {
-    if ( mThunderbirdCmdLine.isEmpty() )
-        return false;
-
     arguments = mThunderbirdCmdLine;
-
-    executable = Utils::expandPath( arguments.takeFirst() );
-
-    return true;
+    executable = arguments.takeFirst();
 }
 
 const QPixmap &Settings::getNotificationIcon() {
+    // Use the icon theme's Thunderbird icon so the tray matches the other icons,
+    // and the bundled one if the theme has none
+    for (const QString &name : {QString("thunderbird"), QString("org.mozilla.Thunderbird")}) {
+        if (mNotificationIcon.isNull() && QIcon::hasThemeIcon(name)) {
+            mNotificationIcon = QIcon::fromTheme(name).pixmap(QSize(128, 128), 1.0);
+        }
+    }
     if (mNotificationIcon.isNull()) {
         if (!mNotificationIcon.load(":res/thunderbird.png")) {
             Log::fatal( tr("Cannot load default system tray icon.") );

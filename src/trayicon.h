@@ -2,7 +2,6 @@
 #define TRAYICON_H
 
 #include <QTimer>
-#include <QDateTime>
 #include <QWidget>
 #include <QImage>
 #include <QProcess>
@@ -49,7 +48,7 @@ class TrayIcon : public QSystemTrayIcon
         void    settingsChanged();
 
     public slots:
-        void    unreadCounterUpdate( unsigned int total );
+        void    unreadCounterUpdate( const QMap<QString, quint32>& counts );
 
         /**
          * The warning status of a watched path in the unread monitor changed.
@@ -132,8 +131,9 @@ class TrayIcon : public QSystemTrayIcon
         static void drawCountBadge(QPainter &painter, const QSize &iconSize, unsigned int count,
                                    const QColor &color);
 
-        // Current unread messages count
+        // Current unread messages count, in total and per monitored folder
         unsigned int    mUnreadCounter;
+        QMap<QString, quint32> mUnreadCounts;
 
         // Show/hide Thunderbird menu item (we modify its text)
         QAction *       mMenuShowHideThunderbird;
@@ -144,9 +144,6 @@ class TrayIcon : public QSystemTrayIcon
 
         // State checking timer (once a second)
         QTimer          mStateTimer;
-
-        // Time when Thunderbird could be started
-        QDateTime       mThunderbirdStartTime;
 
         // If true, Thunderbird window existed anytime before, but not necessarily now
         // (we use this to distinguish between start and restart)

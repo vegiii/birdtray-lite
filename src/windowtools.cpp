@@ -5,9 +5,11 @@
 #include <QtDBus/QDBusMessage>
 
 #include "windowtools.h"
-#include "birdtrayapp.h"
-#include "settings.h"
 #include "log.h"
+
+// The Thunderbird process name, and the text Thunderbird's window titles end with
+static const QString PROCESS_NAME = "thunderbird";
+static const QString WINDOW_MATCH = "Mozilla Thunderbird";
 
 #define KWIN_SCRIPT_NAME QString("birdtray-lite")
 
@@ -31,7 +33,6 @@ WindowTools *WindowTools::create()
 
 bool WindowTools::lookup()
 {
-    const QString processName = BirdtrayApp::get()->getSettings()->mThunderbirdProcessName;
     const QStringList entries = QDir( "/proc" ).entryList( QDir::Dirs | QDir::NoDotAndDotDot );
     bool found = false;
 
@@ -52,7 +53,7 @@ bool WindowTools::lookup()
         const QList<QByteArray> args = cmdlineFile.readAll().split('\0');
         for ( const QByteArray& arg : args )
         {
-            if ( !arg.isEmpty() && QString::fromLocal8Bit(arg).contains( processName, Qt::CaseInsensitive ) )
+            if ( !arg.isEmpty() && QString::fromLocal8Bit(arg).contains( PROCESS_NAME, Qt::CaseInsensitive ) )
             {
                 found = true;
                 break;
@@ -122,10 +123,6 @@ void WindowTools::runKWinScript( const QString& action )
     // This is the only reliable way to control a Wayland-native window from outside
     // the compositor on KDE Plasma. KWin only loads scripts from files, so the script
     // is written to the private runtime directory.
-    const QString windowMatch = BirdtrayApp::get()->getSettings()->mThunderbirdWindowMatch.trimmed();
-    QString searchStr = windowMatch.isEmpty() ? QString("Thunderbird") : windowMatch;
-    searchStr.replace( "\\", "\\\\" ).replace( "\"", "\\\"" );
-
     const QString script = QString(
         "var windows = workspace.windowList();\n"
         "for (var i = 0; i < windows.length; i++) {\n"
@@ -134,7 +131,7 @@ void WindowTools::runKWinScript( const QString& action )
         "%2"
         "        break;\n"
         "    }\n"
-        "}\n" ).arg( searchStr, action );
+        "}\n" ).arg( WINDOW_MATCH, action );
 
     const QString scriptPath = QStandardPaths::writableLocation( QStandardPaths::RuntimeLocation )
                                + "/birdtray-lite-kwin.js";

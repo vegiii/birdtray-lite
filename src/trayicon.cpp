@@ -30,7 +30,6 @@ TrayIcon::TrayIcon(bool showSettings)
     connect(QApplication::instance(), &QApplication::aboutToQuit, this, &TrayIcon::onQuit);
 
     Settings* settings = BirdtrayApp::get()->getSettings();
-    mThunderbirdStartTime = QDateTime::currentDateTime().addSecs(settings->mLaunchThunderbirdDelay);
 
     mWinTools = WindowTools::create();
     if (mWinTools) {
@@ -39,17 +38,13 @@ TrayIcon::TrayIcon(bool showSettings)
     }
     createMenu();
 
-    // On the first start, start at login and monitor the inboxes of all Thunderbird accounts
-    QStringList inboxes;
+    // On the first start, start at login, monitor the inboxes of all Thunderbird accounts
+    // and show the settings so they can be checked
     if (settings->isFirstRun) {
         DialogSettings::setAutostart(true);
-    }
-    if (settings->isFirstRun && settings->watchedMorkFiles.isEmpty()) {
-        inboxes = Thunderbird::inboxes();
-        settings->watchedMorkFiles = inboxes;
-        if (!inboxes.isEmpty()) {
-            settings->save();
-        }
+        settings->watchedMorkFiles = Thunderbird::inboxes();
+        settings->save();
+        showSettings = true;
     }
     createUnreadCounterThread();
 
@@ -65,24 +60,6 @@ TrayIcon::TrayIcon(bool showSettings)
     updateIcon();
     show();
 
-    if (!inboxes.isEmpty()) {
-        showMessage(tr("Birdtray Lite"), tr("Monitoring %n inbox(es) from Thunderbird.", "", inboxes.size()));
-    }
-
-    // If the settings are not yet configure, pop up the message
-    if (!showSettings && settings->showDialogIfNoAccountsConfigured
-        && settings->watchedMorkFiles.isEmpty()) {
-        QMessageBox questionDialog(QMessageBox::Question, tr("Would you like to set up Birdtray Lite?"),
-                tr("You have not yet configured any email folders to monitor. "
-                   "Would you like to do it now?"), QMessageBox::Yes | QMessageBox::No);
-        QPushButton* dontAskAgainButton = questionDialog.addButton(
-                tr("Don't ask again"), QMessageBox::RejectRole);
-        showSettings = questionDialog.exec() == QMessageBox::Yes;
-        if (questionDialog.clickedButton() == dontAskAgainButton) {
-            settings->showDialogIfNoAccountsConfigured = false;
-            settings->save();
-        }
-    }
     if (showSettings) {
         QTimer::singleShot(0, this, &TrayIcon::showSettings);
     }
@@ -110,10 +87,13 @@ UnreadMonitor* TrayIcon::getUnreadMonitor() const {
     return mUnreadMonitor;
 }
 
-void TrayIcon::unreadCounterUpdate( unsigned int total )
+void TrayIcon::unreadCounterUpdate( const QMap<QString, quint32>& counts )
 {
-    Log::debug("unreadCounterUpdate %d", total );
-    mUnreadCounter = total;
+    mUnreadCounts = counts;
+    mUnreadCounter = 0;
+    for ( quint32 count : counts )
+        mUnreadCounter += count;
+    Log::debug("unreadCounterUpdate %d", mUnreadCounter );
 
     updateIcon();
 }
@@ -166,14 +146,28 @@ void TrayIcon::updateIcon()
     } else if (showCount) {
         drawCount(p, temp.size(), unread, settings->mCountColor);
     }
-    const QMap<QString, QString> warnings = mUnreadMonitor->getWarnings();
-    if (warnings.isEmpty()) {
-        setToolTip(QString());
+    // The tooltip shows the unread count of each account, followed by any warnings
+    QStringList toolTip;
+    if (mUnreadCounter == 0) {
+        toolTip << tr("No unread mail");
     } else {
-        QStringList toolTip;
+        QMap<QString, unsigned int> accountCounts;
+        for (auto it = mUnreadCounts.cbegin(); it != mUnreadCounts.cend(); ++it) {
+            if (it.value() > 0) {
+                accountCounts[Utils::getMailAccountName(QFileInfo(it.key()))] += it.value();
+            }
+        }
+        for (auto it = accountCounts.cbegin(); it != accountCounts.cend(); ++it) {
+            toolTip << QString("%1: %2").arg(it.key()).arg(it.value());
+        }
+    }
+
+    const QMap<QString, QString> warnings = mUnreadMonitor->getWarnings();
+    if (!warnings.isEmpty()) {
+        toolTip << QString();
         const QString &globalWarning = warnings.value(QString());
         if (!globalWarning.isNull()) {
-            toolTip << tr("Warning: %1").arg(globalWarning);
+            toolTip << globalWarning;
         }
         QMapIterator<QString, QString> warningsIterator(warnings);
         while (warningsIterator.hasNext()) {
@@ -194,9 +188,9 @@ void TrayIcon::updateIcon()
             const QString &warning = warningsIterator.value();
             toolTip << name + ": " + warning;
         }
-        setToolTip(toolTip.join('\n'));
         drawWarningIndicator(p, temp.size());
     }
+    setToolTip(toolTip.join('\n'));
 
     p.end();
 
@@ -236,8 +230,7 @@ void TrayIcon::updateState()
         {
             Settings* settings = BirdtrayApp::get()->getSettings();
             // Thunderbird is not running. Start it, or restart it if it has run before
-            if (settings->mKeepThunderbirdRunning && !mThunderbirdProcess &&
-                (mThunderbirdWindowExisted || mThunderbirdStartTime < QDateTime::currentDateTime())) {
+            if (settings->mKeepThunderbirdRunning && !mThunderbirdProcess) {
                 startThunderbird();
 
                 // Hide after?
@@ -307,9 +300,7 @@ void TrayIcon::actionNewEmail() {
     QString executable;
     QStringList args;
 
-    if ( !settings->getStartThunderbirdCmdline( executable, args ) )
-        return;
-
+    settings->getStartThunderbirdCmdline( executable, args );
     args << "-compose";
     QProcess::startDetached(executable, args);
 }
@@ -373,11 +364,7 @@ void TrayIcon::startThunderbird()
     QString executable;
     QStringList args;
 
-    if ( !BirdtrayApp::get()->getSettings()->getStartThunderbirdCmdline( executable, args ) )
-    {
-        Log::debug("Failed to get Thunderbird command-line" );
-        return;
-    }
+    BirdtrayApp::get()->getSettings()->getStartThunderbirdCmdline( executable, args );
 
     Log::debug("Starting Thunderbird as '%s %s'", qPrintable(executable), qPrintable(args.join(' ')));
 

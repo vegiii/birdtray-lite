@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Birdtray Lite
-Comment=System tray new mail notification for Thunderbird
+Comment=Shows Thunderbird's unread mail count in the system tray
 Keywords=Email;E-mail;Thunderbird;Tray;Notification;
 Exec=birdtray-lite
 Terminal=false

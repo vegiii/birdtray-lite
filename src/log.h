@@ -4,7 +4,6 @@
 #include <QMutex>
 #include <QPointer>
 #include <QStringList>
-#include <QFile>
 
 class DialogLogOutput;
 
@@ -20,9 +19,6 @@ class Log final
 
         // Shows the logging widget
         static void    showLogger();
-
-        // Initializes log with/without a file output
-        static void    initialize( const QString& path = "" );
 
     private:
         // Only keep this number of last log lines in buffer
@@ -45,7 +41,6 @@ class Log final
         // All historic log entries are stored here, guarded by mMutex
         QStringList     mEntries;
         QMutex          mMutex;
-        QFile           mOutputFile;
 
         // Auto-set to null when log dialog is closed
         QPointer<DialogLogOutput>   mDialog;

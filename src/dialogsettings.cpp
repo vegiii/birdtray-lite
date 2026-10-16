@@ -74,8 +74,8 @@ DialogSettings::DialogSettings( QWidget *parent)
     setupUi(this);
     Settings* settings = BirdtrayApp::get()->getSettings();
 
-    // Show the first tab
-    tabWidget->setCurrentIndex( 0 );
+    // Start on the Monitoring tab when no folders are monitored yet
+    tabWidget->setCurrentWidget( settings->watchedMorkFiles.isEmpty() ? tabMonitoring : tabGeneral );
 
     connect( buttonBox, &QDialogButtonBox::accepted, this, &DialogSettings::accept );
     connect( buttonBox, &QDialogButtonBox::rejected, this, &DialogSettings::reject );

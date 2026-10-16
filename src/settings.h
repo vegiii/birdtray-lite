@@ -29,14 +29,8 @@ class Settings
         // Whether to show a "New Email" entry in the tray menu
         bool    mNewEmailMenuEnabled;
 
-        // The command to start Thunderbird. The first element is the executable to launch.
+        // The command to start Thunderbird, detected at every start. The first element is the executable.
         QStringList mThunderbirdCmdLine;
-
-        // The name of the Thunderbird process.
-        QString mThunderbirdProcessName;
-
-        // Thunderbird window match
-        QString mThunderbirdWindowMatch;
 
         // Whether clicking the tray icon shows/hides Thunderbird, or starts it if it is closed
         bool    mShowHideThunderbird;
@@ -44,17 +38,11 @@ class Settings
         // Whether to start Thunderbird with the app and restart it if it was closed
         bool    mKeepThunderbirdRunning;
 
-        // The delay in seconds to launch Thunderbird
-        int     mLaunchThunderbirdDelay;
-
         // Whether to hide the Thunderbird window when we start Thunderbird
         bool    mStartThunderbirdHidden;
 
         // Whether to quit Thunderbird when the app quits
         bool    mExitThunderbirdWhenQuit;
-
-        // Enables or disables the dialog on startup that shows if no accounts were configured
-        bool    showDialogIfNoAccountsConfigured;
 
         // Whether no settings file existed when loading the settings
         bool    isFirstRun;
@@ -67,11 +55,10 @@ class Settings
         void    load();
 
         /**
-         * @param executable The actual executable necessary to start (not necessary Thunderbird itself - may be shell or script).
-         * @param arguments The arguments necessary to start Thunderbird.
-         * @return true if executable/arguments is set, false if error
+         * @param executable Receives the program that starts Thunderbird (Thunderbird itself or flatpak).
+         * @param arguments Receives the arguments for the program.
          */
-        bool getStartThunderbirdCmdline( QString& executable, QStringList &arguments );
+        void getStartThunderbirdCmdline( QString& executable, QStringList &arguments );
 
         /**
          * @return The icon to use for the system tray.

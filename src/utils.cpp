@@ -30,14 +30,6 @@ QString Utils::getBirdtrayVersion() {
     return QString("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_PATCH);
 }
 
-QString Utils::stdWToQString(const std::wstring &str) {
-    return QString::fromStdWString(str);
-}
-
-std::wstring Utils::qToStdWString(const QString &str) {
-    return str.toStdWString();
-}
-
 QStringList Utils::getThunderbirdProfilesPaths() {
     return {"~/.config/thunderbird", "~/.thunderbird",  "~/snap/thunderbird/common/.thunderbird", "~/.var/app/org.mozilla.Thunderbird/.thunderbird"};
 }
@@ -50,47 +42,6 @@ QStringList Utils::getDefaultThunderbirdCommand() {
         return { "flatpak", "run", "org.mozilla.Thunderbird" };
     }
     return { "/usr/bin/thunderbird" };
-}
-
-QStringList Utils::splitCommandLine(const QString &src)
-{
-    // This must handle strings like "C:\Program Files\exe\thunderbird.exe" --profile test --title "My test profile" test "a 'bb' \"V\" c"
-    // must return an array with 7 elements
-    QChar sep = QChar::Null;
-    QStringList out;
-    QString current;
-
-    for ( int i = 0; i < src.length(); i++ )
-    {
-        QChar ch = src[i];
-
-        // If we're inside a separator, we reset sep if we encounter a separator.
-        // This ensures things like "aa 'bb' cc" are handled properly
-        if ( sep != QChar::Null && ch == sep )
-        {
-            sep = QChar::Null;
-            continue;
-        }
-        else if ( sep == QChar::Null && (ch == '\'' || ch == '"') )
-        {
-            sep = ch;
-            continue;
-        }
-
-        // Space separates strings, but only if we're not inside a separator
-        if ( sep == QChar::Null && ch.isSpace() )
-        {
-            out.push_back( current );
-            current.clear();
-        }
-        else
-            current.append( ch );
-    }
-
-    if ( !current.isEmpty() )
-        out.push_back( current );
-
-    return out;
 }
 
 QString Utils::getMailFolderName(const QFileInfo &morkFile) {

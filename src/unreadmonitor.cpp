@@ -11,7 +11,6 @@ UnreadMonitor::UnreadMonitor( TrayIcon * parent )
     : QThread( 0 ), mChangedMSFtimer(this)
 {
     moveToThread( this );
-    mLastReportedUnread = 0;
 
     // We get notification once Mork files have been modified.
     connect( &mDBWatcher, &QFileSystemWatcher::fileChanged, this, &UnreadMonitor::watchedFileChanges );
@@ -67,16 +66,21 @@ void UnreadMonitor::updateUnread()
 {
     Log::debug("Triggering the unread counter update");
 
-    int total = getUnreadCount_Mork();
+    if ( BirdtrayApp::get()->getSettings()->watchedMorkFiles.isEmpty() )
+        setWarning( tr("No folders are monitored. Choose them in the settings.") );
+    else
+        clearWarning();
 
-    if ( total != mLastReportedUnread )
+    updateMorkUnreadCounts();
+
+    if ( mMorkUnreadCounts != mLastReportedCounts )
     {
-        emit unreadUpdated( total );
-        mLastReportedUnread = total;
+        emit unreadUpdated( mMorkUnreadCounts );
+        mLastReportedCounts = mMorkUnreadCounts;
     }
 }
 
-int UnreadMonitor::getUnreadCount_Mork()
+void UnreadMonitor::updateMorkUnreadCounts()
 {
     Settings* settings = BirdtrayApp::get()->getSettings();
     bool rescanall = false;
@@ -110,12 +114,7 @@ int UnreadMonitor::getUnreadCount_Mork()
             mMorkUnreadCounts[ path ] = getMorkUnreadCount( path );
     }
 
-    int count = 0;
-    for ( quint32 unread : mMorkUnreadCounts )
-        count += unread;
-
     mChangedMSFfiles.clear();
-    return count;
 }
 
 int UnreadMonitor::getMorkUnreadCount(const QString &path)

@@ -42,7 +42,7 @@ Settings are stored in `~/.config/birdtray-lite/config.json`.
 - Per-folder notification colors and the free color picker: the count uses one of six preset colors.
 - Advanced settings, such as custom icons, fonts and running a command on new mail.
 - Ignoring the current unread emails.
-- Command line options `--dump-mork` and `--decode`.
+- Command line options `--dump-mork`, `--decode`, `--reset-settings` and `--log`.
 - Legacy settings migration and portable mode.
 - Qt Network, Qt Svg and libX11 dependencies.
 - Tests, CI, the Windows installer and other upstream tooling.
@@ -58,7 +58,7 @@ Settings are stored in `~/.config/birdtray-lite/config.json`.
 | CI, IDE files, contrib and screenshots | 16 | 1,354 |
 | **Total** | **123** | **59,323** |
 
-In total 63,205 lines were removed and 1,277 added. The repository went from 159 to 43 files, and the C++ code from 8,173 to 3,713 lines.
+In total 63,396 lines were removed and 1,298 added. The repository went from 159 to 43 files, and the C++ code from 8,173 to 3,543 lines.
 
 ## Credits and license
 
