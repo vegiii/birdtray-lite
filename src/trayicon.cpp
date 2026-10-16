@@ -10,6 +10,7 @@
 #include "windowtools.h"
 #include "utils.h"
 #include "birdtrayapp.h"
+#include "thunderbird.h"
 #include "log.h"
 
 TrayIcon::TrayIcon(bool showSettings)
@@ -42,6 +43,18 @@ TrayIcon::TrayIcon(bool showSettings)
         connect(mWinTools, &WindowTools::onWindowHidden, this, &TrayIcon::onThunderbirdWindowHidden);
     }
     createMenu();
+
+    // On the first start, monitor the inboxes of all Thunderbird accounts
+    QStringList inboxes;
+    if (settings->isFirstRun && settings->watchedMorkFiles.isEmpty()) {
+        inboxes = Thunderbird::inboxes();
+        for (const QString &inbox : inboxes) {
+            settings->watchedMorkFiles[inbox] = settings->mNotificationDefaultColor;
+        }
+        if (!inboxes.isEmpty()) {
+            settings->save();
+        }
+    }
     createUnreadCounterThread();
 
     connect( &mBlinkingTimer, &QTimer::timeout, this, &TrayIcon::blinkTimeout );
@@ -56,7 +69,11 @@ TrayIcon::TrayIcon(bool showSettings)
     updateState();
     updateIcon();
     show();
-    
+
+    if (!inboxes.isEmpty()) {
+        showMessage(tr("Birdtray Lite"), tr("Monitoring %n inbox(es) from Thunderbird.", "", inboxes.size()));
+    }
+
     // If the settings are not yet configure, pop up the message
     if (!showSettings && settings->showDialogIfNoAccountsConfigured
         && settings->watchedMorkFiles.isEmpty()) {

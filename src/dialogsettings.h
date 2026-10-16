@@ -27,6 +27,7 @@ class DialogSettings : public QDialog, public Ui::DialogSettings
          * Add one or multiple accounts.
          */
         void    accountAdd();
+        void    accountAddInboxes();
         void    accountEdit();
         void    accountEditIndex( const QModelIndex& index );
         void    accountRemove();

@@ -25,6 +25,7 @@ add_executable(birdtray-lite
         src/qtcomponents.cpp
         src/setting_newemail.cpp
         src/settings.cpp
+        src/thunderbird.cpp
         src/trayicon.cpp
         src/unreadmonitor.cpp
         src/utils.cpp

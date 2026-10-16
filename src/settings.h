@@ -126,6 +126,11 @@ class Settings
          * Enables or disabled the dialog on startup that shows if no accounts were configured.
          */
         bool    showDialogIfNoAccountsConfigured;
+
+        /**
+         * Whether no settings file existed when loading the settings.
+         */
+        bool    isFirstRun;
         
         /**
          * Whether to show the Birdtray system tray icon only if there are unread Mail messages.

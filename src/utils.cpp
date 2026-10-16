@@ -1,6 +1,7 @@
 #include "utils.h"
 #include "version.h"
 #include "birdtrayapp.h"
+#include "thunderbird.h"
 
 #include <QApplication>
 #include <QStringConverter>
@@ -38,7 +39,7 @@ std::wstring Utils::qToStdWString(const QString &str) {
 }
 
 QStringList Utils::getThunderbirdProfilesPaths() {
-    return {"~/.thunderbird", "~/snap/thunderbird/common/.thunderbird", "~/.var/app/org.mozilla.Thunderbird/.thunderbird"};
+    return {"~/.config/thunderbird", "~/.thunderbird",  "~/snap/thunderbird/common/.thunderbird", "~/.var/app/org.mozilla.Thunderbird/.thunderbird"};
 }
 
 QStringList Utils::getDefaultThunderbirdCommand() {
@@ -116,7 +117,8 @@ QString Utils::getMailAccountName(const QFileInfo &morkFile) {
             return QString();
         }
     }
-    return name;
+    QString accountName = Thunderbird::accountName(parentDir.absolutePath());
+    return accountName.isEmpty() ? name : accountName;
 }
 
 QString Utils::pixmapToString(const QPixmap &pixmap) {

@@ -326,6 +326,16 @@
                </widget>
               </item>
               <item>
+               <widget class="QPushButton" name="btnAccountAddInboxes">
+                <property name="toolTip">
+                 <string>Add the inboxes of all Thunderbird accounts that are not monitored yet.</string>
+                </property>
+                <property name="text">
+                 <string>Add inboxes</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QPushButton" name="btnAccountEdit">
                 <property name="text">
                  <string>Edit</string>
@@ -1155,6 +1165,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>btnNotificationIconUnread</tabstop>
   <tabstop>treeAccounts</tabstop>
   <tabstop>btnAccountAdd</tabstop>
+  <tabstop>btnAccountAddInboxes</tabstop>
   <tabstop>btnAccountEdit</tabstop>
   <tabstop>btnAccountRemove</tabstop>
   <tabstop>boxAllowSuppression</tabstop>

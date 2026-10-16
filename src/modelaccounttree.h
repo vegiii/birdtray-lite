@@ -33,6 +33,12 @@ class ModelAccountTree : public QAbstractItemModel, public QStyledItemDelegate
         void    removeAccount( const QModelIndex& idx );
         void    clear();
 
+        // The paths of the monitored mork files
+        const QList<QString>& accounts() const { return mAccounts; }
+
+        // The notification colors of the monitored mork files
+        const QList<QColor>& colors() const { return mColors; }
+
         // Moves the current accounts/colors to settings
         void    applySettings();
 

@@ -13,6 +13,7 @@
 #include "modelnewemails.h"
 #include "utils.h"
 #include "mailaccountdialog.h"
+#include "thunderbird.h"
 #include "birdtrayapp.h"
 #include "log.h"
 
@@ -73,6 +74,7 @@ DialogSettings::DialogSettings( QWidget *parent)
     connect( treeAccounts, &QTreeViewWithKeyEvents::onKeyPressed, this, &DialogSettings::onKeyPressedOnTreeAccount );
 
     connect( btnAccountAdd, &QPushButton::clicked, this, &DialogSettings::accountAdd );
+    connect( btnAccountAddInboxes, &QPushButton::clicked, this, &DialogSettings::accountAddInboxes );
     connect( btnAccountEdit, &QPushButton::clicked, this, &DialogSettings::accountEdit );
     connect( btnAccountRemove, &QPushButton::clicked, this, &DialogSettings::accountRemove );
 
@@ -265,10 +267,25 @@ void DialogSettings::accountAdd()
     }
     else
     {
-        MailAccountDialog accountDialog(this, btnNotificationColor->color());
+        QMap<QString, QColor> monitored;
+        for (int i = 0; i < mAccountModel->accounts().size(); i++) {
+            monitored.insert(mAccountModel->accounts()[i], mAccountModel->colors()[i]);
+        }
+        MailAccountDialog accountDialog(this, btnNotificationColor->color(), monitored);
         if (accountDialog.exec() != QDialog::Accepted) {
             return;
         }
+
+        // Folders that were unchecked in the dialog are no longer monitored
+        QStringList unselected;
+        accountDialog.getUnselectedFolders(unselected);
+        for (const QString &folder : unselected) {
+            int row = mAccountModel->accounts().indexOf(folder);
+            if (row != -1) {
+                mAccountModel->removeAccount(mAccountModel->index(row, 0));
+            }
+        }
+
         QString path;
         QColor color;
         QList<std::tuple<QString, QColor>> accountInfoList;
@@ -280,6 +297,27 @@ void DialogSettings::accountAdd()
     }
 
     treeAccounts->setCurrentIndex(mAccountModel->index(mAccountModel->rowCount() - 1, 0));
+}
+
+void DialogSettings::accountAddInboxes()
+{
+    const QStringList inboxes = Thunderbird::inboxes();
+    int added = 0;
+    for (const QString &inbox : inboxes) {
+        if (!mAccountModel->accounts().contains(inbox)) {
+            mAccountModel->addAccount(inbox, btnNotificationColor->color());
+            added++;
+        }
+    }
+
+    if (inboxes.isEmpty()) {
+        QMessageBox::information(this, tr("Add inboxes"),
+                tr("No Thunderbird inboxes were found. Use Add to choose the folders manually."));
+    } else if (added == 0) {
+        QMessageBox::information(this, tr("Add inboxes"), tr("All inboxes are already monitored."));
+    } else {
+        treeAccounts->setCurrentIndex(mAccountModel->index(mAccountModel->rowCount() - 1, 0));
+    }
 }
 
 void DialogSettings::accountEdit()

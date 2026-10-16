@@ -59,6 +59,7 @@ Settings::Settings()
     ignoreUnreadCountOnShow = false;
     ignoreUnreadCountOnHide = false;
     showDialogIfNoAccountsConfigured = true;
+    isFirstRun = false;
     mThunderbirdWindowMatch = " Mozilla Thunderbird";
     mThunderbirdProcessName = THUNDERBIRD_PROCESS_NAME_DEFAULT;
     mNotificationMinimumFontSize = 4;
@@ -189,6 +190,7 @@ void Settings::load()
     }
 
     (void) getNotificationIcon(); // Load the default
+    isFirstRun = true;
 
     save();
 }

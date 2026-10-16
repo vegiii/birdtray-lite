@@ -7,24 +7,33 @@
 #include "mailaccountdialog.h"
 #include "ui_mailaccountdialog.h"
 #include "utils.h"
+#include "thunderbird.h"
 #include "colorbutton.h"
 
-MailAccountDialog::MailAccountDialog(QWidget* parent, QColor defaultColor) :
+MailAccountDialog::MailAccountDialog(QWidget* parent, QColor defaultColor,
+                                     QMap<QString, QColor> monitoredFolders) :
         QDialog(parent),
         ui(new Ui::MailAccountDialog),
-        defaultColor(std::move(defaultColor)) {
+        defaultColor(std::move(defaultColor)),
+        monitoredFolders(std::move(monitoredFolders)) {
     ui->setupUi(this);
     connect(ui->tbProfilesBrowseButton, &QAbstractButton::clicked,
             this, &MailAccountDialog::onProfilesDirBrowseButtonClicked);
     connect(ui->tbProfilesPathEdit, &QLineEdit::editingFinished,
             this, &MailAccountDialog::loadProfiles);
     connect(ui->accountsList, &QTreeWidget::itemChanged, &MailAccountDialog::onAccountItemChanged);
-    for (const QString &path : Utils::getThunderbirdProfilesPaths()) {
-        if (QDir(Utils::expandPath(path)).exists()) {
-            ui->tbProfilesPathEdit->setText(path);
-            loadProfiles();
-            break;
+    QString profilesDir = Thunderbird::profilesDir();
+    if (profilesDir.isEmpty()) {
+        for (const QString &path : Utils::getThunderbirdProfilesPaths()) {
+            if (QDir(Utils::expandPath(path)).exists()) {
+                profilesDir = path;
+                break;
+            }
         }
+    }
+    if (!profilesDir.isEmpty()) {
+        ui->tbProfilesPathEdit->setText(profilesDir);
+        loadProfiles();
     }
 }
 
@@ -40,6 +49,18 @@ void MailAccountDialog::getSelectedAccounts(QList<std::tuple<QString, QColor>> &
         outList.append(std::make_tuple(
                 selectedItem->data(0, Qt::UserRole).toString(),
                 color.isNull() ? defaultColor : color.value<QColor>()));
+    }
+}
+
+void MailAccountDialog::getUnselectedFolders(QStringList &outList) const {
+    QTreeWidgetItemIterator iterator(
+            ui->accountsList,
+            QTreeWidgetItemIterator::NotChecked | QTreeWidgetItemIterator::NoChildren);
+    for (; *iterator != nullptr; ++iterator) {
+        QString path = (*iterator)->data(0, Qt::UserRole).toString();
+        if (!path.isEmpty()) {
+            outList.append(path);
+        }
     }
 }
 
@@ -108,8 +129,15 @@ void MailAccountDialog::loadProfiles() {
     ui->accountsList->clear();
     QDir profilesDir(Utils::expandPath(profilesDirPath));
     bool foundAValidProfileDir = false;
-    for (const QString &profileDirName: profilesDir.entryList(
-            QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot | QDir::Filter::Hidden)) {
+    QStringList profileDirNames = profilesDir.entryList(
+            QDir::Filter::Dirs | QDir::Filter::NoDotAndDotDot | QDir::Filter::Hidden);
+
+    // Only show the profile Thunderbird uses, if profiles.ini names one
+    QString defaultProfile = Thunderbird::defaultProfile(profilesDir.absolutePath());
+    if (!defaultProfile.isEmpty() && QDir(defaultProfile).exists()) {
+        profileDirNames = {QDir(profilesDir.absolutePath()).relativeFilePath(defaultProfile)};
+    }
+    for (const QString &profileDirName: profileDirNames) {
         const QString profileDir = profilesDir.absoluteFilePath(profileDirName);
         const QStringList mailFolders = getMailFoldersFor(profileDir);
         if (mailFolders.isEmpty()) {
@@ -143,11 +171,16 @@ void MailAccountDialog::loadAccounts(QTreeWidgetItem* profileTreeItem,
             if (!msfFileIterator.hasNext()) {
                 continue;
             }
-            auto* accountItem = new QTreeWidgetItem(profileTreeItem, {mailAccount});
+            QString accountName = Thunderbird::accountName(accountDirectoryPath);
+            auto* accountItem = new QTreeWidgetItem(
+                    profileTreeItem, {accountName.isEmpty() ? mailAccount : accountName});
             accountItem->setExpanded(true);
             if (msfFileIterator.hasNext()) {
                 accountItem->setCheckState(0, Qt::Unchecked);
-                profileTreeItem->setCheckState(0, Qt::Unchecked);
+                // Setting the profile state again would uncheck the folders of earlier accounts
+                if (profileTreeItem->data(0, Qt::CheckStateRole).isNull()) {
+                    profileTreeItem->setCheckState(0, Qt::Unchecked);
+                }
             }
             profileTreeItem->addChild(accountItem);
             while (msfFileIterator.hasNext()) {
@@ -158,15 +191,23 @@ void MailAccountDialog::loadAccounts(QTreeWidgetItem* profileTreeItem,
                     continue;
                 }
                 auto* folderItem = new QTreeWidgetItem(accountItem, {name});
-                if (QString::compare(
-                        msfFile.completeBaseName(), "INBOX", Qt::CaseInsensitive) == 0) {
+                bool isInbox = QString::compare(
+                        msfFile.completeBaseName(), "INBOX", Qt::CaseInsensitive) == 0
+                        && msfFile.dir() == QDir(accountDirectoryPath);
+                if (isInbox) {
                     QFont font = folderItem->font(0);
                     font.setBold(true);
                     folderItem->setFont(0, font);
                 }
-                folderItem->setCheckState(0, Qt::Unchecked);
-                folderItem->setData(0, Qt::UserRole, msfFile.absoluteFilePath());
-                auto* colorButton = new ColorButton(ui->accountsList, defaultColor);
+                // Select the monitored folders, or the inboxes if nothing is monitored yet
+                const QString path = msfFile.absoluteFilePath();
+                bool selected = monitoredFolders.contains(path)
+                        || (monitoredFolders.isEmpty() && isInbox);
+                folderItem->setCheckState(0, selected ? Qt::Checked : Qt::Unchecked);
+                folderItem->setData(0, Qt::UserRole, path);
+                QColor color = monitoredFolders.value(path, defaultColor);
+                folderItem->setData(1, Qt::UserRole, color);
+                auto* colorButton = new ColorButton(ui->accountsList, color);
                 colorButton->setBorderlessMode(true);
                 connect(colorButton, &ColorButton::onColorChanged, this, [=](const QColor &color) {
                     folderItem->setData(1, Qt::UserRole, color);
