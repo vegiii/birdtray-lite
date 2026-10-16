@@ -2,7 +2,9 @@
 #include <QGuiApplication>
 #include <QDir>
 #include <QFile>
-#include <QProcess>
+#include <QStandardPaths>
+#include <QtDBus/QDBusConnection>
+#include <QtDBus/QDBusMessage>
 #include <QStringList>
 
 #include "birdtrayapp.h"
@@ -10,6 +12,8 @@
 #include "settings.h"
 #include "utils.h"
 #include "log.h"
+
+#define KWIN_SCRIPT_NAME QString("birdtray-lite")
 
 /*
  * This code is mostly taken from xlibutil.cpp KDocker project, licensed under GPLv2 or higher.
@@ -573,9 +577,10 @@ bool WindowTools_X11::checkWindow()
 
 void WindowTools_X11::kwinScriptMinimize( bool minimize )
 {
-    // Write a one-shot KWin script to minimize/restore the TB window by caption.
+    // Run a one-shot KWin script to minimize/restore the TB window by caption.
     // This is the only reliable way to control a Wayland-native window from outside
-    // the compositor on KDE Plasma.
+    // the compositor on KDE Plasma. KWin only loads scripts from files, so the script
+    // is written to the private runtime directory.
     const QString windowMatch = BirdtrayApp::get()->getSettings()->mThunderbirdWindowMatch.trimmed();
     const QString searchStr   = windowMatch.isEmpty() ? QString("Thunderbird") : windowMatch;
     const QString minimizeVal = minimize ? "true" : "false";
@@ -607,47 +612,41 @@ void WindowTools_X11::kwinScriptMinimize( bool minimize )
             "}\n"
           ).arg(QString(searchStr).replace("\"", "\\\""));
 
-    const QString scriptPath = QDir::tempPath() + "/birdtray-lite_kwin_minimize.js";
+    const QString scriptPath = QStandardPaths::writableLocation( QStandardPaths::RuntimeLocation )
+                               + "/birdtray-lite-kwin.js";
     QFile f( scriptPath );
     if ( !f.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
     {
-        Log::debug("kwinScriptMinimize: failed to write temp script" );
+        Log::debug("kwinScriptMinimize: failed to write script" );
         return;
     }
     f.write( script.toUtf8() );
     f.close();
 
-    QProcess loadProc;
-    loadProc.start("qdbus6", {
-        "org.kde.KWin", "/Scripting",
-        "org.kde.kwin.Scripting.loadScript", scriptPath
-    });
+    QDBusConnection bus = QDBusConnection::sessionBus();
 
-    if ( !loadProc.waitForFinished( 2000 ) )
+    // Unload the script from the previous call, KWin refuses to load a name twice
+    QDBusMessage unload = QDBusMessage::createMethodCall(
+        "org.kde.KWin", "/Scripting", "org.kde.kwin.Scripting", "unloadScript" );
+    unload << KWIN_SCRIPT_NAME;
+    bus.call( unload, QDBus::Block, 2000 );
+
+    QDBusMessage load = QDBusMessage::createMethodCall(
+        "org.kde.KWin", "/Scripting", "org.kde.kwin.Scripting", "loadScript" );
+    load << scriptPath << KWIN_SCRIPT_NAME;
+    const QDBusMessage reply = bus.call( load, QDBus::Block, 2000 );
+
+    const QList<QVariant> args = reply.arguments();
+    const int scriptId = args.isEmpty() ? -1 : args.first().toInt();
+    if ( reply.type() != QDBusMessage::ReplyMessage || scriptId < 0 )
     {
-        Log::debug("kwinScriptMinimize: qdbus6 loadScript timed out" );
-        QFile::remove( scriptPath );
+        Log::debug("kwinScriptMinimize: loadScript failed: %s", qPrintable( reply.errorMessage() ) );
         return;
     }
 
-    bool ok;
-    int scriptId = loadProc.readAllStandardOutput().trimmed().toInt( &ok );
-    if ( !ok || scriptId <= 0 )
-    {
-        Log::debug("kwinScriptMinimize: loadScript returned invalid id (qdbus6 not available?)" );
-        QFile::remove( scriptPath );
-        return;
-    }
-
-    // Run async — don't block the GUI thread waiting for KWin to execute the script
-    QProcess::startDetached("qdbus6", {
-        "org.kde.KWin",
-        QString("/Scripting/Script%1").arg(scriptId),
-        "org.kde.kwin.Script.run"
-    });
-
-    // Temp file will be cleaned up after a short delay to ensure KWin has read it
-    QTimer::singleShot( 500, [scriptPath]() { QFile::remove( scriptPath ); } );
+    // Run async, don't block the GUI thread waiting for KWin to execute the script
+    bus.send( QDBusMessage::createMethodCall(
+        "org.kde.KWin", QString("/Scripting/Script%1").arg( scriptId ), "org.kde.kwin.Script", "run" ) );
     Log::debug("kwinScriptMinimize: minimize=%s via KWin script id %d", minimize ? "true" : "false", scriptId );
 }
 

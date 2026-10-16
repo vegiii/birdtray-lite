@@ -7,7 +7,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 6.2 CONFIG REQUIRED COMPONENTS Core Gui Widgets Network Svg)
+find_package(Qt6 6.2 CONFIG REQUIRED COMPONENTS Core Gui Widgets DBus Svg)
 find_library(X11_LIBRARY X11 REQUIRED)
 
 option(OPT_THUNDERBIRD_CMDLINE "Default Thunderbird startup command-line" [])
@@ -52,7 +52,7 @@ add_executable(birdtray-lite
         src/resources.qrc)
 target_include_directories(birdtray-lite PRIVATE src)
 target_link_libraries(birdtray-lite PRIVATE
-        Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Network Qt6::Svg ${X11_LIBRARY})
+        Qt6::Core Qt6::Gui Qt6::Widgets Qt6::DBus Qt6::Svg ${X11_LIBRARY})
 
 include(GNUInstallDirs)
 set(APP_ID io.github.vegiii.BirdtrayLite)

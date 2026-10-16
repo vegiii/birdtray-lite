@@ -2,8 +2,6 @@
 #define BIRDTRAY_BIRDTRAY_APP_H
 
 #include <QApplication>
-#include <QtNetwork/QLocalServer>
-#include <QtNetwork/QLocalSocket>
 #include <QtCore/QCommandLineParser>
 #include "settings.h"
 #include "trayicon.h"
@@ -14,6 +12,7 @@
  */
 class BirdtrayApp: public QApplication {
     Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "io.github.vegiii.BirdtrayLite")
 public:
     
     /**
@@ -41,12 +40,14 @@ public:
      */
     TrayIcon* getTrayIcon() const;
 
-protected Q_SLOTS:
-    
+public Q_SLOTS:
+
     /**
-     * Called when a secondary Birdtray instance attaches to this primary instance.
+     * Called over D-Bus when a secondary Birdtray Lite instance sends a command.
+     *
+     * @param command The command given on the secondary instance's command line.
      */
-    void onSecondInstanceAttached();
+    Q_SCRIPTABLE void runCommand(const QString &command);
 
 private:
     /**
@@ -60,11 +61,6 @@ private:
     TrayIcon* trayIcon = nullptr;
     
     /**
-     * A server to handle commands from secondary Birdtray instances.
-     */
-    QLocalServer* singleInstanceServer = nullptr;
-    
-    /**
      * Command line parser containing the parsed Birdtray command line.
      */
     QCommandLineParser commandLineParser;
@@ -75,35 +71,13 @@ private:
     void parseCmdArguments();
     
     /**
-     * Start a local server to handle requests from secondary instances of Birdtray.
-     * If this succeeds, this instance of Birdtray will become the primary singleton instance.
+     * Register the D-Bus service that makes this the primary Birdtray Lite instance.
+     * If another instance already owns it, the command line commands are sent to that instance.
      *
-     * @return true if the server was started successfully,
-     *         false if another instance of Birdtray is already running.
+     * @return true if this is now the primary instance,
+     *         false if another instance of Birdtray Lite is already running.
      */
     bool startSingleInstanceServer();
-    
-    /**
-     * Connect to a running instance of Birdtray.
-     *
-     * @return true, if a connection was established successfully.
-     */
-    bool connectToRunningInstance() const;
-    
-    /**
-     * Send commands indicated by the command line to the primary singleton Birdtray instance.
-     *
-     * @param serverSocket The socket tu use to communicate with the singleton Birdtray instance.
-     */
-    void sendCommandsToRunningInstance(QLocalSocket &serverSocket) const;
-    
-    /**
-     * Called when the primary Birdtray instance receives
-     * a command from a secondary Birdtray instance.
-     *
-     * @param clientSocket The socket to the secondary Birdtray instance.
-     */
-    void onSecondInstanceCommand(QLocalSocket* clientSocket);
     
     /**
      * Wait for the system tray to become available and exit if it doesn't within 60 seconds.

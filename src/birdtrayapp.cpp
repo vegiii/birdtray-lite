@@ -1,4 +1,6 @@
 #include <QtCore/QThread>
+#include <QtDBus/QDBusConnection>
+#include <QtDBus/QDBusMessage>
 
 #include "birdtrayapp.h"
 #include "utils.h"
@@ -7,7 +9,8 @@
 #include "version.h"
 #include "log.h"
 
-#define SINGLE_INSTANCE_SERVER_NAME "birdtray-lite.single.instance"
+#define DBUS_SERVICE_NAME "io.github.vegiii.BirdtrayLite"
+#define DBUS_OBJECT_PATH "/"
 #define TOGGLE_THUNDERBIRD_COMMAND "toggle-tb"
 #define SHOW_THUNDERBIRD_COMMAND "show-tb"
 #define HIDE_THUNDERBIRD_COMMAND "hide-tb"
@@ -23,7 +26,6 @@ BirdtrayApp::BirdtrayApp(int &argc, char** argv) : QApplication(argc, argv)
     // This prevents exiting the application when the dialogs are closed on Gnome/XFCE
     QApplication::setQuitOnLastWindowClosed(false);
 
-    
     parseCmdArguments();
     
     QString morkPath = commandLineParser.value("dump-mork");
@@ -60,11 +62,6 @@ BirdtrayApp::BirdtrayApp(int &argc, char** argv) : QApplication(argc, argv)
 }
 
 BirdtrayApp::~BirdtrayApp() {
-    if (singleInstanceServer != nullptr) {
-        singleInstanceServer->close();
-        singleInstanceServer->deleteLater();
-        singleInstanceServer = nullptr;
-    }
     delete trayIcon;
     delete settings;
 }
@@ -81,11 +78,22 @@ TrayIcon* BirdtrayApp::getTrayIcon() const {
     return trayIcon;
 }
 
-void BirdtrayApp::onSecondInstanceAttached() {
-    QLocalSocket* clientSocket = singleInstanceServer->nextPendingConnection();
-    if (clientSocket != nullptr) {
-        connect(clientSocket, &QLocalSocket::readyRead,
-                this, [=]() { onSecondInstanceCommand(clientSocket); });
+void BirdtrayApp::runCommand(const QString &command) {
+    if (trayIcon == nullptr) {
+        return;
+    }
+    if (command == TOGGLE_THUNDERBIRD_COMMAND) {
+        if (trayIcon->getWindowTools()->isHidden()) {
+            trayIcon->showThunderbird();
+        } else {
+            trayIcon->hideThunderbird();
+        }
+    } else if (command == SHOW_THUNDERBIRD_COMMAND) {
+        trayIcon->showThunderbird();
+    } else if (command == HIDE_THUNDERBIRD_COMMAND) {
+        trayIcon->hideThunderbird();
+    } else if (command == SETTINGS_COMMAND) {
+        trayIcon->showSettings();
     }
 }
 
@@ -109,73 +117,27 @@ void BirdtrayApp::parseCmdArguments() {
 }
 
 bool BirdtrayApp::startSingleInstanceServer() {
-    singleInstanceServer = new QLocalServer();
-    bool serverListening = singleInstanceServer->listen(SINGLE_INSTANCE_SERVER_NAME);
-    if (!serverListening
-        && (singleInstanceServer->serverError() == QAbstractSocket::AddressInUseError)) {
-        if (connectToRunningInstance()) {
-            return false;
+    QDBusConnection bus = QDBusConnection::sessionBus();
+    if (!bus.isConnected()) {
+        qWarning("No D-Bus session bus, running without single instance check");
+        return true;
+    }
+    bus.registerObject(DBUS_OBJECT_PATH, this, QDBusConnection::ExportScriptableSlots);
+    if (bus.registerService(DBUS_SERVICE_NAME)) {
+        return true;
+    }
+    bus.unregisterObject(DBUS_OBJECT_PATH);
+
+    for (const char* command : {TOGGLE_THUNDERBIRD_COMMAND, SHOW_THUNDERBIRD_COMMAND,
+                                HIDE_THUNDERBIRD_COMMAND, SETTINGS_COMMAND}) {
+        if (commandLineParser.isSet(command)) {
+            QDBusMessage message = QDBusMessage::createMethodCall(
+                    DBUS_SERVICE_NAME, DBUS_OBJECT_PATH, DBUS_SERVICE_NAME, "runCommand");
+            message << QString(command);
+            bus.call(message);
         }
-        // The other instance might have crashed, try to remove the dead socket and try again.
-        QLocalServer::removeServer(SINGLE_INSTANCE_SERVER_NAME);
-        serverListening = singleInstanceServer->listen(SINGLE_INSTANCE_SERVER_NAME);
     }
-
-    if (!serverListening) {
-        return !connectToRunningInstance();
-    }
-    connect(singleInstanceServer, &QLocalServer::newConnection,
-            this, &BirdtrayApp::onSecondInstanceAttached);
-    return true;
-}
-
-bool BirdtrayApp::connectToRunningInstance() const {
-    bool connectionSuccessful = false;
-    QLocalSocket serverSocket;
-    serverSocket.connectToServer(SINGLE_INSTANCE_SERVER_NAME, QLocalSocket::WriteOnly);
-    if (serverSocket.waitForConnected()) {
-        sendCommandsToRunningInstance(serverSocket);
-        connectionSuccessful = true;
-        serverSocket.disconnectFromServer();
-    }
-    return connectionSuccessful;
-}
-
-void BirdtrayApp::sendCommandsToRunningInstance(QLocalSocket &serverSocket) const {
-    if (commandLineParser.isSet(TOGGLE_THUNDERBIRD_COMMAND)) {
-        serverSocket.write(TOGGLE_THUNDERBIRD_COMMAND "\n");
-    }
-    if (commandLineParser.isSet(SHOW_THUNDERBIRD_COMMAND)) {
-        serverSocket.write(SHOW_THUNDERBIRD_COMMAND "\n");
-    }
-    if (commandLineParser.isSet(HIDE_THUNDERBIRD_COMMAND)) {
-        serverSocket.write(HIDE_THUNDERBIRD_COMMAND "\n");
-    }
-    if (commandLineParser.isSet(SETTINGS_COMMAND)) {
-        serverSocket.write(SETTINGS_COMMAND "\n");
-    }
-    serverSocket.waitForBytesWritten();
-}
-
-void BirdtrayApp::onSecondInstanceCommand(QLocalSocket* clientSocket) {
-    if (!clientSocket->canReadLine()) {
-        return;
-    }
-    QByteArray line = clientSocket->readLine(128);
-    line.chop(1);
-    if (line == TOGGLE_THUNDERBIRD_COMMAND) {
-        if (trayIcon->getWindowTools()->isHidden()) {
-            trayIcon->showThunderbird();
-        } else {
-            trayIcon->hideThunderbird();
-        }
-    } else if (line == SHOW_THUNDERBIRD_COMMAND) {
-        trayIcon->showThunderbird();
-    } else if (line == HIDE_THUNDERBIRD_COMMAND) {
-        trayIcon->hideThunderbird();
-    } else if (line == SETTINGS_COMMAND) {
-        trayIcon->showSettings();
-    }
+    return false;
 }
 
 void BirdtrayApp::ensureSystemTrayAvailable() {
