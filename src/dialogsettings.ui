@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>871</width>
-    <height>538</height>
+    <width>560</width>
+    <height>520</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,1079 +17,232 @@
    <iconset resource="resources.qrc">
     <normaloff>:/res/birdtray.svg</normaloff>:/res/birdtray.svg</iconset>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="layoutDialog">
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <property name="tabBarAutoHide">
-      <bool>false</bool>
-     </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tabGeneral">
       <attribute name="title">
        <string>General</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="layoutGeneral">
+      <item>
+       <widget class="QCheckBox" name="boxAutostart">
+        <property name="text">
+         <string>Start Birdtray Lite at login</string>
+        </property>
+       </widget>
+      </item>
        <item>
-        <widget class="QCheckBox" name="boxAutostart">
-         <property name="text">
-          <string>Start Birdtray Lite at login</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_2">
+        <widget class="QGroupBox" name="groupThunderbird">
          <property name="title">
-          <string>New Mail Notification</string>
+          <string>Thunderbird</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="1" colspan="2">
-           <widget class="QFontComboBox" name="notificationFont"/>
-          </item>
-          <item row="3" column="2" colspan="3">
-           <widget class="QSlider" name="sliderBlinkingSpeed">
-            <property name="maximum">
-             <number>30</number>
-            </property>
-            <property name="singleStep">
-             <number>5</number>
-            </property>
-            <property name="pageStep">
-             <number>5</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="tickPosition">
-             <enum>QSlider::TickPosition::TicksBelow</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1" colspan="5">
-           <layout class="QHBoxLayout" name="horizontalLayout_9">
-            <item>
-             <widget class="QToolButton" name="btnNotificationIcon">
-              <property name="text">
-               <string notr="true">...</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="boxShowUnreadCount">
-              <property name="whatsThis">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If this box is checked, the Birdtray Lite icon will show the number of unread emails.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;If it is unchecked, no count will be shown, and you will only know about unread emails because of the blinking or different icon, depending on your settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="text">
-               <string>Show unread count</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="boxNotificationIconUnread">
-              <property name="text">
-               <string>Different icon when unread:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="btnNotificationIconUnread">
-              <property name="text">
-               <string notr="true">...</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLabel" name="label_15">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Off</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="5">
-           <widget class="QLabel" name="label_16">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Fastest</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>Icon (Ctrl-click to reset):</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This notification color will be used when more than one monitored account has unread emails.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Multiple notification color:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1" colspan="5">
-           <widget class="ColorButton" name="btnNotificationColor">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="4" colspan="2">
-           <widget class="QSpinBox" name="notificationFontWeight">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This changes the font thickness, i.e. makes the font bold.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="suffix">
-             <string notr="true"> %</string>
-            </property>
-            <property name="maximum">
-             <number>198</number>
-            </property>
-            <property name="singleStep">
-             <number>2</number>
-            </property>
-            <property name="value">
-             <number>100</number>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Blinking speed:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Font style:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>Bold:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_17">
-            <property name="text">
-             <string>Notification border color:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1" colspan="2">
-           <widget class="ColorButton" name="borderColorButton">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="3">
-           <widget class="QLabel" name="label_18">
-            <property name="text">
-             <string>Width:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="4">
-           <widget class="QSlider" name="borderWidthSlider">
-            <property name="maximum">
-             <number>100</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="5">
-           <widget class="QLabel" name="borderWidthLabel">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>None</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tabAccounts">
-      <attribute name="title">
-       <string>Monitoring</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_10">
-       <item>
-        <widget class="QGroupBox" name="groupAccounts">
-         <property name="title">
-          <string>Accounts to monitor</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_11">
+         <layout class="QVBoxLayout" name="layoutThunderbird">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QTreeViewWithKeyEvents" name="treeAccounts">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="rootIsDecorated">
-               <bool>false</bool>
-              </property>
-              <property name="itemsExpandable">
-               <bool>false</bool>
-              </property>
-              <property name="expandsOnDoubleClick">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_2">
-              <item>
-               <widget class="QPushButton" name="btnAccountAdd">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select mail folders for watching.&lt;br/&gt;&lt;br/&gt;If the dialog doesn't show your folder, &lt;i&gt;Ctrl + Shift click&lt;/i&gt; to open a file selection dialog that allows adding any mork file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Add</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnAccountAddInboxes">
-                <property name="toolTip">
-                 <string>Add the inboxes of all Thunderbird accounts that are not monitored yet.</string>
-                </property>
-                <property name="text">
-                 <string>Add inboxes</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnAccountEdit">
-                <property name="text">
-                 <string>Edit</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnAccountRemove">
-                <property name="toolTip">
-                 <string>You can also remove folders with Delete or Backspace</string>
-                </property>
-                <property name="text">
-                 <string>Remove</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="verticalSpacer_10">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="boxAllowSuppression">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If enabled, this option adds the &amp;quot;Ignore currently unread emails&amp;quot; action to the context menu. This action allows you to ignore the emails which are currently unread. Birdtray Lite would then pretend there are no unread emails left, and would only show new emails over the ignored count.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;For example, if there were 10 unread emails, and you clicked on &amp;quot;Ignore&amp;quot; action, Birdtray Lite will show no unread email indicator as long as unread email count remains at 10. Once new email is received and you have 11 total unread emails, Birdtray Lite will show the new email count as 1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="title">
-          <string>Allow ignoring the current unread email counter</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_12">
-          <item>
-           <widget class="QCheckBox" name="ignoreMailCountOnStartupBox">
-            <property name="toolTip">
-             <string>Ignore all unread email that are present when Birdtray Lite starts. Only new emails will be taken into account by the unread counter.</string>
-            </property>
+           <widget class="QCheckBox" name="boxLaunchThunderbirdAtStart">
             <property name="text">
-             <string>At startup</string>
+             <string>Start Thunderbird with Birdtray Lite</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="ignoreMailCountOnHideBox">
+           <widget class="QCheckBox" name="boxRestartThunderbird">
             <property name="text">
-             <string>When hiding Thunderbird</string>
+             <string>Restart Thunderbird if it is closed</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="ignoreMailCountOnShowBox">
+           <widget class="QCheckBox" name="boxStartThunderbirdOnTrayIconClick">
             <property name="text">
-             <string>When showing Thunderbird</string>
+             <string>Start Thunderbird when clicking the tray icon if it is closed</string>
             </property>
            </widget>
           </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Unread change cmd:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="leProcessRunOnCountChange">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If not empty, this command will be invoked every time the unread counter changes (including when it becomes zero). It is invoked via shell, as-is, with %NEW% replaced by the new unread count value and %OLD% replaced with the old unread count value (which may be the same as new).&lt;/p&gt;&lt;p&gt;Most users don't need this functionality and should leave it empty.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="whatsThis">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If not empty, this command will be invoked every time the unread counter changes (including when it becomes zero). It is invoked via shell, as-is, with %NEW% replaced by the new unread count value and %OLD% replaced with the old unread count value (which may be the same as new).&lt;/p&gt;&lt;p&gt;Most users don't need this functionality and should leave it empty.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_2">
-      <attribute name="title">
-       <string>Hiding</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <item>
-        <widget class="QGroupBox" name="groupBox_5">
-         <property name="title">
-          <string>Launching and Hiding</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
-             <widget class="QCheckBox" name="boxLaunchThunderbirdAtStart">
-              <property name="text">
-               <string>Start Thunderbird when Birdtray Lite starts</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spinThunderbirdStartDelay">
-              <property name="whatsThis">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When both Thunderbird and Birdtray Lite are set to start with the operating system, this usually results in two copies of Thunderbird being launched. Here you can add a delay before Thunderbird is launched, to prevent this.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="suffix">
-               <string> second delay</string>
-              </property>
-              <property name="prefix">
-               <string>with a </string>
-              </property>
-              <property name="maximum">
-               <number>60</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="boxHideWindowAtStart">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>and hide it</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_6">
-            <item>
-             <widget class="QCheckBox" name="boxStopThunderbirdOnExit">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Terminate Thunderbird when quitting Birdtray Lite</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QCheckBox" name="boxStartThunderbirdHidden">
+            <property name="text">
+             <string>Start Thunderbird hidden</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QCheckBox" name="boxShowHideThunderbird">
             <property name="text">
-             <string>Hide/show Thunderbird window when clicking on tray icon</string>
+             <string>Hide/show Thunderbird when clicking the tray icon</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="boxStopThunderbirdOnExit">
+            <property name="text">
+             <string>Close Thunderbird when quitting Birdtray Lite</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QCheckBox" name="boxMonitorThunderbirdWindow">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
             <property name="text">
-             <string>Show red X in tray icon if Thunderbird is not running</string>
+             <string>Show a red X when Thunderbird is not running</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-             <widget class="QCheckBox" name="boxRestartThunderbird">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Restart Thunderbird if it was closed</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="boxHideWindowAtRestart">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>and hide it</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_15">
-            <item>
-             <widget class="QCheckBox" name="boxStartThunderbirdOnTrayIconClick">
-              <property name="text">
-               <string>Start Thunderbird by clicking on the tray icon if it was closed</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="boxHideWindowAfterManualStart">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>and hide it</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_9">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
           </item>
          </layout>
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_4">
+        <widget class="QGroupBox" name="groupTrayIcon">
+         <property name="title">
+          <string>Tray icon</string>
+         </property>
+         <layout class="QVBoxLayout" name="layoutTrayIcon">
+          <item>
+           <widget class="QCheckBox" name="boxShowUnreadCount">
+            <property name="text">
+             <string>Show unread count</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="layoutCountColor">
+            <item>
+             <widget class="QLabel" name="labelCountColor">
+              <property name="text">
+               <string>Count color:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="ColorButton" name="btnNotificationColor">
+              <property name="toolTip">
+               <string>Used when more than one monitored folder has unread mail.</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="spacerCountColor">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="boxBlink">
+            <property name="text">
+             <string>Blink on new mail</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="onlyShowIconOnNewMail">
+            <property name="text">
+             <string>Hide the icon when there is no unread mail</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="boxEnableNewEmail">
+            <property name="text">
+             <string>Show &quot;New Email&quot; in the tray menu</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="spacerGeneral">
          <property name="orientation">
           <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>103</height>
-          </size>
          </property>
         </spacer>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_4">
+     <widget class="QWidget" name="tabMonitoring">
       <attribute name="title">
-       <string>New Email</string>
+       <string>Monitoring</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_8">
+      <layout class="QHBoxLayout" name="layoutMonitoring">
        <item>
-        <widget class="QCheckBox" name="boxEnableNewEmail">
-         <property name="text">
-          <string>Enable New Email submenu</string>
+        <widget class="QTreeViewWithKeyEvents" name="treeAccounts">
+         <property name="rootIsDecorated">
+          <bool>false</bool>
+         </property>
+         <property name="itemsExpandable">
+          <bool>false</bool>
+         </property>
+         <property name="expandsOnDoubleClick">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
-         <item>
-          <widget class="QTreeView" name="treeNewEmails">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="rootIsDecorated">
-            <bool>false</bool>
-           </property>
-           <property name="itemsExpandable">
-            <bool>false</bool>
-           </property>
-           <property name="expandsOnDoubleClick">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_7">
-           <item>
-            <spacer name="verticalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Orientation::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btnNewEmailAdd">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Add</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btnNewEmailEdit">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Edit</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btnNewEmailDelete">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Remove</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Orientation::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
+        <layout class="QVBoxLayout" name="layoutAccountButtons">
+        <item>
+         <widget class="QPushButton" name="btnAccountAdd">
+          <property name="toolTip">
+           <string>Choose the mail folders to monitor.&lt;br/&gt;&lt;br/&gt;Ctrl + Shift click to add any mork file.</string>
+          </property>
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAccountAddInboxes">
+          <property name="toolTip">
+           <string>Add the inboxes of all Thunderbird accounts that are not monitored yet.</string>
+          </property>
+          <property name="text">
+           <string>Add inboxes</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAccountEdit">
+          <property name="toolTip">
+           <string>Change the color used when only this folder has unread mail.</string>
+          </property>
+          <property name="text">
+           <string>Edit</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAccountRemove">
+          <property name="toolTip">
+           <string>You can also remove folders with Delete or Backspace.</string>
+          </property>
+          <property name="text">
+           <string>Remove</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="spacerAccountButtons">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+         </spacer>
+        </item>
         </layout>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_5">
-      <attribute name="title">
-       <string>Advanced</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_12">
-       <item>
-        <widget class="QGroupBox" name="groupBox_4">
-         <property name="title">
-          <string/>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_9">
-          <item>
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Please do not change these settings unless you understand what you're doing.</string>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,0,0">
-            <item row="3" column="1">
-             <widget class="QSpinBox" name="spinMinimumFontSize">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>1</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="suffix">
-               <string> points</string>
-              </property>
-              <property name="prefix">
-               <string>Minimum: </string>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>512</number>
-              </property>
-              <property name="value">
-               <number>4</number>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_11">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Notification font size:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1" colspan="2">
-             <widget class="QLineEdit" name="leThunderbirdCmdLine">
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the full command-line (with arguments) which will be used to start Thunderbird. Arguments are space-separated, but spaces in quotes are allowed, i.e. something like &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;C:\Program Files\tb.exe&amp;quot; --profile test&lt;/span&gt; will work.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="labelWindowNamePattern">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Thunderbird window name pattern:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1" colspan="2">
-             <widget class="QLineEdit" name="leThunderbirdProcessName"/>
-            </item>
-            <item row="1" column="1" colspan="2">
-             <widget class="QLineEdit" name="leThunderbirdWindowMatch"/>
-            </item>
-            <item row="3" column="2">
-             <widget class="QSpinBox" name="spinMaximumFontSize">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>1</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="suffix">
-               <string> points</string>
-              </property>
-              <property name="prefix">
-               <string>Maximum: </string>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>512</number>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_7">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Thunderbird command line:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="processNameLabel">
-              <property name="text">
-               <string>Thunderbird process name:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="label_8">
-              <property name="text">
-               <string>Count offset from center:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="2">
-             <widget class="QDoubleSpinBox" name="spinVerticalUnreadCountOffset">
-              <property name="prefix">
-               <string>Vertical: </string>
-              </property>
-              <property name="suffix">
-               <string> %</string>
-              </property>
-              <property name="minimum">
-               <double>-100.000000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>100.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QDoubleSpinBox" name="spinHorizontalUnreadCountOffset">
-              <property name="prefix">
-               <string>Horizontal: </string>
-              </property>
-              <property name="suffix">
-               <string> %</string>
-              </property>
-              <property name="minimum">
-               <double>-100.000000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>100.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_8">
-            <item>
-             <widget class="QCheckBox" name="boxBlinkingUsesAlpha">
-              <property name="text">
-               <string>When blinking, use the fade-in/fade-out transition (increases CPU use!)</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_10">
-            <item>
-             <widget class="QLabel" name="label_13">
-              <property name="text">
-               <string>Make the system tray icon</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spinUnreadOpacityLevel">
-              <property name="suffix">
-               <string notr="true"> %</string>
-              </property>
-              <property name="prefix">
-               <string/>
-              </property>
-              <property name="maximum">
-               <number>100</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_14">
-              <property name="text">
-               <string>opaque when new mail is present,</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="onlyShowIconOnNewMail">
-              <property name="text">
-               <string>hide it if no new mail is present.</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_5">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_11">
-            <item>
-             <spacer name="horizontalSpacer_6">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btnShowLogWindow">
-              <property name="text">
-               <string>Show log window</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_13">
-            <item>
-             <widget class="QCheckBox" name="boxForceReread">
-              <property name="text">
-               <string>Force index file re-read every</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spinForceRereadSeconds">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="suffix">
-               <string> seconds</string>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>3600</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_7">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_16">
-            <item>
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>When detecting a change, wait</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spinWatchFileTimerMilliseconds">
-              <property name="suffix">
-               <string> milliseconds</string>
-              </property>
-              <property name="maximum">
-               <number>99999</number>
-              </property>
-              <property name="value">
-               <number>150</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_12">
-              <property name="text">
-               <string>before updating the unread counter.</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_10">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_8">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>179</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_3">
+     <widget class="QWidget" name="tabAbout">
       <attribute name="title">
        <string>About</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <layout class="QVBoxLayout" name="layoutAbout">
        <item>
         <widget class="QTextBrowser" name="browserAbout">
          <property name="html">
@@ -1108,25 +261,27 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
+       <item>
+        <layout class="QHBoxLayout" name="layoutLog">
+         <item>
+          <spacer name="spacerLog">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnShowLogWindow">
+           <property name="text">
+            <string>Show log window</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Policy::Preferred</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -1137,7 +292,6 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>ColorButton</class>
@@ -1150,203 +304,8 @@ p, li { white-space: pre-wrap; }
    <header>qtcomponents.h</header>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>tabWidget</tabstop>
-  <tabstop>boxAutostart</tabstop>
-  <tabstop>notificationFont</tabstop>
-  <tabstop>notificationFontWeight</tabstop>
-  <tabstop>btnNotificationColor</tabstop>
-  <tabstop>borderColorButton</tabstop>
-  <tabstop>borderWidthSlider</tabstop>
-  <tabstop>sliderBlinkingSpeed</tabstop>
-  <tabstop>btnNotificationIcon</tabstop>
-  <tabstop>boxShowUnreadCount</tabstop>
-  <tabstop>boxNotificationIconUnread</tabstop>
-  <tabstop>btnNotificationIconUnread</tabstop>
-  <tabstop>treeAccounts</tabstop>
-  <tabstop>btnAccountAdd</tabstop>
-  <tabstop>btnAccountAddInboxes</tabstop>
-  <tabstop>btnAccountEdit</tabstop>
-  <tabstop>btnAccountRemove</tabstop>
-  <tabstop>boxAllowSuppression</tabstop>
-  <tabstop>ignoreMailCountOnStartupBox</tabstop>
-  <tabstop>ignoreMailCountOnHideBox</tabstop>
-  <tabstop>ignoreMailCountOnShowBox</tabstop>
-  <tabstop>leProcessRunOnCountChange</tabstop>
-  <tabstop>boxLaunchThunderbirdAtStart</tabstop>
-  <tabstop>spinThunderbirdStartDelay</tabstop>
-  <tabstop>boxHideWindowAtStart</tabstop>
-  <tabstop>boxStopThunderbirdOnExit</tabstop>
-  <tabstop>boxShowHideThunderbird</tabstop>
-  <tabstop>boxMonitorThunderbirdWindow</tabstop>
-  <tabstop>boxRestartThunderbird</tabstop>
-  <tabstop>boxHideWindowAtRestart</tabstop>
-  <tabstop>boxStartThunderbirdOnTrayIconClick</tabstop>
-  <tabstop>boxHideWindowAfterManualStart</tabstop>
-  <tabstop>boxEnableNewEmail</tabstop>
-  <tabstop>treeNewEmails</tabstop>
-  <tabstop>btnNewEmailAdd</tabstop>
-  <tabstop>btnNewEmailEdit</tabstop>
-  <tabstop>btnNewEmailDelete</tabstop>
-  <tabstop>leThunderbirdCmdLine</tabstop>
-  <tabstop>leThunderbirdWindowMatch</tabstop>
-  <tabstop>spinMinimumFontSize</tabstop>
-  <tabstop>boxBlinkingUsesAlpha</tabstop>
-  <tabstop>spinUnreadOpacityLevel</tabstop>
-  <tabstop>onlyShowIconOnNewMail</tabstop>
-  <tabstop>btnShowLogWindow</tabstop>
-  <tabstop>boxForceReread</tabstop>
-  <tabstop>spinForceRereadSeconds</tabstop>
-  <tabstop>spinWatchFileTimerMilliseconds</tabstop>
-  <tabstop>browserAbout</tabstop>
- </tabstops>
  <resources>
   <include location="resources.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>boxLaunchThunderbirdAtStart</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>boxHideWindowAtStart</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>119</x>
-     <y>72</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>483</x>
-     <y>90</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>boxRestartThunderbird</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>boxHideWindowAtRestart</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>130</x>
-     <y>227</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>322</x>
-     <y>227</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>boxEnableNewEmail</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>treeNewEmails</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>101</x>
-     <y>45</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>119</x>
-     <y>81</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>boxEnableNewEmail</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>btnNewEmailAdd</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>101</x>
-     <y>45</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>687</x>
-     <y>203</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>boxEnableNewEmail</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>btnNewEmailEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>101</x>
-     <y>45</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>687</x>
-     <y>233</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>boxEnableNewEmail</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>btnNewEmailDelete</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>101</x>
-     <y>45</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>687</x>
-     <y>263</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>boxNotificationIconUnread</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>btnNotificationIconUnread</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>580</x>
-     <y>211</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>678</x>
-     <y>212</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>boxForceReread</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>spinForceRereadSeconds</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>165</x>
-     <y>272</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>302</x>
-     <y>273</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>boxStartThunderbirdOnTrayIconClick</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>boxHideWindowAfterManualStart</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>319</x>
-     <y>251</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>402</x>
-     <y>247</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

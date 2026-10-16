@@ -45,9 +45,6 @@ class UnreadMonitor : public QThread
         void    watchedFileChanges( const QString& filechanged );
         void    updateUnread();
 
-        // This one forces rereading Mork files
-        void    forceUpdateUnread();
-
     private:
         void    getUnreadCount_Mork( int & count, QColor& color );
         int     getMorkUnreadCount( const QString& path );
@@ -85,9 +82,6 @@ class UnreadMonitor : public QThread
 
         // List of changed files (for MSF monitoring)
         QList<QString>      mChangedMSFfiles;
-
-        // This timer is used when force update is set, triggering such update
-        QTimer              mForceUpdateTimer;
 
         // Last reported unread
         int    mLastReportedUnread;

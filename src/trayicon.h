@@ -79,7 +79,6 @@ class TrayIcon : public QSystemTrayIcon
         void    actionSnoozeFor();
         void    actionUnsnooze();
         void    actionNewEmail();
-        void    actionIgnoreEmails();
 
         void    actionSystrayIconActivated( QSystemTrayIcon::ActivationReason reason );
 
@@ -111,15 +110,6 @@ class TrayIcon : public QSystemTrayIcon
         void    createUnreadCounterThread();
         
         /**
-         * update the number of ignored mails.
-         *
-         * @param ignoredMails The new number of ignored mails.
-         * @param updateIcon Whether a change in the number of ignored mails
-         *                   should result in an update of the tray icon.
-         */
-        void    setIgnoredUnreadMails(unsigned int ignoredMails, bool updateIcon = true);
-        
-        /**
          * Draw the warning indicator.
          * @param painter The painter to use when drawing.
          * @param iconSize The size of the icon image to draw on in pixel.
@@ -128,7 +118,6 @@ class TrayIcon : public QSystemTrayIcon
 
         // State variables for blinking; mBlinkingTimeout=0 means we are not blinking
         double          mBlinkingIconOpacity;
-        double          mBlinkingDelta;
         unsigned int    mBlinkingTimeout;
         QTimer          mBlinkingTimer;
 
@@ -141,9 +130,6 @@ class TrayIcon : public QSystemTrayIcon
 
         // Show/hide Thunderbird menu item (we modify its text)
         QAction *       mMenuShowHideThunderbird;
-
-        // Ignore unread emails item (we modify its text) - only if we have this functionality
-        QAction *       mMenuIgnoreUnreads;
 
         // Unsnooze menu item
         QAction *       mMenuUnsnooze;
@@ -168,11 +154,6 @@ class TrayIcon : public QSystemTrayIcon
         // If true, it will hide Thunderbird window as soon as its shown
         bool            mThunderbirdWindowHide;
 
-        /**
-         * The number of unread emails that Birdtray is ignoring.
-         */
-        unsigned int    ignoredUnreadEmails = 0;
-
         // Window tools (show/hide)
         WindowTools *   mWinTools;
 
@@ -191,12 +172,6 @@ class TrayIcon : public QSystemTrayIcon
          * The currently opened settings dialog.
          */
         DialogSettings* settingsDialog = nullptr;
-
-               
-        /**
-         * Whether we have received data about unread emails yet.
-         */
-        bool haveUnreadMailsData = false;
 };
 
 #endif // TRAYICON_H

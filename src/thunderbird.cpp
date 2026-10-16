@@ -83,7 +83,7 @@ QList<Thunderbird::Account> Thunderbird::accounts(const QString &profileDir)
             continue;
         }
         QString inbox;
-        for (const QString &name : {"INBOX.msf", "Inbox.msf"}) {
+        for (const char* name : {"INBOX.msf", "Inbox.msf"}) {
             if (QFile::exists(QDir(directory).filePath(name))) {
                 inbox = QDir(directory).filePath(name);
                 break;

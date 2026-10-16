@@ -7,37 +7,33 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 6.2 CONFIG REQUIRED COMPONENTS Core Gui Widgets DBus Svg)
+find_package(Qt6 6.2 CONFIG REQUIRED COMPONENTS Core Gui Widgets DBus)
 add_definitions(-DQT_DEPRECATED_WARNINGS)
 
 add_executable(birdtray-lite
         src/main.cpp
         src/birdtrayapp.cpp
         src/colorbutton.cpp
-        src/dialogaddeditnewemail.cpp
         src/dialoglogoutput.cpp
         src/dialogsettings.cpp
         src/log.cpp
         src/mailaccountdialog.cpp
         src/modelaccounttree.cpp
-        src/modelnewemails.cpp
         src/morkparser.cpp
         src/qtcomponents.cpp
-        src/setting_newemail.cpp
         src/settings.cpp
         src/thunderbird.cpp
         src/trayicon.cpp
         src/unreadmonitor.cpp
         src/utils.cpp
         src/windowtools.cpp
-        src/dialogaddeditnewemail.ui
         src/dialoglogoutput.ui
         src/dialogsettings.ui
         src/mailaccountdialog.ui
         src/resources.qrc)
 target_include_directories(birdtray-lite PRIVATE src)
 target_link_libraries(birdtray-lite PRIVATE
-        Qt6::Core Qt6::Gui Qt6::Widgets Qt6::DBus Qt6::Svg)
+        Qt6::Core Qt6::Gui Qt6::Widgets Qt6::DBus)
 
 include(GNUInstallDirs)
 set(APP_ID io.github.vegiii.BirdtrayLite)

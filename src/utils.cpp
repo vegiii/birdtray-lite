@@ -43,6 +43,12 @@ QStringList Utils::getThunderbirdProfilesPaths() {
 }
 
 QStringList Utils::getDefaultThunderbirdCommand() {
+    // Use the Flatpak if Thunderbird is not installed as a package
+    if (!QFile::exists("/usr/bin/thunderbird")
+        && (QDir("/var/lib/flatpak/app/org.mozilla.Thunderbird").exists()
+            || QDir(expandPath("~/.local/share/flatpak/app/org.mozilla.Thunderbird")).exists())) {
+        return { "flatpak", "run", "org.mozilla.Thunderbird" };
+    }
     return { "/usr/bin/thunderbird" };
 }
 
@@ -119,21 +125,4 @@ QString Utils::getMailAccountName(const QFileInfo &morkFile) {
     }
     QString accountName = Thunderbird::accountName(parentDir.absolutePath());
     return accountName.isEmpty() ? name : accountName;
-}
-
-QString Utils::pixmapToString(const QPixmap &pixmap) {
-    QByteArray iconData;
-    QBuffer buffer(&iconData);
-    buffer.open(QIODevice::WriteOnly);
-    pixmap.save(&buffer, "PNG");
-    buffer.close();
-    return QString::fromLatin1(iconData.toBase64());
-}
-
-QPixmap Utils::pixmapFromString(const QString &data) {
-    QPixmap pixmap;
-    if (!data.isEmpty()) {
-        pixmap.loadFromData(QByteArray::fromBase64(data.toLatin1()), "PNG");
-    }
-    return pixmap;
 }

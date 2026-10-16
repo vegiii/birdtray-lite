@@ -16,7 +16,6 @@
 TrayIcon::TrayIcon(bool showSettings)
 {
     mBlinkingIconOpacity = 1.0;
-    mBlinkingDelta = 0.0;
     mBlinkingTimeout = 0;
 
     mUnreadCounter = 0;
@@ -26,7 +25,6 @@ TrayIcon::TrayIcon(bool showSettings)
     setContextMenu( mSystrayMenu );
 
     mMenuShowHideThunderbird = 0;
-    mMenuIgnoreUnreads = 0;
     mThunderbirdProcess = nullptr;
     
     mThunderbirdWindowExists = false;
@@ -118,35 +116,8 @@ UnreadMonitor* TrayIcon::getUnreadMonitor() const {
 void TrayIcon::unreadCounterUpdate( unsigned int total, QColor color )
 {
     Log::debug("unreadCounterUpdate %d", total );
-    Settings* settings = BirdtrayApp::get()->getSettings();
-    if (settings->ignoreUnreadCountOnStart && !haveUnreadMailsData) {
-        // Ignore unread emails that are present at Birdtray startup.
-        setIgnoredUnreadMails(total, false);
-    }
-    if (total < ignoredUnreadEmails) {
-        setIgnoredUnreadMails(total, false);
-    }
-    
-    // Execute the hook process
-    if ( !settings->mProcessRunOnCountChange.isEmpty() )
-    {
-        QString cmdline = settings->mProcessRunOnCountChange;
-
-        // Replace the %NEW% with the new unread count
-        cmdline.replace( "%NEW%", QString::number( total ) );
-
-        // Replace the %OLD% with the old unread count
-        cmdline.replace( "%OLD%", QString::number( mUnreadCounter ) );
-
-        if ( !QProcess::startDetached( cmdline ) )
-            Log::debug( "Failed to execute hook command %s", qPrintable( cmdline ) );
-        else
-            Log::debug( "Executing hook command %s", qPrintable( cmdline ) );
-    }
-
     mUnreadCounter = total;
     mUnreadColor = color;
-    haveUnreadMailsData = true;
 
     updateIcon();
 }
@@ -171,8 +142,6 @@ static unsigned int largestFontSize(const QFont &font, int minfontsize, int maxf
     {
         cursize = minfontsize + (maxfontsize - minfontsize) / 2;
         testfont.setPointSize( cursize );
-        testfont.setWeight(
-                static_cast<QFont::Weight>(BirdtrayApp::get()->getSettings()->mNotificationFontWeight));
         QSize size = QFontMetrics( testfont ).size( Qt::TextSingleLine, text );
 
         if ( size.width() < rectsize.width() && size.height() <= rectsize.height() )
@@ -198,9 +167,6 @@ void TrayIcon::updateIcon()
     }
     else
     {
-        // Subtract the ignored unread mails
-        unread -= ignoredUnreadEmails;
-
         // Are we blinking, and if not, should we be?
         if (unread > 0 && settings->mBlinkSpeed > 0 && mBlinkingTimeout == 0) {
             enableBlinking(true);
@@ -230,13 +196,7 @@ void TrayIcon::updateIcon()
     else
         p.setOpacity( mBlinkingIconOpacity );
 
-    if (unread != 0 && !settings->mNotificationIconUnread.isNull()) {
-        p.drawPixmap(settings->mNotificationIconUnread.rect(), settings->mNotificationIconUnread);
-    } else {
-        p.drawPixmap(settings->getNotificationIcon().rect(), settings->getNotificationIcon());
-    }
-
-    p.setFont(settings->mNotificationFont);
+    p.drawPixmap(settings->getNotificationIcon().rect(), settings->getNotificationIcon());
 
     // Do we need to draw error sign?
     if (settings->mMonitorThunderbirdWindow && !mThunderbirdWindowExists) {
@@ -254,35 +214,21 @@ void TrayIcon::updateIcon()
         // Find the suitable font size, starting from 4
         QString countvalue = QString::number( unread );
 
-        int fontsize = static_cast<int>(largestFontSize(
-                settings->mNotificationFont,
-                static_cast<int>(settings->mNotificationMinimumFontSize),
-                static_cast<int>(settings->mNotificationMaximumFontSize),
-                countvalue, temp.size() - QSize(2, 2)));
-
-        settings->mNotificationFont.setPointSize(fontsize);
-        settings->mNotificationFont.setWeight(static_cast<QFont::Weight>(settings->mNotificationFontWeight));
-        QFontMetrics fm(settings->mNotificationFont);
+        // The weight and border match the old Birdtray defaults
+        QFont font = QApplication::font();
+        font.setWeight(static_cast<QFont::Weight>(50));
+        font.setPointSize(static_cast<int>(largestFontSize(font, 4, 512, countvalue, temp.size() - QSize(2, 2))));
         p.setOpacity( mBlinkingTimeout ? 1.0 - mBlinkingIconOpacity : 1.0 );
 
         QPainterPath textPath;
-        textPath.addText(0, 0, settings->mNotificationFont, countvalue);
+        textPath.addText(0, 0, font, countvalue);
         QRectF textBoundingRect = textPath.boundingRect();
 
-        double horizontalMargin = temp.width() - textBoundingRect.width();
-        double verticalMargin = temp.height() - textBoundingRect.height();
-        double borderMargin = settings->mNotificationBorderWidth;
-        double horizontalOffset = ((horizontalMargin - borderMargin) / 2.0) * settings->horizontalUnreadCountOffset;
-        double verticalOffset = ((verticalMargin - borderMargin) / 2.0) * -settings->verticalUnreadCountOffset;
-        
-        double x = std::clamp(horizontalMargin / 2.0 + horizontalOffset, 0.0, horizontalMargin) - textBoundingRect.left();
-        double y = std::clamp(verticalMargin / 2.0 + verticalOffset, 0.0, verticalMargin) - textBoundingRect.top();
+        // Center the count on the icon
+        double x = (temp.width() - textBoundingRect.width()) / 2.0 - textBoundingRect.left();
+        double y = (temp.height() - textBoundingRect.height()) / 2.0 - textBoundingRect.top();
         textPath.translate(x, y);
-        if (settings->mNotificationBorderWidth > 0
-            && settings->mNotificationBorderColor.isValid()) {
-            p.strokePath(textPath, QPen(
-                    settings->mNotificationBorderColor, settings->mNotificationBorderWidth));
-        }
+        p.strokePath(textPath, QPen(Qt::white, 15));
         p.fillPath(textPath, mUnreadColor);
     }
     const QMap<QString, QString> warnings = mUnreadMonitor->getWarnings();
@@ -335,16 +281,8 @@ void TrayIcon::enableBlinking(bool enabled)
         Settings* settings = BirdtrayApp::get()->getSettings();
         mBlinkingIconOpacity = 1.0;
 
-        // If we are using the alpha transition, we have to update icon more often
-        if (settings->mBlinkingUseAlphaTransition) {
-            mBlinkingDelta = std::min(1.0, (2.0 / settings->mBlinkSpeed));
-            mBlinkingTimeout = settings->mBlinkSpeed == 1 ? 50 : 100;
-        } else {
-            // The blinking speed slider is a value from 0 to 30,
-            // so we make it 50x so the maximum is 1500 ms.
-            mBlinkingDelta = 0;
-            mBlinkingTimeout = settings->mBlinkSpeed * 50;
-        }
+        // The blinking speed is a value from 0 to 30, so we make it 50x so the maximum is 1500 ms.
+        mBlinkingTimeout = settings->mBlinkSpeed * 50;
 
         mBlinkingTimer.setInterval( mBlinkingTimeout );
         mBlinkingTimer.start();
@@ -353,7 +291,6 @@ void TrayIcon::enableBlinking(bool enabled)
     {
         mBlinkingTimer.stop();
         mBlinkingIconOpacity = 1.0;
-        mBlinkingDelta = 0.0;
         mBlinkingTimeout = 0;
     }
 }
@@ -398,7 +335,7 @@ void TrayIcon::updateState()
                     startThunderbird();
 
                     // Hide after?
-                    if (settings->mHideWhenStarted) {
+                    if (settings->mStartThunderbirdHidden) {
                         mThunderbirdWindowHide = true;
                     }
                 }
@@ -408,7 +345,7 @@ void TrayIcon::updateState()
                     startThunderbird();
 
                     // Hide after?
-                    if (settings->mHideWhenRestarted) {
+                    if (settings->mStartThunderbirdHidden) {
                         mThunderbirdWindowHide = true;
                     }
                 }
@@ -427,29 +364,12 @@ void TrayIcon::updateState()
 
 void TrayIcon::blinkTimeout()
 {
-    // Apply blinking fade-in/fade-out, if needed
-    if ( mBlinkingDelta != 0.0 )
-    {
-        if ( mBlinkingIconOpacity + mBlinkingDelta > 1.0 || mBlinkingIconOpacity + mBlinkingDelta < 0.0 )
-            mBlinkingDelta = -mBlinkingDelta;
-
-        mBlinkingIconOpacity += mBlinkingDelta;
-    }
-    else
-    {
-        Settings* settings = BirdtrayApp::get()->getSettings();
-        // We are either not blinking at all, or doing no transition
-        // this depends on nonzero settings->mBlinkSpeed
-        if (settings->mBlinkSpeed != 0) {
-            // Flip the opacity
-            if (mBlinkingIconOpacity == settings->mUnreadOpacityLevel) {
-                mBlinkingIconOpacity = 1.0 - settings->mUnreadOpacityLevel;
-            } else {
-                mBlinkingIconOpacity = settings->mUnreadOpacityLevel;
-            }
-        } else {
-            mBlinkingIconOpacity = settings->mUnreadOpacityLevel;
-        }
+    // Flip the opacity between the unread opacity level and its inverse
+    const double unreadOpacityLevel = 0.75;
+    if (mBlinkingIconOpacity == unreadOpacityLevel) {
+        mBlinkingIconOpacity = 1.0 - unreadOpacityLevel;
+    } else {
+        mBlinkingIconOpacity = unreadOpacityLevel;
     }
 
     updateIcon();
@@ -477,9 +397,6 @@ void TrayIcon::showSettings()
             return;
         }
         settings->save();
-        if (!settings->mAllowSuppressingUnreads) {
-            setIgnoredUnreadMails(0, false);
-        }
 
         // Recreate menu
         createMenu();
@@ -502,7 +419,7 @@ void TrayIcon::actionActivate()
     Settings* settings = BirdtrayApp::get()->getSettings();
     if ( settings->startClosedThunderbird && !mWinTools->lookup() && mThunderbirdProcess == nullptr ) {
         startThunderbird();
-        if (settings->hideWhenStartedManually) {
+        if (settings->mStartThunderbirdHidden) {
             mThunderbirdWindowHide = true;
         }
     } else if ( mWinTools->isHidden() ) {
@@ -549,24 +466,7 @@ void TrayIcon::actionNewEmail() {
         return;
 
     args << "-compose";
-
-    if (!settings->mNewEmailData.isEmpty()) {
-        auto* action = (QAction*) sender();
-        if (action->data().isValid()) {
-            int index = (action->data().toInt());
-            if (index < 0 || index > settings->mNewEmailData.size() - 1) {
-                return;
-            }
-            args << settings->mNewEmailData[index].asArgs();
-        }
-    }
-
     QProcess::startDetached(executable, args);
-}
-
-void TrayIcon::actionIgnoreEmails()
-{
-    setIgnoredUnreadMails(mUnreadCounter);
 }
 
 void TrayIcon::actionSystrayIconActivated(QSystemTrayIcon::ActivationReason reason) {
@@ -593,27 +493,8 @@ void TrayIcon::createMenu()
     mSystrayMenu->addAction( mMenuShowHideThunderbird );
     mSystrayMenu->addSeparator();
 
-    // New email could be either a single action, or menu depending on settings
     if (settings->mNewEmailMenuEnabled) {
-        if (!settings->mNewEmailData.isEmpty()) {
-            // A submenu
-            auto* newEmails = new QMenu(tr("New Email"));
-            auto* action = new QAction(tr("Blank"), this);
-            connect(action, &QAction::triggered, this, &TrayIcon::actionNewEmail);
-            newEmails->addAction(action);
-            newEmails->addSeparator();
-            for (int index = 0; index < settings->mNewEmailData.size(); index++) {
-                action = new QAction(settings->mNewEmailData[index].menuentry(), this);
-                connect(action, &QAction::triggered, this, &TrayIcon::actionNewEmail);
-                // Remember the delay in the action itself
-                action->setData(index);
-                newEmails->addAction(action);
-            }
-            mSystrayMenu->addMenu(newEmails);
-        } else {
-            // A single action
-            mSystrayMenu->addAction(tr("New Email Message"), this, SLOT(actionNewEmail()));
-        }
+        mSystrayMenu->addAction(tr("New Email"), this, SLOT(actionNewEmail()));
         mSystrayMenu->addSeparator();
     }
 
@@ -648,18 +529,6 @@ void TrayIcon::createMenu()
 
     mSystrayMenu->addAction( mMenuUnsnooze );
     mMenuUnsnooze->setVisible( false );
-
-    // Add the ignore action
-    if (settings->mAllowSuppressingUnreads) {
-        mMenuIgnoreUnreads = new QAction( tr("Ignore unread emails"), this );
-        connect( mMenuIgnoreUnreads, &QAction::triggered, this, &TrayIcon::actionIgnoreEmails );
-        mSystrayMenu->addAction( mMenuIgnoreUnreads );
-        // Force an update of the ignore unread mails menu entry text.
-        setIgnoredUnreadMails(ignoredUnreadEmails++, false);
-    }
-    else {
-        mMenuIgnoreUnreads = nullptr;
-    }
 
     mSystrayMenu->addSeparator();
 
@@ -752,16 +621,10 @@ void TrayIcon::onQuit() {
 
 void TrayIcon::onThunderbirdWindowShown() {
     mMenuShowHideThunderbird->setText( tr("Hide Thunderbird") );
-    if (haveUnreadMailsData && BirdtrayApp::get()->getSettings()->ignoreUnreadCountOnShow) {
-        setIgnoredUnreadMails(mUnreadCounter);
-    }
 }
 
 void TrayIcon::onThunderbirdWindowHidden() {
     mMenuShowHideThunderbird->setText( tr("Show Thunderbird") );
-    if (haveUnreadMailsData && BirdtrayApp::get()->getSettings()->ignoreUnreadCountOnHide) {
-        setIgnoredUnreadMails(mUnreadCounter);
-    }
 }
 
 void TrayIcon::hideThunderbird()
@@ -772,25 +635,6 @@ void TrayIcon::hideThunderbird()
 void TrayIcon::showThunderbird()
 {
     mWinTools->show();
-}
-
-void TrayIcon::setIgnoredUnreadMails(unsigned int ignoredMails, bool updateIcon) {
-    if (ignoredMails == ignoredUnreadEmails) {
-        return;
-    }
-    Log::debug("Setting ignored unread mails to %u", ignoredMails);
-    ignoredUnreadEmails = ignoredMails;
-    if (mMenuIgnoreUnreads) {
-        if (ignoredUnreadEmails > 0) {
-            mMenuIgnoreUnreads->setText(
-                    tr("Ignore unread emails (now %1)").arg(ignoredUnreadEmails));
-        } else {
-            mMenuIgnoreUnreads->setText(tr("Ignore unread emails"));
-        }
-    }
-    if (updateIcon) {
-        this->updateIcon();
-    }
 }
 
 void TrayIcon::drawWarningIndicator(QPainter &painter, const QSize &iconSize) {

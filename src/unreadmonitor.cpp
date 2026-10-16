@@ -8,7 +8,7 @@
 #include "birdtrayapp.h"
 
 UnreadMonitor::UnreadMonitor( TrayIcon * parent )
-    : QThread( 0 ), mChangedMSFtimer(this), mForceUpdateTimer(this)
+    : QThread( 0 ), mChangedMSFtimer(this)
 {
     moveToThread( this );
     mLastReportedUnread = 0;
@@ -19,29 +19,17 @@ UnreadMonitor::UnreadMonitor( TrayIcon * parent )
     // Settings changed
     connect( parent, &TrayIcon::settingsChanged, this, &UnreadMonitor::slotSettingsChanged );
 
-    // Set up the watched file timer
-    mChangedMSFtimer.setInterval(BirdtrayApp::get()->getSettings()->mWatchFileTimeout);
+    // Set up the watched file timer, Thunderbird writes the index files in bursts
+    mChangedMSFtimer.setInterval(150);
     mChangedMSFtimer.setSingleShot( true );
 
     connect( &mChangedMSFtimer, &QTimer::timeout, this, &UnreadMonitor::updateUnread );
-
-    // Set up the forced update timer
-    mForceUpdateTimer.setSingleShot( false );
-    connect( &mForceUpdateTimer, &QTimer::timeout, this, &UnreadMonitor::forceUpdateUnread );
 }
 
 void UnreadMonitor::run()
 {
     // Start it as soon as thread starts its event loop
     QTimer::singleShot( 0, [=](){ updateUnread(); } );
-    
-    // And activate the forced update timer if settings specify so
-    unsigned int rereadIntervalSec = BirdtrayApp::get()->getSettings()->mIndexFilesRereadIntervalSec;
-    if ( rereadIntervalSec > 0 )
-    {
-        mForceUpdateTimer.setInterval( static_cast<int>(rereadIntervalSec * 1000) );
-        mForceUpdateTimer.start();
-    }
 
     // Start the event loop
     exec();
@@ -54,16 +42,6 @@ const QMap<QString, QString> &UnreadMonitor::getWarnings() const {
 void UnreadMonitor::slotSettingsChanged()
 {
     Settings* settings = BirdtrayApp::get()->getSettings();
-    // And activate it if settings specify so
-    if ( settings->mIndexFilesRereadIntervalSec > 0 )
-    {
-        mForceUpdateTimer.setInterval( settings->mIndexFilesRereadIntervalSec * 1000 );
-        mForceUpdateTimer.start();
-    }
-    else
-        mForceUpdateTimer.stop();
-    
-    mChangedMSFtimer.setInterval(static_cast<int>(settings->mWatchFileTimeout));
 
     // We reinitialize everything because the settings changed
     mMorkUnreadCounts.clear();
@@ -101,12 +79,6 @@ void UnreadMonitor::updateUnread()
         mLastReportedUnread = total;
         mLastColor = chosenColor;
     }
-}
-
-void UnreadMonitor::forceUpdateUnread()
-{
-    mChangedMSFfiles = BirdtrayApp::get()->getSettings()->watchedMorkFiles.orderedKeys();
-    updateUnread();
 }
 
 void UnreadMonitor::getUnreadCount_Mork(int &count, QColor &color)
