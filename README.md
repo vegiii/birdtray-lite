@@ -8,7 +8,7 @@ This fork is meant for my personal use on Fedora KDE Wayland and comes with no g
 - Add a simple autostart checkbox.
 - Simplify installation.
 - Keep dependencies to a minimum.
-- Clean up code I will never use.
+- Remove unused features to keep the code small.
 
 ## Install or update
 
