@@ -46,7 +46,7 @@ void UnreadMonitor::slotSettingsChanged()
     // We reinitialize everything because the settings changed
     mMorkUnreadCounts.clear();
 
-    const QStringList &accountsList = settings->watchedMorkFiles.orderedKeys();
+    const QStringList &accountsList = settings->watchedMorkFiles;
     for (const QString &path : warnings.keys()) {
         if (!accountsList.contains(path)) {
             clearWarning(path);
@@ -67,21 +67,16 @@ void UnreadMonitor::updateUnread()
 {
     Log::debug("Triggering the unread counter update");
 
-    // We execute a single statement and then parse the groups and decide on colors.
-    QColor chosenColor;
-    int total = 0;
+    int total = getUnreadCount_Mork();
 
-    getUnreadCount_Mork(total, chosenColor);
-
-    if ( total != mLastReportedUnread || chosenColor != mLastColor )
+    if ( total != mLastReportedUnread )
     {
-        emit unreadUpdated( total, chosenColor );
+        emit unreadUpdated( total );
         mLastReportedUnread = total;
-        mLastColor = chosenColor;
     }
 }
 
-void UnreadMonitor::getUnreadCount_Mork(int &count, QColor &color)
+int UnreadMonitor::getUnreadCount_Mork()
 {
     Settings* settings = BirdtrayApp::get()->getSettings();
     bool rescanall = false;
@@ -99,7 +94,7 @@ void UnreadMonitor::getUnreadCount_Mork(int &count, QColor &color)
     if ( rescanall )
     {
         mMorkUnreadCounts.clear();
-        for (const QString &path : settings->watchedMorkFiles.orderedKeys()) {
+        for (const QString &path : settings->watchedMorkFiles) {
             mMorkUnreadCounts[path] = getMorkUnreadCount(path);
             if (!mDBWatcher.files().contains(path) && !mDBWatcher.addPath(path)) {
                 setWarning(tr("Unable to watch %1 for changes.")
@@ -115,25 +110,12 @@ void UnreadMonitor::getUnreadCount_Mork(int &count, QColor &color)
             mMorkUnreadCounts[ path ] = getMorkUnreadCount( path );
     }
 
-    // Find the total, and set the color
-    QColor chosenColor;
-    for ( const QString& tpath : mMorkUnreadCounts.keys() )
-    {
-        if ( mMorkUnreadCounts[ tpath ] > 0 )
-        {
-            count += mMorkUnreadCounts[ tpath ];
+    int count = 0;
+    for ( quint32 unread : mMorkUnreadCounts )
+        count += unread;
 
-            if ( chosenColor.isValid() ) {
-                if (chosenColor != settings->watchedMorkFiles[tpath]) {
-                    chosenColor = settings->mNotificationDefaultColor;
-                }
-            } else {
-                chosenColor = settings->watchedMorkFiles[tpath];
-            }
-        }
-    }
-    color = chosenColor;
     mChangedMSFfiles.clear();
+    return count;
 }
 
 int UnreadMonitor::getMorkUnreadCount(const QString &path)

@@ -8,13 +8,10 @@
 #include "ui_mailaccountdialog.h"
 #include "utils.h"
 #include "thunderbird.h"
-#include "colorbutton.h"
 
-MailAccountDialog::MailAccountDialog(QWidget* parent, QColor defaultColor,
-                                     QMap<QString, QColor> monitoredFolders) :
+MailAccountDialog::MailAccountDialog(QWidget* parent, QStringList monitoredFolders) :
         QDialog(parent),
         ui(new Ui::MailAccountDialog),
-        defaultColor(std::move(defaultColor)),
         monitoredFolders(std::move(monitoredFolders)) {
     ui->setupUi(this);
     connect(ui->tbProfilesBrowseButton, &QAbstractButton::clicked,
@@ -41,14 +38,10 @@ MailAccountDialog::~MailAccountDialog() {
     delete ui;
 }
 
-void MailAccountDialog::getSelectedAccounts(QList<std::tuple<QString, QColor>> &outList) const {
+void MailAccountDialog::getSelectedAccounts(QStringList &outList) const {
     QTreeWidgetItemIterator iterator = iterateCheckedAccountItems();
     for (; *iterator != nullptr; ++iterator) {
-        QTreeWidgetItem* selectedItem = *iterator;
-        QVariant color = selectedItem->data(1, Qt::UserRole);
-        outList.append(std::make_tuple(
-                selectedItem->data(0, Qt::UserRole).toString(),
-                color.isNull() ? defaultColor : color.value<QColor>()));
+        outList.append((*iterator)->data(0, Qt::UserRole).toString());
     }
 }
 
@@ -205,14 +198,6 @@ void MailAccountDialog::loadAccounts(QTreeWidgetItem* profileTreeItem,
                         || (monitoredFolders.isEmpty() && isInbox);
                 folderItem->setCheckState(0, selected ? Qt::Checked : Qt::Unchecked);
                 folderItem->setData(0, Qt::UserRole, path);
-                QColor color = monitoredFolders.value(path, defaultColor);
-                folderItem->setData(1, Qt::UserRole, color);
-                auto* colorButton = new ColorButton(ui->accountsList, color);
-                colorButton->setBorderlessMode(true);
-                connect(colorButton, &ColorButton::onColorChanged, this, [=](const QColor &color) {
-                    folderItem->setData(1, Qt::UserRole, color);
-                });
-                ui->accountsList->setItemWidget(folderItem, 1, colorButton);
                 accountItem->addChild(folderItem);
             }
         }

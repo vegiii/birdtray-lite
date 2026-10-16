@@ -24,33 +24,27 @@ rm -rf /tmp/birdtray-lite
 
 Settings are stored in `~/.config/birdtray-lite/config.json`.
 
-## Changes from birdtray-wayland
+## Changes from upstream
 
 ### Added
 
-- Inboxes of all Thunderbird accounts are monitored automatically on the first start, and an "Add inboxes" button adds new ones.
-- The folder dialog finds the Thunderbird profile in `~/.config/thunderbird`, shows accounts by email address and shows monitored folders as selected.
-- A "Start Birdtray Lite at login" checkbox.
-- An install script.
-- Closing Thunderbird on quit now works on Wayland.
+- Monitors all Thunderbird inboxes on the first start.
+- Fixed unread count on the tray icon.
+- Option to start at login.
+- Closing Thunderbird on quit works on Wayland.
+- Install script.
 
 ### Removed
 
-- Auto-updater.
-- Windows and macOS support.
-- X11 support: Thunderbird is controlled through KWin only, which also drops the libX11 dependency.
-- Translations.
-- Email templates: "New Email" opens a blank message.
-- Snooze.
+- Windows, macOS and X11 support: Thunderbird is controlled through KWin only.
+- Auto-updater, translations, snooze, email templates and blinking.
+- Per-folder notification colors: one count color is used for all folders.
+- Advanced settings, such as custom icons, fonts and running a command on new mail.
 - Ignoring the current unread emails.
-- Running a command when the unread count changes.
-- Advanced settings: font, bold, border, custom icons, opacity, fade, font sizes, count offsets, forced re-read and change delay.
-- Separate "and hide it" options, merged into "Start Thunderbird hidden".
-- "Hide when minimized" and "Support non-NETWM compliant WMs" (X11 only).
 - Command line options `--dump-mork` and `--decode`.
-- Legacy settings migration, portable mode and the installer settings import.
-- Qt Network and Qt Svg dependencies.
-- Tests, CI, the Windows installer, IDE files and other upstream tooling.
+- Legacy settings migration and portable mode.
+- Qt Network, Qt Svg and libX11 dependencies.
+- Tests, CI, the Windows installer and other upstream tooling.
 
 ### Deleted
 
@@ -63,7 +57,7 @@ Settings are stored in `~/.config/birdtray-lite/config.json`.
 | CI, IDE files, contrib and screenshots | 16 | 1,354 |
 | **Total** | **114** | **58,421** |
 
-In total 61,935 lines were removed and 941 added. The repository went from 159 to 50 files, and the C++ code from 8,173 to 4,585 lines.
+In total 62,326 lines were removed and 1,008 added. The repository went from 159 to 50 files, and the C++ code from 8,173 to 4,283 lines.
 
 ## Credits and license
 

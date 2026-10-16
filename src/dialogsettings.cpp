@@ -1,7 +1,6 @@
 #include <Qt>
 
 #include <QFileDialog>
-#include <QColorDialog>
 #include <QMessageBox>
 #include <QtCore/QStandardPaths>
 
@@ -20,7 +19,7 @@ static QString autostartFilePath()
            + "/autostart/io.github.vegiii.BirdtrayLite.desktop";
 }
 
-static void setAutostart( bool enabled )
+void DialogSettings::setAutostart( bool enabled )
 {
     const QString path = autostartFilePath();
 
@@ -58,13 +57,12 @@ DialogSettings::DialogSettings( QWidget *parent)
 
     connect( buttonBox, &QDialogButtonBox::accepted, this, &DialogSettings::accept );
     connect( buttonBox, &QDialogButtonBox::rejected, this, &DialogSettings::reject );
+    connect( buttonBox->button( QDialogButtonBox::Apply ), &QPushButton::clicked, this, &DialogSettings::apply );
 
-    connect( treeAccounts, &QTreeView::doubleClicked, this, &DialogSettings::accountEditIndex  );
     connect( treeAccounts, &QTreeViewWithKeyEvents::onKeyPressed, this, &DialogSettings::onKeyPressedOnTreeAccount );
 
     connect( btnAccountAdd, &QPushButton::clicked, this, &DialogSettings::accountAdd );
     connect( btnAccountAddInboxes, &QPushButton::clicked, this, &DialogSettings::accountAddInboxes );
-    connect( btnAccountEdit, &QPushButton::clicked, this, &DialogSettings::accountEdit );
     connect( btnAccountRemove, &QPushButton::clicked, this, &DialogSettings::accountRemove );
 
     connect( btnShowLogWindow, &QPushButton::clicked, this, &DialogSettings::onShowLogWindow );
@@ -79,8 +77,7 @@ DialogSettings::DialogSettings( QWidget *parent)
     boxStopThunderbirdOnExit->setChecked( settings->mExitThunderbirdWhenQuit );
     boxMonitorThunderbirdWindow->setChecked( settings->mMonitorThunderbirdWindow );
     boxShowUnreadCount->setChecked( settings->mShowUnreadEmailCount );
-    btnNotificationColor->setColor( settings->mNotificationDefaultColor );
-    boxBlink->setChecked( settings->mBlinkSpeed > 0 );
+    btnCountColor->setColor( settings->mCountColor );
     onlyShowIconOnNewMail->setChecked( settings->onlyShowIconOnUnreadMessages );
     boxEnableNewEmail->setChecked( settings->mNewEmailMenuEnabled );
 
@@ -89,12 +86,12 @@ DialogSettings::DialogSettings( QWidget *parent)
     treeAccounts->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     treeAccounts->setCurrentIndex(mAccountModel->index(0, 0));
 
-    // Create the "About" box
-    QString origabout = browserAbout->toHtml();
-    origabout.replace( "[VERSION]", Utils::getBirdtrayVersion() );
-    origabout.replace( "[DATE]", QString("%1 %2").arg(__DATE__) .arg(__TIME__) );
-    origabout.replace( "[QT_VERSION]", QT_VERSION_STR );
-    browserAbout->setText( origabout );
+    // Fill in the "About" text
+    QString about = labelAbout->text();
+    about.replace( "[VERSION]", Utils::getBirdtrayVersion() );
+    about.replace( "[DATE]", QString("%1 %2").arg(__DATE__) .arg(__TIME__) );
+    about.replace( "[QT_VERSION]", QT_VERSION_STR );
+    labelAbout->setText( about );
 }
 
 void DialogSettings::onKeyPressedOnTreeAccount(QKeyEvent * event)
@@ -106,6 +103,12 @@ void DialogSettings::onKeyPressedOnTreeAccount(QKeyEvent * event)
 }
 
 void DialogSettings::accept()
+{
+    apply();
+    QDialog::accept();
+}
+
+void DialogSettings::apply()
 {
     Settings* settings = BirdtrayApp::get()->getSettings();
 
@@ -119,18 +122,13 @@ void DialogSettings::accept()
     settings->mExitThunderbirdWhenQuit = boxStopThunderbirdOnExit->isChecked();
     settings->mMonitorThunderbirdWindow = boxMonitorThunderbirdWindow->isChecked();
     settings->mShowUnreadEmailCount = boxShowUnreadCount->isChecked();
-    settings->mNotificationDefaultColor = btnNotificationColor->color();
-    // Keep a custom blinking speed from an old config, otherwise blink every 500 ms
-    if ( !boxBlink->isChecked() )
-        settings->mBlinkSpeed = 0;
-    else if ( settings->mBlinkSpeed == 0 )
-        settings->mBlinkSpeed = 10;
+    settings->mCountColor = btnCountColor->color();
     settings->onlyShowIconOnUnreadMessages = onlyShowIconOnNewMail->isChecked();
     settings->mNewEmailMenuEnabled = boxEnableNewEmail->isChecked();
 
     mAccountModel->applySettings();
 
-    QDialog::accept();
+    BirdtrayApp::get()->getTrayIcon()->applySettings();
 }
 
 void DialogSettings::accountAdd()
@@ -144,16 +142,12 @@ void DialogSettings::accountAdd()
             return;
         }
         for (const QString &file : files) {
-            mAccountModel->addAccount(file, btnNotificationColor->color());
+            mAccountModel->addAccount(file);
         }
     }
     else
     {
-        QMap<QString, QColor> monitored;
-        for (int i = 0; i < mAccountModel->accounts().size(); i++) {
-            monitored.insert(mAccountModel->accounts()[i], mAccountModel->colors()[i]);
-        }
-        MailAccountDialog accountDialog(this, btnNotificationColor->color(), monitored);
+        MailAccountDialog accountDialog(this, mAccountModel->accounts());
         if (accountDialog.exec() != QDialog::Accepted) {
             return;
         }
@@ -168,13 +162,10 @@ void DialogSettings::accountAdd()
             }
         }
 
-        QString path;
-        QColor color;
-        QList<std::tuple<QString, QColor>> accountInfoList;
-        accountDialog.getSelectedAccounts(accountInfoList);
-        for (const std::tuple<QString, QColor> &accountInfo : accountInfoList) {
-            std::tie(path, color) = accountInfo;
-            mAccountModel->addAccount(path, color);
+        QStringList selected;
+        accountDialog.getSelectedAccounts(selected);
+        for (const QString &path : selected) {
+            mAccountModel->addAccount(path);
         }
     }
 
@@ -187,7 +178,7 @@ void DialogSettings::accountAddInboxes()
     int added = 0;
     for (const QString &inbox : inboxes) {
         if (!mAccountModel->accounts().contains(inbox)) {
-            mAccountModel->addAccount(inbox, btnNotificationColor->color());
+            mAccountModel->addAccount(inbox);
             added++;
         }
     }
@@ -199,26 +190,6 @@ void DialogSettings::accountAddInboxes()
         QMessageBox::information(this, tr("Add inboxes"), tr("All inboxes are already monitored."));
     } else {
         treeAccounts->setCurrentIndex(mAccountModel->index(mAccountModel->rowCount() - 1, 0));
-    }
-}
-
-void DialogSettings::accountEdit()
-{
-    if ( treeAccounts->currentIndex().isValid() )
-        accountEditIndex( treeAccounts->currentIndex() );
-}
-
-void DialogSettings::accountEditIndex(const QModelIndex &index)
-{
-    if (!index.isValid()) {
-        return;
-    }
-    QString path;
-    QColor color;
-    mAccountModel->getAccount(index, path, color);
-    color = QColorDialog::getColor(color, this);
-    if (color.isValid()) {
-        mAccountModel->editAccount(index, path, color);
     }
 }
 

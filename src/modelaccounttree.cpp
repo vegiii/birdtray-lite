@@ -1,6 +1,4 @@
 #include <QCoreApplication>
-#include <QBrush>
-#include <QPainter>
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 
@@ -10,21 +8,14 @@
 #include "unreadmonitor.h"
 
 ModelAccountTree::ModelAccountTree(QObject* parent, QTreeView* treeView)
-        : QAbstractItemModel(parent), QStyledItemDelegate(parent) {
-    Settings* settings = BirdtrayApp::get()->getSettings();
-    // Get the current settings in proper(stored) order
-    for (const QString& path : settings->watchedMorkFiles.orderedKeys()) {
-        mAccounts.push_back(path);
-        mColors.push_back(settings->watchedMorkFiles[path]);
-    }
+        : QAbstractItemModel(parent) {
+    mAccounts = BirdtrayApp::get()->getSettings()->watchedMorkFiles;
     treeView->setModel(this);
-    treeView->setItemDelegateForColumn(1, this);
 }
 
 int ModelAccountTree::columnCount(const QModelIndex &) const
 {
-    // We have two columns
-    return 2;
+    return 1;
 }
 
 QVariant ModelAccountTree::data(const QModelIndex &index, int role) const {
@@ -62,7 +53,7 @@ QVariant ModelAccountTree::data(const QModelIndex &index, int role) const {
 
 QModelIndex ModelAccountTree::index(int row, int column, const QModelIndex &) const
 {
-    if ( row < 0 || row >= mAccounts.size() || column > 2 )
+    if ( row < 0 || row >= mAccounts.size() || column != 0 )
         return QModelIndex();
 
     return createIndex( row, column );
@@ -87,85 +78,39 @@ Qt::ItemFlags ModelAccountTree::flags(const QModelIndex &) const
 
 QVariant ModelAccountTree::headerData(int section, Qt::Orientation , int role) const
 {
-    if ( role == Qt::DisplayRole )
-    {
-        if (section == 0) {
-            return QCoreApplication::translate("ModelAccountTree", "Account");
-        } else {
-            return QCoreApplication::translate("ModelAccountTree", "Notification color");
-        }
-    }
+    if ( role == Qt::DisplayRole && section == 0 )
+        return QCoreApplication::translate("ModelAccountTree", "Account");
 
     return QVariant();
 }
 
-void ModelAccountTree::paint(QPainter* painter, const QStyleOptionViewItem &option,
-                             const QModelIndex &index) const {
-    QStyledItemDelegate::paint(painter, option, index);
-    if (index.column() == 1) {
-        painter->fillRect(option.rect.marginsRemoved(QMargins(1, 1, 1, 1)), mColors[index.row()]);
-    }
-}
-
-void ModelAccountTree::addAccount(const QString &path, const QColor &color)
+void ModelAccountTree::addAccount(const QString &path)
 {
-    if (path.isEmpty()) {
+    if (path.isEmpty() || mAccounts.contains(path)) {
         return;
     }
-    int existingIndex = mAccounts.indexOf(path);
-    if (existingIndex != -1) {
-        editAccount(createIndex(existingIndex, 0), path, color);
-        return;
-    }
-    // Only this line changed
-    beginInsertRows( QModelIndex(), mColors.size(), mColors.size() + 1 );
-
+    beginInsertRows( QModelIndex(), mAccounts.size(), mAccounts.size() );
     mAccounts.push_back( path );
-    mColors.push_back( color );
-
     endInsertRows();
-}
-
-void ModelAccountTree::editAccount(const QModelIndex &idx, const QString &path, const QColor &color)
-{
-    if (path.isEmpty()) {
-        return;
-    }
-    mAccounts[ idx.row() ] = path;
-    mColors[ idx.row() ] = color;
-
-    emit dataChanged( createIndex( idx.row(), 0 ),  createIndex( idx.row(), 1 ) );
-}
-
-void ModelAccountTree::getAccount(const QModelIndex &idx, QString &path, QColor &color)
-{
-    path = mAccounts[ idx.row() ];
-    color = mColors[ idx.row() ];
 }
 
 void ModelAccountTree::removeAccount(const QModelIndex &idx)
 {
     beginRemoveRows( QModelIndex(), idx.row(), idx.row() );
     mAccounts.removeAt( idx.row() );
-    mColors.removeAt( idx.row() );
     endRemoveRows();
 }
 
 void ModelAccountTree::clear()
 {
-    if (mColors.isEmpty()) {
+    if (mAccounts.isEmpty()) {
         return;
     }
-    beginRemoveRows( QModelIndex(), 0, mColors.size() - 1 );
+    beginRemoveRows( QModelIndex(), 0, mAccounts.size() - 1 );
     mAccounts.clear();
-    mColors.clear();
     endRemoveRows();
 }
 
 void ModelAccountTree::applySettings() {
-    Settings* settings = BirdtrayApp::get()->getSettings();
-    settings->watchedMorkFiles.clear();
-    for (int i = 0; i < mAccounts.size(); i++) {
-        settings->watchedMorkFiles[mAccounts[i]] = mColors[i];
-    }
+    BirdtrayApp::get()->getSettings()->watchedMorkFiles = mAccounts;
 }

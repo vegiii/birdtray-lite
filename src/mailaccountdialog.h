@@ -1,7 +1,6 @@
 #ifndef MAIL_ACCOUNT_DIALOG_H
 #define MAIL_ACCOUNT_DIALOG_H
 
-#include <tuple>
 #include <QWizard>
 #include <QtCore/QDir>
 #include <QtCore/QMap>
@@ -52,17 +51,14 @@ protected:
 class MailAccountDialog : public QDialog {
 Q_OBJECT
 public:
-    explicit MailAccountDialog(QWidget* parent = nullptr, QColor defaultColor = Qt::black,
-                               QMap<QString, QColor> monitoredFolders = {});
+    explicit MailAccountDialog(QWidget* parent = nullptr, QStringList monitoredFolders = {});
     
     ~MailAccountDialog() override;
     
     /**
-     * Returns the list of paths to the selected msf files as well as the optional selected color.
-     *
-     * @param outList: The list of paths to the selected msf files and the selected color.
+     * @param outList Receives the paths to the selected msf files.
      */
-    void getSelectedAccounts(QList<std::tuple<QString, QColor>> &outList) const;
+    void getSelectedAccounts(QStringList &outList) const;
     
     /**
      * @param outList Receives the paths of all folders shown in the dialog that are not selected.
@@ -130,12 +126,7 @@ private:
      */
     Ui::MailAccountDialog* ui;
     
-    /**
-     * The default notification color.
-     */
-    const QColor defaultColor;
-    
-    const QMap<QString, QColor> monitoredFolders;
+    const QStringList monitoredFolders;
     
     /**
      * The current directory path that contains the profiles.

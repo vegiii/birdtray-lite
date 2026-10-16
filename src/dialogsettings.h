@@ -15,8 +15,14 @@ class DialogSettings : public QDialog, public Ui::DialogSettings
     public:
         explicit DialogSettings(QWidget *parent = 0);
 
+        // Adds or removes Birdtray Lite from the programs Plasma starts at login
+        static void setAutostart( bool enabled );
+
     public slots:
         void    accept() override;
+
+        // Saves the settings and updates the tray icon
+        void    apply();
 
         // Account buttons
         /**
@@ -24,8 +30,6 @@ class DialogSettings : public QDialog, public Ui::DialogSettings
          */
         void    accountAdd();
         void    accountAddInboxes();
-        void    accountEdit();
-        void    accountEditIndex( const QModelIndex& index );
         void    accountRemove();
         void    accountRemoveIndex( const QModelIndex& index );
 

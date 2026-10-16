@@ -3,7 +3,6 @@
 #include <QPainter>
 #include <QProcess>
 #include <QMessageBox>
-#include <QPainterPath>
 
 #include "trayicon.h"
 #include "unreadmonitor.h"
@@ -15,9 +14,6 @@
 
 TrayIcon::TrayIcon(bool showSettings)
 {
-    mBlinkingIconOpacity = 1.0;
-    mBlinkingTimeout = 0;
-
     mUnreadCounter = 0;
 
     // Context menu
@@ -42,20 +38,20 @@ TrayIcon::TrayIcon(bool showSettings)
     }
     createMenu();
 
-    // On the first start, monitor the inboxes of all Thunderbird accounts
+    // On the first start, start at login and monitor the inboxes of all Thunderbird accounts
     QStringList inboxes;
+    if (settings->isFirstRun) {
+        DialogSettings::setAutostart(true);
+    }
     if (settings->isFirstRun && settings->watchedMorkFiles.isEmpty()) {
         inboxes = Thunderbird::inboxes();
-        for (const QString &inbox : inboxes) {
-            settings->watchedMorkFiles[inbox] = settings->mNotificationDefaultColor;
-        }
+        settings->watchedMorkFiles = inboxes;
         if (!inboxes.isEmpty()) {
             settings->save();
         }
     }
     createUnreadCounterThread();
 
-    connect( &mBlinkingTimer, &QTimer::timeout, this, &TrayIcon::blinkTimeout );
     connect( this, &TrayIcon::activated, this, &TrayIcon::actionSystrayIconActivated );
 
     // State timer
@@ -113,11 +109,10 @@ UnreadMonitor* TrayIcon::getUnreadMonitor() const {
     return mUnreadMonitor;
 }
 
-void TrayIcon::unreadCounterUpdate( unsigned int total, QColor color )
+void TrayIcon::unreadCounterUpdate( unsigned int total )
 {
     Log::debug("unreadCounterUpdate %d", total );
     mUnreadCounter = total;
-    mUnreadColor = color;
 
     updateIcon();
 }
@@ -131,41 +126,11 @@ void TrayIcon::unreadMonitorWarningChanged(const QString &path) {
     updateIcon();
 }
 
-// Shamelessly stolen from Spivak Karaoke Player: github.com/gyunaev/spivak
-static unsigned int largestFontSize(const QFont &font, int minfontsize, int maxfontsize, const QString &text, const QSize& rectsize )
-{
-    int cursize = minfontsize;
-    QFont testfont( font );
-
-    // We are trying to find the maximum font size which fits by doing the binary search
-    while ( maxfontsize - minfontsize > 1 )
-    {
-        cursize = minfontsize + (maxfontsize - minfontsize) / 2;
-        testfont.setPointSize( cursize );
-        QSize size = QFontMetrics( testfont ).size( Qt::TextSingleLine, text );
-
-        if ( size.width() < rectsize.width() && size.height() <= rectsize.height() )
-            minfontsize = cursize;
-        else
-            maxfontsize = cursize;
-    }
-
-    return cursize;
-}
-
 void TrayIcon::updateIcon()
 {
     Settings* settings = BirdtrayApp::get()->getSettings();
     // How many unread messages are here?
     unsigned int unread = mUnreadCounter;
-
-    // Are we blinking, and if not, should we be?
-    if (unread > 0 && settings->mBlinkSpeed > 0 && mBlinkingTimeout == 0) {
-        enableBlinking(true);
-    }
-
-    if ( unread == 0 && mBlinkingTimeout != 0 )
-        enableBlinking( false );
 
     if (settings->onlyShowIconOnUnreadMessages && unread == 0) {
         this->hide();
@@ -177,14 +142,7 @@ void TrayIcon::updateIcon()
 
     temp.fill( Qt::transparent );
     p.begin( &temp );
-
-    // We use 0.75 opacity if we have unread count and non-blinking.
-    // We use blinking opacity if we have unread count and blinking.
-    // And we use 1.0 if we have zero unread count
-    if ( unread == 0 )
-        p.setOpacity( 1.0 );
-    else
-        p.setOpacity( mBlinkingIconOpacity );
+    p.setRenderHint( QPainter::Antialiasing );
 
     p.drawPixmap(settings->getNotificationIcon().rect(), settings->getNotificationIcon());
 
@@ -201,25 +159,7 @@ void TrayIcon::updateIcon()
 
     // Do we need to draw the unread counter?
     if (unread > 0 && settings->mShowUnreadEmailCount) {
-        // Find the suitable font size, starting from 4
-        QString countvalue = QString::number( unread );
-
-        // The weight and border match the old Birdtray defaults
-        QFont font = QApplication::font();
-        font.setWeight(static_cast<QFont::Weight>(50));
-        font.setPointSize(static_cast<int>(largestFontSize(font, 4, 512, countvalue, temp.size() - QSize(2, 2))));
-        p.setOpacity( mBlinkingTimeout ? 1.0 - mBlinkingIconOpacity : 1.0 );
-
-        QPainterPath textPath;
-        textPath.addText(0, 0, font, countvalue);
-        QRectF textBoundingRect = textPath.boundingRect();
-
-        // Center the count on the icon
-        double x = (temp.width() - textBoundingRect.width()) / 2.0 - textBoundingRect.left();
-        double y = (temp.height() - textBoundingRect.height()) / 2.0 - textBoundingRect.top();
-        textPath.translate(x, y);
-        p.strokePath(textPath, QPen(Qt::white, 15));
-        p.fillPath(textPath, mUnreadColor);
+        drawCountBadge(p, temp.size(), unread, settings->mCountColor);
     }
     const QMap<QString, QString> warnings = mUnreadMonitor->getWarnings();
     if (warnings.isEmpty()) {
@@ -262,27 +202,6 @@ void TrayIcon::updateIcon()
         setIcon( temp );
     }
     this->show();
-}
-
-void TrayIcon::enableBlinking(bool enabled)
-{
-    if ( enabled )
-    {
-        Settings* settings = BirdtrayApp::get()->getSettings();
-        mBlinkingIconOpacity = 1.0;
-
-        // The blinking speed is a value from 0 to 30, so we make it 50x so the maximum is 1500 ms.
-        mBlinkingTimeout = settings->mBlinkSpeed * 50;
-
-        mBlinkingTimer.setInterval( mBlinkingTimeout );
-        mBlinkingTimer.start();
-    }
-    else
-    {
-        mBlinkingTimer.stop();
-        mBlinkingIconOpacity = 1.0;
-        mBlinkingTimeout = 0;
-    }
 }
 
 void TrayIcon::updateState()
@@ -346,19 +265,6 @@ void TrayIcon::updateState()
     }
 }
 
-void TrayIcon::blinkTimeout()
-{
-    // Flip the opacity between the unread opacity level and its inverse
-    const double unreadOpacityLevel = 0.75;
-    if (mBlinkingIconOpacity == unreadOpacityLevel) {
-        mBlinkingIconOpacity = 1.0 - unreadOpacityLevel;
-    } else {
-        mBlinkingIconOpacity = unreadOpacityLevel;
-    }
-
-    updateIcon();
-}
-
 void TrayIcon::actionQuit()
 {
     QApplication::quit();
@@ -372,27 +278,20 @@ void TrayIcon::showSettings()
         settingsDialog->activateWindow();
         return;
     }
-    Settings* settings = BirdtrayApp::get()->getSettings();
     settingsDialog = new DialogSettings();
-    connect(settingsDialog, &QDialog::finished, this, [=](int result) {
+    connect(settingsDialog, &QDialog::finished, this, [=]() {
         settingsDialog->deleteLater();
         settingsDialog = nullptr;
-        if (result != QDialog::Accepted) {
-            return;
-        }
-        settings->save();
-
-        // Recreate menu
-        createMenu();
-
-        // Recalculate the delta
-        enableBlinking( false );
-        updateIcon();
-        // TODO: Update on thunderbird path setting change
-
-        emit settingsChanged();
     });
     settingsDialog->show();
+}
+
+void TrayIcon::applySettings()
+{
+    BirdtrayApp::get()->getSettings()->save();
+    createMenu();
+    updateIcon();
+    emit settingsChanged();
 }
 
 void TrayIcon::actionActivate()
@@ -558,6 +457,28 @@ void TrayIcon::hideThunderbird()
 void TrayIcon::showThunderbird()
 {
     mWinTools->show();
+}
+
+void TrayIcon::drawCountBadge(QPainter &painter, const QSize &iconSize, unsigned int count,
+                              const QColor &color) {
+    // A pill in the bottom right corner that grows with the number of digits
+    QString text = count > 99 ? QString("99+") : QString::number(count);
+    double height = iconSize.height() * 0.56;
+    double width = height + (text.length() - 1) * iconSize.width() * 0.23;
+    QRectF badge(iconSize.width() - width, iconSize.height() - height, width, height);
+    badge.adjust(2, 2, -2, -2);
+
+    painter.setOpacity(1.0);
+    painter.setPen(QPen(Qt::white, iconSize.width() * 0.05));
+    painter.setBrush(color);
+    painter.drawRoundedRect(badge, badge.height() / 2, badge.height() / 2);
+
+    QFont font = QApplication::font();
+    font.setWeight(QFont::ExtraBold);
+    font.setPixelSize(static_cast<int>(height * (text.length() > 2 ? 0.6 : 0.78)));
+    painter.setFont(font);
+    painter.setPen(Qt::white);
+    painter.drawText(badge, Qt::AlignCenter, text);
 }
 
 void TrayIcon::drawWarningIndicator(QPainter &painter, const QSize &iconSize) {

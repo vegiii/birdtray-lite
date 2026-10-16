@@ -3,7 +3,6 @@
 
 #include <QThread>
 #include <QString>
-#include <QColor>
 #include <QMap>
 #include <QTimer>
 #include <QStringList>
@@ -31,7 +30,7 @@ class UnreadMonitor : public QThread
 
     signals:
         // Unread counter changed
-        void    unreadUpdated( unsigned int total, QColor color );
+        void    unreadUpdated( unsigned int total );
 
         /**
          * A warning was added or removed for the given watched path.
@@ -46,7 +45,7 @@ class UnreadMonitor : public QThread
         void    updateUnread();
 
     private:
-        void    getUnreadCount_Mork( int & count, QColor& color );
+        int     getUnreadCount_Mork();
         int     getMorkUnreadCount( const QString& path );
     
         /**
@@ -85,7 +84,6 @@ class UnreadMonitor : public QThread
 
         // Last reported unread
         int    mLastReportedUnread;
-        QColor mLastColor;
     
         /**
          * This contains mappings from watched paths to warning messages for that path.

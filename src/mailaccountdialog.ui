@@ -53,7 +53,7 @@
       <bool>true</bool>
      </property>
      <property name="columnCount">
-      <number>2</number>
+      <number>1</number>
      </property>
      <property name="emptyText" stdset="0">
       <string>No mail profiles were found.
@@ -67,18 +67,6 @@ Please make sure you selected the correct profiles directory.</string>
        <string>Email Folder</string>
       </property>
      </column>
-     <column>
-      <property name="text">
-       <string>Notification Color</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>If you monitor multiple folders, the default notification color is used to show the sum of all unread mails.</string>
-     </property>
     </widget>
    </item>
    <item>

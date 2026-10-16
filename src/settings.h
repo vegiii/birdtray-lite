@@ -14,11 +14,8 @@ class Settings
     public:
         Settings();
 
-        // Color of the unread count when more than one monitored folder has unread mail
-        QColor  mNotificationDefaultColor;
-
-        // Blinking speed, 0 disables blinking
-        unsigned int    mBlinkSpeed;
+        // Color of the unread count badge
+        QColor  mCountColor;
 
         // Whether to show the unread email count
         bool    mShowUnreadEmailCount;
@@ -68,11 +65,8 @@ class Settings
         // Whether no settings file existed when loading the settings
         bool    isFirstRun;
 
-        /**
-         * A mapping of watched mork files to their notification color
-         * in the order the user added them.
-         */
-        OrderedMap<QString, QColor> watchedMorkFiles;
+        // The watched mork files in the order the user added them
+        QStringList watchedMorkFiles;
 
         // Load and save them
         void    save();

@@ -21,22 +21,21 @@ Settings::Settings()
     if ( !apppath.exists() )
         apppath.mkpath( apppath.absolutePath() );
 
-    mNotificationDefaultColor = QColor("#0000FF");
-    mBlinkSpeed = 0;
+    mCountColor = QColor("#2A5BD7");
     mShowUnreadEmailCount = true;
     onlyShowIconOnUnreadMessages = false;
-    mNewEmailMenuEnabled = false;
+    mNewEmailMenuEnabled = true;
     mThunderbirdCmdLine = Utils::getDefaultThunderbirdCommand();
     mThunderbirdProcessName = "thunderbird";
     mThunderbirdWindowMatch = " Mozilla Thunderbird";
-    mShowHideThunderbird = false;
-    mLaunchThunderbird = false;
+    mShowHideThunderbird = true;
+    mLaunchThunderbird = true;
     mLaunchThunderbirdDelay = 0;
-    mRestartThunderbird = false;
-    startClosedThunderbird = false;
-    mStartThunderbirdHidden = false;
-    mExitThunderbirdWhenQuit = false;
-    mMonitorThunderbirdWindow = false;
+    mRestartThunderbird = true;
+    startClosedThunderbird = true;
+    mStartThunderbirdHidden = true;
+    mExitThunderbirdWhenQuit = true;
+    mMonitorThunderbirdWindow = true;
     showDialogIfNoAccountsConfigured = true;
     isFirstRun = false;
 }
@@ -45,8 +44,7 @@ void Settings::save()
 {
     QJsonObject out;
 
-    out[ "common/defaultcolor" ] = mNotificationDefaultColor.name();
-    out[ "common/blinkspeed" ] = static_cast<int>( mBlinkSpeed );
+    out[ "common/countcolor" ] = mCountColor.name();
     out[ "common/showunreademailcount" ] = mShowUnreadEmailCount;
     out[ "advanced/onlyShowIconOnUnreadMessages" ] = onlyShowIconOnUnreadMessages;
     out[ "common/newemailEnabled" ] = mNewEmailMenuEnabled;
@@ -67,10 +65,9 @@ void Settings::save()
     // Store the account map
     QJsonArray accounts;
 
-    for ( const QString& path : watchedMorkFiles.orderedKeys() )
+    for ( const QString& path : watchedMorkFiles )
     {
         QJsonObject ac;
-        ac[ "color" ] = watchedMorkFiles[path].name();
         ac[ "path" ] = path;
 
         accounts.push_back( ac );
@@ -122,8 +119,7 @@ void Settings::load()
 void Settings::fromJSON( const QJsonObject& settings )
 {
     // Missing keys keep their default value
-    mNotificationDefaultColor = QColor( settings.value( "common/defaultcolor" ).toString( mNotificationDefaultColor.name() ) );
-    mBlinkSpeed = settings.value( "common/blinkspeed" ).toInt( mBlinkSpeed );
+    mCountColor = QColor( settings.value( "common/countcolor" ).toString( mCountColor.name() ) );
     mShowUnreadEmailCount = settings.value( "common/showunreademailcount" ).toBool( mShowUnreadEmailCount );
     onlyShowIconOnUnreadMessages = settings.value( "advanced/onlyShowIconOnUnreadMessages" ).toBool(
             onlyShowIconOnUnreadMessages );
@@ -155,12 +151,9 @@ void Settings::fromJSON( const QJsonObject& settings )
         for ( const QJsonValueRef& a : settings["accounts"].toArray() )
         {
             QString path = a.toObject().value("path").toString();
-            QString color = a.toObject().value("color").toString();
 
-            if ( path.isEmpty() )
-                continue;
-
-            watchedMorkFiles[ path ] = QColor( color );
+            if ( !path.isEmpty() && !watchedMorkFiles.contains( path ) )
+                watchedMorkFiles.push_back( path );
         }
     }
 }

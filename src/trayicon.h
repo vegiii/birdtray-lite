@@ -40,11 +40,16 @@ class TrayIcon : public QSystemTrayIcon
          */
         void showThunderbird();
 
+        /**
+         * Save the settings and update the tray icon and menu.
+         */
+        void applySettings();
+
     signals:
         void    settingsChanged();
 
     public slots:
-        void    unreadCounterUpdate(unsigned int total, QColor color );
+        void    unreadCounterUpdate( unsigned int total );
 
         /**
          * The warning status of a watched path in the unread monitor changed.
@@ -60,18 +65,11 @@ class TrayIcon : public QSystemTrayIcon
 
 
     private slots:
-        // Updates the icon, this is called when blinking
+        // Updates the icon
         void    updateIcon();
-
-        // Set or reset blinking. Each timeoutms the opacity changes by percentagechange
-        // For example, for on-off every 500ms call it with (500, 100)
-        void    enableBlinking( bool enabled );
 
         // Checks the application current state
         void    updateState();
-
-        // Blinking timer
-        void    blinkTimeout();
 
         // Context menu actions
         static void actionQuit();
@@ -114,17 +112,18 @@ class TrayIcon : public QSystemTrayIcon
          */
         static void drawWarningIndicator(QPainter &painter, const QSize &iconSize);
 
-        // State variables for blinking; mBlinkingTimeout=0 means we are not blinking
-        double          mBlinkingIconOpacity;
-        unsigned int    mBlinkingTimeout;
-        QTimer          mBlinkingTimer;
+        /**
+         * Draw the unread count in a badge in the bottom right corner.
+         * @param painter The painter to use when drawing.
+         * @param iconSize The size of the icon image to draw on in pixel.
+         * @param count The unread count.
+         * @param color The badge color.
+         */
+        static void drawCountBadge(QPainter &painter, const QSize &iconSize, unsigned int count,
+                                   const QColor &color);
 
-        // To distinguish whe
-        bool            mBlinkTick;
-
-        // Current unread messages count and color
+        // Current unread messages count
         unsigned int    mUnreadCounter;
-        QColor          mUnreadColor;
 
         // Show/hide Thunderbird menu item (we modify its text)
         QAction *       mMenuShowHideThunderbird;

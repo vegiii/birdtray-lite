@@ -1,13 +1,11 @@
 #ifndef ACCOUNTTREEITEM_H
 #define ACCOUNTTREEITEM_H
 
-#include <QList>
-#include <QColor>
+#include <QStringList>
 #include <QAbstractItemModel>
 #include <QtWidgets/QTreeView>
-#include <QtWidgets/QStyledItemDelegate>
 
-class ModelAccountTree : public QAbstractItemModel, public QStyledItemDelegate
+class ModelAccountTree : public QAbstractItemModel
 {
     public:
         /**
@@ -24,27 +22,19 @@ class ModelAccountTree : public QAbstractItemModel, public QStyledItemDelegate
         virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
         virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
         virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-        void paint(QPainter* painter, const QStyleOptionViewItem &option,
-                   const QModelIndex &index) const override;
 
-        void    addAccount(const QString& path, const QColor& color );
-        void    editAccount(const QModelIndex& idx, const QString& path, const QColor& color );
-        void    getAccount(const QModelIndex& idx, QString& path, QColor& color );
+        void    addAccount( const QString& path );
         void    removeAccount( const QModelIndex& idx );
         void    clear();
 
         // The paths of the monitored mork files
-        const QList<QString>& accounts() const { return mAccounts; }
+        const QStringList& accounts() const { return mAccounts; }
 
-        // The notification colors of the monitored mork files
-        const QList<QColor>& colors() const { return mColors; }
-
-        // Moves the current accounts/colors to settings
+        // Moves the current accounts to settings
         void    applySettings();
 
     private:
-        QList< QString> mAccounts;
-        QList< QColor > mColors;
+        QStringList mAccounts;
 };
 
 #endif // ACCOUNTTREEITEM_H
