@@ -16,6 +16,40 @@
 #include "birdtrayapp.h"
 #include "log.h"
 
+// Plasma starts the desktop files in this directory at login
+static QString autostartFilePath()
+{
+    return QStandardPaths::writableLocation( QStandardPaths::GenericConfigLocation )
+           + "/autostart/io.github.vegiii.BirdtrayLite.desktop";
+}
+
+static void setAutostart( bool enabled )
+{
+    const QString path = autostartFilePath();
+
+    if ( !enabled )
+    {
+        QFile::remove( path );
+        return;
+    }
+
+    QDir().mkpath( QFileInfo( path ).absolutePath() );
+    QFile file( path );
+    if ( !file.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+    {
+        QMessageBox::warning( nullptr, QObject::tr("Autostart"),
+                QObject::tr("Could not write %1:\n%2").arg( path, file.errorString() ) );
+        return;
+    }
+
+    file.write( QString(
+        "[Desktop Entry]\n"
+        "Type=Application\n"
+        "Name=Birdtray Lite\n"
+        "Exec=%1\n"
+        "Icon=io.github.vegiii.BirdtrayLite\n" ).arg( QCoreApplication::applicationFilePath() ).toUtf8() );
+}
+
 DialogSettings::DialogSettings( QWidget *parent)
     : QDialog(parent), Ui::DialogSettings()
 {
@@ -59,6 +93,7 @@ DialogSettings::DialogSettings( QWidget *parent)
     notificationFontWeight->setValue( settings->mNotificationFontWeight * 2 );
     sliderBlinkingSpeed->setValue( settings->mBlinkSpeed == 0 ?
             0 : sliderBlinkingSpeed->maximum() + 1 - static_cast<int>(settings->mBlinkSpeed) );
+    boxAutostart->setChecked( QFile::exists( autostartFilePath() ) );
     boxLaunchThunderbirdAtStart->setChecked( settings->mLaunchThunderbird );
     boxShowHideThunderbird->setChecked( settings->mShowHideThunderbird );
     boxMonitorThunderbirdWindow->setChecked( settings->mMonitorThunderbirdWindow );
@@ -161,6 +196,8 @@ void DialogSettings::accept()
     settings->verticalUnreadCountOffset = spinVerticalUnreadCountOffset->value() / 100.0;
     settings->mBlinkSpeed = sliderBlinkingSpeed->value() == 0 ?
             0 : sliderBlinkingSpeed->maximum() + 1 - sliderBlinkingSpeed->value();
+    if ( boxAutostart->isChecked() != QFile::exists( autostartFilePath() ) )
+        setAutostart( boxAutostart->isChecked() );
     settings->mLaunchThunderbird = boxLaunchThunderbirdAtStart->isChecked();
     settings->mShowHideThunderbird = boxShowHideThunderbird->isChecked();
     settings->mThunderbirdCmdLine = Utils::splitCommandLine( leThunderbirdCmdLine->text() );
