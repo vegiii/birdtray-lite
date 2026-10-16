@@ -1,8 +1,14 @@
 # Birdtray Lite
 
-Tray icon showing the unread mail count for Thunderbird, with hide/show of the Thunderbird window on X11 and KDE Plasma Wayland.
+This fork is meant for my personal use on Fedora KDE Wayland and comes with no guarantee that it will work on other computers. I recommend using the upstream repositories instead.
 
-A trimmed-down fork of [Birdtray](https://github.com/gyunaev/birdtray) by George Yunaev, licensed under GPLv3.
+## Why this fork
+
+- Make inbox discovery easier to set up.
+- Add a simple autostart checkbox.
+- Simplify installation.
+- Keep dependencies to a minimum.
+- Clean up code I will never use.
 
 ## Build
 
@@ -13,3 +19,9 @@ cmake --build build
 ```
 
 Settings are stored in `~/.config/birdtray-lite/config.json`.
+
+## Credits and license
+
+Based on [Birdtray](https://github.com/gyunaev/birdtray) by George Yunaev and contributors, and [birdtray-wayland](https://github.com/stark1tty/birdtray-wayland) by Nika Shilobod, which added hide/show support for KDE Plasma Wayland and Flatpak Thunderbird.
+
+Licensed under the [GNU General Public License v3](LICENSE.txt).
