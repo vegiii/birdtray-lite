@@ -58,11 +58,11 @@ Settings are stored in `~/.config/birdtray-lite/config.json`.
 | Translations | 42 | 17,251 |
 | Source files | 37 | 3,781 |
 | Windows installer | 11 | 2,039 |
-| CI, IDE files, contrib and screenshots | 16 | 1,354 |
+| CI, IDE files, contrib and screenshots | 17 | 1,358 |
 | Icons | 5 | – |
-| **Total** | **128** | **59,323** |
+| **Total** | **129** | **59,327** |
 
-In total 63,558 lines were removed and 1,409 added. The repository went from 159 to 43 files, and the C++ code from 8,173 to 3,557 lines.
+In total 63,562 lines were removed and 1,409 added. The repository went from 159 to 42 files, and the C++ code from 8,173 to 3,557 lines.
 
 ## Credits and license
 
