@@ -62,6 +62,8 @@ Builds and installs to `~/.local`. Run it again to update.
 
 ### Deleted
 
+Compared with [birdtray-wayland at `2ac2016`](https://github.com/stark1tty/birdtray-wayland/tree/2ac2016200c6b8ba8333f46e4be6103dc4d49e12).
+
 | Part | Files | Lines |
 |---|---:|---:|
 | Tests and test data | 17 | 34,898 |
@@ -72,7 +74,7 @@ Builds and installs to `~/.local`. Run it again to update.
 | Icons | 6 | – |
 | **Total** | **136** | **59,967** |
 
-In total 64,054 lines were removed and 1,762 added. The repository went from 159 to 34 files, and the C++ code from 8,173 to 3,525 lines.
+In total 64,047 lines were removed and 1,811 added. The repository went from 159 to 34 files, and the C++ code from 8,173 to 3,569 lines.
 
 ## Credits and license
 

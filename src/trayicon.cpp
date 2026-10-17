@@ -1,4 +1,6 @@
 #include <QMenu>
+#include <QDBusConnection>
+#include <QCoreApplication>
 #include <QTimer>
 #include <QPainter>
 #include <QProcess>
@@ -56,7 +58,6 @@ TrayIcon::TrayIcon(bool showSettings)
     // Update the state and icon when everything is settled
     updateState();
     updateIcon();
-    show();
 
     if (showSettings) {
         QTimer::singleShot(0, this, &TrayIcon::showSettings);
@@ -111,7 +112,7 @@ void TrayIcon::updateIcon()
     // How many unread messages are here?
     unsigned int unread = mUnreadCounter;
 
-    if (settings->onlyShowIconOnUnreadMessages && unread == 0) {
+    if (!settings->mShowWhenRelevant && settings->onlyShowIconOnUnreadMessages && unread == 0) {
         this->hide();
         return;
     }
@@ -195,7 +196,34 @@ void TrayIcon::updateIcon()
         mLastDrawnIcon = temp.toImage();
         setIcon( temp );
     }
-    this->show();
+    updateTrayStatus(!settings->mShowWhenRelevant || unread > 0);
+}
+
+void TrayIcon::updateTrayStatus(bool relevant)
+{
+    // Qt has no relevance API. With KDE's platform theme, locate its local
+    // KStatusNotifierItem via the named connection used by KF6.
+    static int nextConnection = 1;
+    auto notifierObject = [](int index) -> QObject* {
+        const QString name = QString("org.kde.StatusNotifierItem-%1-%2")
+                                 .arg(QCoreApplication::applicationPid()).arg(index);
+        return QDBusConnection(name).objectRegisteredAt("/StatusNotifierItem");
+    };
+    if (!isVisible()) {
+        while (notifierObject(nextConnection))
+            ++nextConnection;
+        show();
+    }
+    // Also retry when the tray host becomes available after app startup.
+    if (!mNotifier) {
+        if (QObject *object = notifierObject(nextConnection)) {
+            if (object->parent() && object->parent()->inherits("KStatusNotifierItem"))
+                mNotifier = object->parent();
+            ++nextConnection;
+        }
+    }
+    if (mNotifier)
+        mNotifier->setProperty("status", relevant ? "Active" : "Passive");
 }
 
 void TrayIcon::updateState()

@@ -27,6 +27,7 @@ Settings::Settings()
     mThemeTrayIcon = false;
     mShowUnreadEmailCount = true;
     onlyShowIconOnUnreadMessages = false;
+    mShowWhenRelevant = false;
     mNewEmailMenuEnabled = true;
     mThunderbirdCmdLine = Thunderbird::defaultCommand();
     mShowHideThunderbird = true;
@@ -46,6 +47,7 @@ void Settings::save()
     out[ "common/trayicon" ] = mThemeTrayIcon ? "theme" : "birdtray";
     out[ "common/showunreademailcount" ] = mShowUnreadEmailCount;
     out[ "advanced/onlyShowIconOnUnreadMessages" ] = onlyShowIconOnUnreadMessages;
+    out[ "common/showwhenrelevant" ] = mShowWhenRelevant;
     out[ "common/newemailEnabled" ] = mNewEmailMenuEnabled;
     out[ "common/showhidethunderbird" ] = mShowHideThunderbird;
     out[ "common/keepthunderbirdrunning" ] = mKeepThunderbirdRunning;
@@ -116,6 +118,7 @@ void Settings::fromJSON( const QJsonObject& settings )
     mShowUnreadEmailCount = settings.value( "common/showunreademailcount" ).toBool( mShowUnreadEmailCount );
     onlyShowIconOnUnreadMessages = settings.value( "advanced/onlyShowIconOnUnreadMessages" ).toBool(
             onlyShowIconOnUnreadMessages );
+    mShowWhenRelevant = settings.value("common/showwhenrelevant").toBool(mShowWhenRelevant);
     mNewEmailMenuEnabled = settings.value( "common/newemailEnabled" ).toBool( mNewEmailMenuEnabled );
     mShowHideThunderbird = settings.value( "common/showhidethunderbird" ).toBool( mShowHideThunderbird );
     mKeepThunderbirdRunning = settings.value( "common/keepthunderbirdrunning" ).toBool( mKeepThunderbirdRunning );

@@ -49,6 +49,16 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="boxShowWhenRelevant">
+            <property name="text">
+             <string>Show when relevant in KDE (unread mail)</string>
+            </property>
+            <property name="toolTip">
+             <string>Keep the icon in KDE’s tray popup when there is no unread mail. Set the entry to “Show when relevant” in KDE System Tray settings.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="boxThemeTrayIcon">
             <property name="text">
              <string>Use the icon theme's Thunderbird icon in the tray</string>

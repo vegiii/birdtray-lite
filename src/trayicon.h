@@ -2,6 +2,7 @@
 #define TRAYICON_H
 
 #include <QTimer>
+#include <QPointer>
 #include <QWidget>
 #include <QImage>
 #include <QProcess>
@@ -105,6 +106,8 @@ class TrayIcon : public QSystemTrayIcon
         void    onThunderbirdWindowAdded();
 
     private:
+        void    updateTrayStatus(bool relevant);
+        QPointer<QObject> mNotifier;
         void    createMenu();
         void    createUnreadCounterThread();
         

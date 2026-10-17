@@ -28,6 +28,9 @@ class Settings
         // Whether to show the tray icon only if there are unread mail messages
         bool    onlyShowIconOnUnreadMessages;
 
+        // Let Plasma hide the icon in its popup when there is no unread mail
+        bool    mShowWhenRelevant;
+
         // Whether to show a "New Email" entry in the tray menu
         bool    mNewEmailMenuEnabled;
 

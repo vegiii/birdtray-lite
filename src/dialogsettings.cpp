@@ -119,6 +119,9 @@ DialogSettings::DialogSettings( QWidget *parent)
         }
     }
     comboCountColor->setCurrentIndex( closest );
+    boxShowWhenRelevant->setChecked(settings->mShowWhenRelevant);
+    onlyShowIconOnNewMail->setEnabled(!settings->mShowWhenRelevant);
+    connect(boxShowWhenRelevant, &QCheckBox::toggled, onlyShowIconOnNewMail, &QCheckBox::setDisabled);
     onlyShowIconOnNewMail->setChecked( settings->onlyShowIconOnUnreadMessages );
     boxEnableNewEmail->setChecked( settings->mNewEmailMenuEnabled );
 
@@ -184,6 +187,7 @@ void DialogSettings::apply()
     settings->mCountBadge = comboCountStyle->currentIndex() == 1;
     settings->mThemeTrayIcon = boxThemeTrayIcon->isChecked();
     settings->mCountColor = comboCountColor->currentData().value<QColor>();
+    settings->mShowWhenRelevant = boxShowWhenRelevant->isChecked();
     settings->onlyShowIconOnUnreadMessages = onlyShowIconOnNewMail->isChecked();
     settings->mNewEmailMenuEnabled = boxEnableNewEmail->isChecked();
     settings->watchedMorkFiles = folderTree->checkedFolders();
