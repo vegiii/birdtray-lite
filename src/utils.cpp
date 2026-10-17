@@ -1,5 +1,4 @@
 #include "utils.h"
-#include "version.h"
 #include "birdtrayapp.h"
 #include "thunderbird.h"
 
@@ -21,10 +20,6 @@ QString Utils::expandPath(const QString &path) {
     QString expandedPath(result.we_wordv[0]);
     wordfree(&result);
     return expandedPath;
-}
-
-QString Utils::getBirdtrayVersion() {
-    return QString("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_PATCH);
 }
 
 QStringList Utils::getThunderbirdProfilesPaths() {

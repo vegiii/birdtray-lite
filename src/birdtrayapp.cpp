@@ -5,7 +5,6 @@
 #include "birdtrayapp.h"
 #include "utils.h"
 #include "windowtools.h"
-#include "version.h"
 #include "log.h"
 
 #define DBUS_SERVICE_NAME "io.github.vegiii.BirdtrayLite"
@@ -21,7 +20,6 @@ BirdtrayApp::BirdtrayApp(int &argc, char** argv) : QApplication(argc, argv)
     QApplication::setWindowIcon(QIcon(QString::fromUtf8(":/res/birdtray.svg")));
     QCoreApplication::setApplicationName("birdtray-lite");
     QGuiApplication::setDesktopFileName("io.github.vegiii.BirdtrayLite");
-    QCoreApplication::setApplicationVersion(Utils::getBirdtrayVersion());
     // Keep running when the settings or log window is closed
     QApplication::setQuitOnLastWindowClosed(false);
 
@@ -32,7 +30,7 @@ BirdtrayApp::BirdtrayApp(int &argc, char** argv) : QApplication(argc, argv)
         return;
     }
 
-    Log::debug( "Birdtray Lite version %d.%d.%d started", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH );
+    Log::debug( "Birdtray Lite started" );
 
     ensureSystemTrayAvailable();
     // Load settings
@@ -100,7 +98,6 @@ void BirdtrayApp::parseCmdArguments() {
     commandLineParser.setApplicationDescription(
             tr("Shows Thunderbird's unread mail count in the system tray."));
     commandLineParser.addHelpOption();
-    commandLineParser.addVersionOption();
     commandLineParser.addOptions({
             {SETTINGS_COMMAND, tr("Show the settings.")},
             {{"t", TOGGLE_THUNDERBIRD_COMMAND}, tr("Toggle the Thunderbird window.")},

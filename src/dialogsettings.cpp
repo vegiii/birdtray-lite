@@ -145,7 +145,7 @@ DialogSettings::DialogSettings( QWidget *parent)
     QString settingsFile = QStandardPaths::writableLocation( QStandardPaths::AppConfigLocation ) + "/config.json";
     settingsFile.replace( QRegularExpression( "^" + QRegularExpression::escape( QDir::homePath() ) ), "~" );
     labelIcon->setPixmap( QApplication::windowIcon().pixmap( 48, 48 ) );
-    labelTitle->setText( tr("Birdtray Lite %1").arg( Utils::getBirdtrayVersion() ) );
+    labelTitle->setText( tr("Birdtray Lite") );
     QFont titleFont = labelTitle->font();
     titleFont.setBold( true );
     titleFont.setPointSizeF( titleFont.pointSizeF() * 1.4 );

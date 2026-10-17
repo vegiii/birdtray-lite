@@ -17,11 +17,6 @@ class Utils
         static QString expandPath(const QString& path);
         
         /**
-         * @return The version of Birdtray as a string.
-         */
-        static QString getBirdtrayVersion();
-
-        /**
          * @return A list of possible locations of the directory
          *         that contains the Thunderbird profiles.
          * @see https://support.mozilla.org/en-US/kb/profiles-where-thunderbird-stores-user-data#w_profile-location-summary
