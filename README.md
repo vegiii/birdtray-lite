@@ -15,17 +15,11 @@ This fork is meant for my personal use on Fedora KDE Wayland and comes with no g
 
 ## Install or update
 
-Builds in `/tmp` and installs to `~/.local`. Run the same command again to update.
+Installs missing build dependencies, builds in a temporary folder and installs to `~/.local`. Run the same command again to update.
 
 ```bash
-sudo dnf install cmake gcc-c++ git qt6-qtbase-devel &&
-rm -rf /tmp/birdtray-lite &&
-git clone --depth 1 https://github.com/vegiii/birdtray-lite /tmp/birdtray-lite &&
-/tmp/birdtray-lite/install.sh &&
-rm -rf /tmp/birdtray-lite
+curl -fsSL https://raw.githubusercontent.com/vegiii/birdtray-lite/main/install.sh | bash
 ```
-
-Settings are stored in `~/.config/birdtray-lite/config.json`.
 
 ## Changes from upstream
 
