@@ -6,11 +6,12 @@ This fork is meant for my personal use on Fedora KDE Wayland and comes with no g
 
 ## Why this fork
 
-- Make inbox discovery easier to set up.
+- Make mail monitoring setup easier.
+- Make the settings menu simpler.
 - Add a simple autostart checkbox.
-- Simplify installation.
 - Keep dependencies to a minimum.
 - Remove unused features to keep the code small.
+- Make installation simpler.
 
 ## Install or update
 
@@ -71,7 +72,7 @@ Settings are stored in `~/.config/birdtray-lite/config.json`.
 | Icons | 5 | – |
 | **Total** | **129** | **59,327** |
 
-In total 63,562 lines were removed and 1,409 added. The repository went from 159 to 42 files, and the C++ code from 8,173 to 3,557 lines.
+In total 63,780 lines were removed and 1,639 added. The repository went from 159 to 41 files, and the C++ code from 8,173 to 3,611 lines.
 
 ## Credits and license
 
