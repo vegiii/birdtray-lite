@@ -152,9 +152,11 @@ DialogSettings::DialogSettings( QWidget *parent)
     labelTitle->setFont( titleFont );
     labelSettings->setText( settingsFile );
     labelBuilt->setText( tr("%1 with Qt %2").arg( QLocale().toString( QDate::fromString( QString(__DATE__).simplified(), "MMM d yyyy" ), "d MMMM yyyy" ), QT_VERSION_STR ) );
+    // Space the credits off from the details above, since they share one grid
+    labelCreditsTitle->setContentsMargins( 0, 10, 0, 0 );
 
     // The detail names are dimmed like in KDE's own About pages
-    for ( QLabel* name : { labelSourceName, labelSettingsName, labelBuiltName, labelLicenseName, labelIconCreditName } )
+    for ( QLabel* name : { labelSourceName, labelSettingsName, labelBuiltName, labelLicenseName } )
     {
         QPalette palette = name->palette();
         palette.setColor( QPalette::WindowText, palette.color( QPalette::PlaceholderText ) );
