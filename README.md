@@ -35,8 +35,16 @@ Settings are stored in `~/.config/birdtray-lite/config.json`.
 - Simpler settings, with the mail folders selected directly in the Monitoring tab.
 - Option to start at login.
 - Own icon, with an option to use the icon theme's Thunderbird icon in the tray.
-- Closing Thunderbird on quit works on Wayland.
 - Install script.
+
+### Changed
+
+- KWin is controlled through Qt D-Bus instead of the `qdbus6` command, so `qt6-qttools` is no longer needed.
+- The KWin script is written to the private runtime directory instead of `/tmp`.
+- Closing Thunderbird on quit also goes through KWin, so it works on Wayland.
+- Own app ID and settings file, so it can be installed next to Birdtray.
+- Single-instance check uses D-Bus instead of a local socket.
+- The Thunderbird command, including the Flatpak, is detected at every start.
 
 ### Removed
 
