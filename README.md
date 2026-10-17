@@ -60,13 +60,13 @@ curl -fsSL https://raw.githubusercontent.com/vegiii/birdtray-lite/main/install.s
 |---|---:|---:|
 | Tests and test data | 17 | 34,898 |
 | Translations | 42 | 17,251 |
-| Source files | 37 | 3,781 |
+| Source files | 43 | 4,421 |
 | Windows installer | 11 | 2,039 |
 | CI, IDE files, contrib and screenshots | 17 | 1,358 |
-| Icons | 5 | – |
-| **Total** | **129** | **59,327** |
+| Icons | 6 | – |
+| **Total** | **136** | **59,967** |
 
-In total 63,780 lines were removed and 1,639 added. The repository went from 159 to 41 files, and the C++ code from 8,173 to 3,611 lines.
+In total 64,056 lines were removed and 1,755 added. The repository went from 159 to 34 files, and the C++ code from 8,173 to 3,525 lines.
 
 ## Credits and license
 
