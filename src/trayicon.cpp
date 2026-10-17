@@ -8,7 +8,6 @@
 #include "trayicon.h"
 #include "unreadmonitor.h"
 #include "windowtools.h"
-#include "utils.h"
 #include "birdtrayapp.h"
 #include "thunderbird.h"
 #include "log.h"
@@ -151,7 +150,7 @@ void TrayIcon::updateIcon()
         QMap<QString, unsigned int> accountCounts;
         for (auto it = mUnreadCounts.cbegin(); it != mUnreadCounts.cend(); ++it) {
             if (it.value() > 0) {
-                accountCounts[Utils::getMailAccountName(QFileInfo(it.key()))] += it.value();
+                accountCounts[Thunderbird::mailAccountName(QFileInfo(it.key()))] += it.value();
             }
         }
         for (auto it = accountCounts.cbegin(); it != accountCounts.cend(); ++it) {
@@ -174,8 +173,8 @@ void TrayIcon::updateIcon()
                 continue;
             }
             QFileInfo accountMorkFile(path);
-            QString accountName = Utils::getMailAccountName(accountMorkFile);
-            QString mailFolderName = Utils::getMailFolderName(accountMorkFile);
+            QString accountName = Thunderbird::mailAccountName(accountMorkFile);
+            QString mailFolderName = Thunderbird::mailFolderName(accountMorkFile);
             QString name;
             if (accountName.isNull() || mailFolderName.isNull()) {
                 name = path;

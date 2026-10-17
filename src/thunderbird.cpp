@@ -5,14 +5,31 @@
 #include <QRegularExpression>
 #include <QSettings>
 
+#include <wordexp.h>
+
 #include "thunderbird.h"
-#include "utils.h"
+
+// Expand ~ and variables in a path as a shell would, and remove wrapping quotes
+static QString expandPath(const QString &path)
+{
+    QString rawPath = path.startsWith('"') && path.endsWith('"') ? path.section('"', 1, 1) : path;
+    wordexp_t result;
+    if (wordexp(rawPath.toStdString().data(), &result, WRDE_NOCMD) != 0) {
+        return rawPath;
+    }
+    QString expandedPath(result.we_wordv[0]);
+    wordfree(&result);
+    return expandedPath;
+}
 
 
 QString Thunderbird::profilesDir()
 {
-    for (const QString &path : Utils::getThunderbirdProfilesPaths()) {
-        QDir dir(Utils::expandPath(path));
+    // See https://support.mozilla.org/en-US/kb/profiles-where-thunderbird-stores-user-data
+    for (const char* path : {"~/.config/thunderbird", "~/.thunderbird",
+                             "~/snap/thunderbird/common/.thunderbird",
+                             "~/.var/app/org.mozilla.Thunderbird/.thunderbird"}) {
+        QDir dir(expandPath(path));
         if (dir.exists("profiles.ini")) {
             return dir.absolutePath();
         }
@@ -126,4 +143,49 @@ QString Thunderbird::accountName(const QString &accountDir)
         }
     }
     return names.value(key);
+}
+
+QString Thunderbird::mailAccountName(const QFileInfo &morkFile)
+{
+    QDir parentDir = morkFile.dir();
+    QString name;
+    while ((name = parentDir.dirName()).endsWith(".sbd")) {
+        if (!parentDir.cdUp()) {
+            return QString();
+        }
+    }
+    QString account = accountName(parentDir.absolutePath());
+    return account.isEmpty() ? name : account;
+}
+
+QString Thunderbird::mailFolderName(const QFileInfo &morkFile)
+{
+    QString dirName;
+    QDir parentDir = morkFile.dir();
+    QString morkBaseName = morkFile.completeBaseName();
+    if (morkBaseName == "INBOX") {
+        morkBaseName = "Inbox";
+    }
+    QString name = morkBaseName;
+    while ((dirName = parentDir.dirName()).endsWith(".sbd")) {
+        dirName.chop(4);
+        if (dirName == "INBOX") {
+            dirName = "Inbox";
+        }
+        name = dirName + '/' + name;
+        if (!parentDir.cdUp()) {
+            return QString();
+        }
+    }
+    return name;
+}
+
+QStringList Thunderbird::defaultCommand()
+{
+    if (!QFile::exists("/usr/bin/thunderbird")
+        && (QDir("/var/lib/flatpak/app/org.mozilla.Thunderbird").exists()
+            || QDir(expandPath("~/.local/share/flatpak/app/org.mozilla.Thunderbird")).exists())) {
+        return { "flatpak", "run", "org.mozilla.Thunderbird" };
+    }
+    return { "/usr/bin/thunderbird" };
 }

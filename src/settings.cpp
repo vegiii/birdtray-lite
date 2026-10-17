@@ -8,7 +8,7 @@
 #include <QMessageBox>
 
 #include "settings.h"
-#include "utils.h"
+#include "thunderbird.h"
 #include "log.h"
 
 Settings::Settings()
@@ -28,7 +28,7 @@ Settings::Settings()
     mShowUnreadEmailCount = true;
     onlyShowIconOnUnreadMessages = false;
     mNewEmailMenuEnabled = true;
-    mThunderbirdCmdLine = Utils::getDefaultThunderbirdCommand();
+    mThunderbirdCmdLine = Thunderbird::defaultCommand();
     mShowHideThunderbird = true;
     mKeepThunderbirdRunning = true;
     mStartThunderbirdHidden = true;

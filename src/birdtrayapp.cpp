@@ -3,7 +3,6 @@
 #include <QtDBus/QDBusMessage>
 
 #include "birdtrayapp.h"
-#include "utils.h"
 #include "windowtools.h"
 #include "log.h"
 
@@ -14,6 +13,11 @@
 #define HIDE_THUNDERBIRD_COMMAND "hide-tb"
 #define SETTINGS_COMMAND "settings"
 
+
+int main(int argc, char *argv[]) {
+    BirdtrayApp app(argc, argv);
+    return QApplication::exec();
+}
 
 BirdtrayApp::BirdtrayApp(int &argc, char** argv) : QApplication(argc, argv)
 {

@@ -10,7 +10,6 @@
 #include <QtCore/QStandardPaths>
 
 #include "dialogsettings.h"
-#include "utils.h"
 #include "thunderbird.h"
 #include "birdtrayapp.h"
 #include "log.h"

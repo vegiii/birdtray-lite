@@ -5,8 +5,7 @@
 #include <QCoreApplication>
 #include <QMap>
 #include <QPixmap>
-
-#include "utils.h"
+#include <QStringList>
 
 
 class Settings

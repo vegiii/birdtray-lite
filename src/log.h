@@ -5,7 +5,7 @@
 #include <QPointer>
 #include <QStringList>
 
-class DialogLogOutput;
+class QPlainTextEdit;
 
 // Logger
 class Log final
@@ -42,8 +42,8 @@ class Log final
         QStringList     mEntries;
         QMutex          mMutex;
 
-        // Auto-set to null when log dialog is closed
-        QPointer<DialogLogOutput>   mDialog;
+        // The text box of the open log window. Auto-set to null when the window is closed
+        QPointer<QPlainTextEdit>    mViewer;
 };
 
 #endif // LOG_H

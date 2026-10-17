@@ -10,9 +10,7 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt6 6.2 CONFIG REQUIRED COMPONENTS Core Gui Widgets DBus)
 
 add_executable(birdtray-lite
-        src/main.cpp
         src/birdtrayapp.cpp
-        src/dialoglogoutput.cpp
         src/dialogsettings.cpp
         src/foldertree.cpp
         src/log.cpp
@@ -21,9 +19,7 @@ add_executable(birdtray-lite
         src/thunderbird.cpp
         src/trayicon.cpp
         src/unreadmonitor.cpp
-        src/utils.cpp
         src/windowtools.cpp
-        src/dialoglogoutput.ui
         src/dialogsettings.ui
         src/resources.qrc)
 target_include_directories(birdtray-lite PRIVATE src)

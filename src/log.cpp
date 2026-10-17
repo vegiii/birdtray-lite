@@ -5,9 +5,13 @@
 #include <QStandardPaths>
 #include <QMessageBox>
 #include <QFile>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QFontDatabase>
+#include <QPlainTextEdit>
+#include <QVBoxLayout>
 
 #include "log.h"
-#include "dialoglogoutput.h"
 
 Log * Log::mLog;
 
@@ -59,15 +63,30 @@ void Log::showLogger()
 
     QMutexLocker l( &self->mMutex );
 
-    // Create a dialog if not exist
-    if ( self->mDialog.isNull() )
+    // Create the window if it does not exist. It is deleted when closed
+    if ( self->mViewer.isNull() )
     {
-        self->mDialog = new DialogLogOutput();
-        self->mDialog->add( self->mEntries );
-        self->mDialog->show();
+        auto* dialog = new QDialog();
+        dialog->setAttribute( Qt::WA_DeleteOnClose );
+        dialog->setWindowTitle( QCoreApplication::translate( "Log", "Debug log viewer" ) );
+        dialog->resize( 500, 380 );
+
+        self->mViewer = new QPlainTextEdit( dialog );
+        self->mViewer->setReadOnly( true );
+        self->mViewer->setFont( QFontDatabase::systemFont( QFontDatabase::FixedFont ) );
+        self->mViewer->appendPlainText( self->mEntries.join( "\r\n" ) );
+
+        auto* buttons = new QDialogButtonBox( QDialogButtonBox::Close, dialog );
+        QObject::connect( buttons, &QDialogButtonBox::rejected, dialog, &QDialog::reject );
+
+        auto* layout = new QVBoxLayout( dialog );
+        layout->addWidget( self->mViewer );
+        layout->addWidget( buttons );
+        dialog->show();
     }
 
-    self->mDialog->activateWindow();
+    self->mViewer->ensureCursorVisible();
+    self->mViewer->window()->activateWindow();
 }
 
 Log *Log::g()
@@ -93,6 +112,9 @@ void Log::add(const QString &text)
     mEntries.push_back( logline );
 
     // Add it to the open log window, if any
-    if ( !mDialog.isNull() )
-        mDialog.data()->add( logline );
+    if ( !mViewer.isNull() )
+    {
+        mViewer->appendPlainText( logline );
+        mViewer->ensureCursorVisible();
+    }
 }

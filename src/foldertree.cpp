@@ -5,7 +5,6 @@
 
 #include "foldertree.h"
 #include "thunderbird.h"
-#include "utils.h"
 #include "birdtrayapp.h"
 #include "unreadmonitor.h"
 
@@ -36,7 +35,7 @@ void FolderTree::load(const QString &profileDir, const QStringList &monitored)
         QDirIterator msfFiles(account.directory, {"*.msf"}, QDir::Files, QDirIterator::Subdirectories);
         while (msfFiles.hasNext()) {
             const QFileInfo msfFile(msfFiles.next());
-            const QString name = Utils::getMailFolderName(msfFile);
+            const QString name = Thunderbird::mailFolderName(msfFile);
             if (name.isNull()) {
                 continue;
             }
