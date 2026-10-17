@@ -34,6 +34,7 @@ Settings are stored in `~/.config/birdtray-lite/config.json`.
 - Fixed unread count on the tray icon, shown as a number or a badge.
 - Simpler settings, with the mail folders selected directly in the Monitoring tab.
 - Option to start at login.
+- Option to hide Thunderbird in the tray when minimized.
 - Own icon, with an option to use the icon theme's Thunderbird icon in the tray.
 - Install script.
 

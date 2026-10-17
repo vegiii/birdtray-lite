@@ -89,6 +89,7 @@ DialogSettings::DialogSettings( QWidget *parent)
     boxAutostart->setChecked( QFile::exists( autostartFilePath() ) );
     boxKeepThunderbirdRunning->setChecked( settings->mKeepThunderbirdRunning );
     boxStartThunderbirdHidden->setChecked( settings->mStartThunderbirdHidden );
+    boxHideWhenMinimized->setChecked( settings->mHideWhenMinimized );
     boxShowHideThunderbird->setChecked( settings->mShowHideThunderbird );
     boxStopThunderbirdOnExit->setChecked( settings->mExitThunderbirdWhenQuit );
     boxShowUnreadCount->setChecked( settings->mShowUnreadEmailCount );
@@ -175,6 +176,7 @@ void DialogSettings::apply()
         setAutostart( boxAutostart->isChecked() );
     settings->mKeepThunderbirdRunning = boxKeepThunderbirdRunning->isChecked();
     settings->mStartThunderbirdHidden = boxStartThunderbirdHidden->isChecked();
+    settings->mHideWhenMinimized = boxHideWhenMinimized->isChecked();
     settings->mShowHideThunderbird = boxShowHideThunderbird->isChecked();
     settings->mExitThunderbirdWhenQuit = boxStopThunderbirdOnExit->isChecked();
     settings->mShowUnreadEmailCount = boxShowUnreadCount->isChecked();

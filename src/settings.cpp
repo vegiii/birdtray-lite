@@ -32,6 +32,7 @@ Settings::Settings()
     mShowHideThunderbird = true;
     mKeepThunderbirdRunning = true;
     mStartThunderbirdHidden = true;
+    mHideWhenMinimized = true;
     mExitThunderbirdWhenQuit = true;
     isFirstRun = false;
 }
@@ -49,6 +50,7 @@ void Settings::save()
     out[ "common/showhidethunderbird" ] = mShowHideThunderbird;
     out[ "common/keepthunderbirdrunning" ] = mKeepThunderbirdRunning;
     out[ "common/startThunderbirdHidden" ] = mStartThunderbirdHidden;
+    out[ "common/hidewhenminimized" ] = mHideWhenMinimized;
     out[ "common/exitthunderbirdonquit" ] = mExitThunderbirdWhenQuit;
 
     // Store the account map
@@ -119,6 +121,7 @@ void Settings::fromJSON( const QJsonObject& settings )
     mKeepThunderbirdRunning = settings.value( "common/keepthunderbirdrunning" ).toBool( mKeepThunderbirdRunning );
     mStartThunderbirdHidden = settings.value( "common/startThunderbirdHidden" ).toBool(
             settings.value( "common/hidewhenstarted" ).toBool( mStartThunderbirdHidden ) );
+    mHideWhenMinimized = settings.value( "common/hidewhenminimized" ).toBool( mHideWhenMinimized );
     mExitThunderbirdWhenQuit = settings.value( "common/exitthunderbirdonquit" ).toBool( mExitThunderbirdWhenQuit );
     watchedMorkFiles.clear();
 

@@ -51,7 +51,7 @@
           <item>
            <widget class="QCheckBox" name="boxThemeTrayIcon">
             <property name="text">
-             <string>Use the Thunderbird icon from the icon theme</string>
+             <string>Use the icon theme's Thunderbird icon in the tray</string>
             </property>
            </widget>
           </item>
@@ -73,18 +73,22 @@
          <layout class="QVBoxLayout" name="layoutThunderbird">
           <item>
            <widget class="QCheckBox" name="boxKeepThunderbirdRunning">
-            <property name="toolTip">
-             <string>Starts Thunderbird with Birdtray Lite and restarts it if it is closed.</string>
-            </property>
             <property name="text">
-             <string>Keep running</string>
+             <string>Start Thunderbird and restart it if it is closed</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QCheckBox" name="boxStartThunderbirdHidden">
             <property name="text">
-             <string>Start hidden</string>
+             <string>Start Thunderbird hidden</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="boxHideWhenMinimized">
+            <property name="text">
+             <string>Hide Thunderbird in the tray when minimized</string>
             </property>
            </widget>
           </item>
@@ -94,14 +98,14 @@
              <string>Starts Thunderbird first if it is not running.</string>
             </property>
             <property name="text">
-             <string>Show or hide when clicking the tray icon</string>
+             <string>Show or hide Thunderbird when clicking the tray icon</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QCheckBox" name="boxStopThunderbirdOnExit">
             <property name="text">
-             <string>Close when quitting Birdtray Lite</string>
+             <string>Quit Thunderbird when quitting Birdtray Lite</string>
             </property>
            </widget>
           </item>
@@ -117,7 +121,7 @@
           <item>
            <widget class="QCheckBox" name="boxShowUnreadCount">
             <property name="text">
-             <string>Show unread count</string>
+             <string>Show the unread count on the tray icon</string>
             </property>
            </widget>
           </item>

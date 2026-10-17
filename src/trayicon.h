@@ -100,6 +100,11 @@ class TrayIcon : public QSystemTrayIcon
          */
         void    onThunderbirdWindowHidden();
 
+        /**
+         * Called when a Thunderbird window opens.
+         */
+        void    onThunderbirdWindowAdded();
+
     private:
         void    createMenu();
         void    createUnreadCounterThread();

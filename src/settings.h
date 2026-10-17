@@ -44,6 +44,9 @@ class Settings
         // Whether to hide the Thunderbird window when we start Thunderbird
         bool    mStartThunderbirdHidden;
 
+        // Whether to hide the Thunderbird window when it is minimized
+        bool    mHideWhenMinimized;
+
         // Whether to quit Thunderbird when the app quits
         bool    mExitThunderbirdWhenQuit;
 

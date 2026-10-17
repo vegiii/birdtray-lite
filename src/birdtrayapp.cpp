@@ -78,6 +78,24 @@ void BirdtrayApp::runCommand(const QString &command) {
     }
 }
 
+void BirdtrayApp::thunderbirdWindowAdded() {
+    if (trayIcon != nullptr) {
+        trayIcon->getWindowTools()->windowAdded();
+    }
+}
+
+void BirdtrayApp::thunderbirdWindowHidden() {
+    if (trayIcon != nullptr) {
+        trayIcon->getWindowTools()->windowHidden();
+    }
+}
+
+void BirdtrayApp::thunderbirdWindowShown() {
+    if (trayIcon != nullptr) {
+        trayIcon->getWindowTools()->windowShown();
+    }
+}
+
 void BirdtrayApp::parseCmdArguments() {
     commandLineParser.setApplicationDescription(
             tr("Shows Thunderbird's unread mail count in the system tray."));

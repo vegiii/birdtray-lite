@@ -12,6 +12,7 @@ static const QString PROCESS_NAME = "thunderbird";
 static const QString WINDOW_MATCH = "Mozilla Thunderbird";
 
 #define KWIN_SCRIPT_NAME QString("birdtray-lite")
+#define KWIN_WATCHER_NAME QString("birdtray-lite-watcher")
 
 
 WindowTools::WindowTools()
@@ -67,6 +68,10 @@ bool WindowTools::lookup()
     if ( found != mFound )
         Log::debug( found ? "Thunderbird process found" : "Thunderbird process not running" );
 
+    // A restarted Thunderbird opens a new, visible window
+    if ( !found )
+        mHidden = false;
+
     mFound = found;
     return found;
 }
@@ -118,11 +123,76 @@ bool WindowTools::closeWindow()
     return true;
 }
 
+void WindowTools::startWatcher( bool hideWhenMinimized )
+{
+    // Tells Birdtray Lite over D-Bus when a Thunderbird window opens, and hides Thunderbird
+    // when it is minimized. A window shown by something else, such as a notification,
+    // gets its taskbar entry back.
+    const QString script = QString(
+        "var hideWhenMinimized = %1;\n"
+        "var seen = {};\n"
+        "function isThunderbird(w) { return w.caption.indexOf(\"%2\") >= 0; }\n"
+        "function notify(method) {\n"
+        "    callDBus(\"io.github.vegiii.BirdtrayLite\", \"/\", \"io.github.vegiii.BirdtrayLite\", method);\n"
+        "}\n"
+        "function checkAdded(w) {\n"
+        "    var id = String(w.internalId);\n"
+        "    if (isThunderbird(w) && !seen[id]) {\n"
+        "        seen[id] = true;\n"
+        "        notify(\"thunderbirdWindowAdded\");\n"
+        "        if (w.minimized && w.skipTaskbar)\n"
+        "            notify(\"thunderbirdWindowHidden\");\n"
+        "    }\n"
+        "}\n"
+        "function watch(w) {\n"
+        "    w.captionChanged.connect(function() { checkAdded(w); });\n"
+        "    w.minimizedChanged.connect(function() {\n"
+        "        if (!isThunderbird(w))\n"
+        "            return;\n"
+        "        if (w.minimized && hideWhenMinimized && !w.skipTaskbar) {\n"
+        "            w.skipTaskbar = true;\n"
+        "            w.skipPager = true;\n"
+        "            notify(\"thunderbirdWindowHidden\");\n"
+        "        } else if (!w.minimized && w.skipTaskbar) {\n"
+        "            w.skipTaskbar = false;\n"
+        "            w.skipPager = false;\n"
+        "            notify(\"thunderbirdWindowShown\");\n"
+        "        }\n"
+        "    });\n"
+        "    checkAdded(w);\n"
+        "}\n"
+        "workspace.windowList().forEach(watch);\n"
+        "workspace.windowAdded.connect(watch);\n" ).arg( hideWhenMinimized ? "true" : "false", WINDOW_MATCH );
+
+    loadKWinScript( KWIN_WATCHER_NAME, script );
+}
+
+void WindowTools::stopWatcher()
+{
+    unloadKWinScript( KWIN_WATCHER_NAME );
+}
+
+void WindowTools::windowAdded()
+{
+    emit onWindowAdded();
+}
+
+void WindowTools::windowHidden()
+{
+    mHidden = true;
+    emit onWindowHidden();
+}
+
+void WindowTools::windowShown()
+{
+    mHidden = false;
+    emit onWindowShown();
+}
+
 void WindowTools::runKWinScript( const QString& action )
 {
     // This is the only reliable way to control a Wayland-native window from outside
-    // the compositor on KDE Plasma. KWin only loads scripts from files, so the script
-    // is written to the private runtime directory.
+    // the compositor on KDE Plasma.
     const QString script = QString(
         "var windows = workspace.windowList();\n"
         "for (var i = 0; i < windows.length; i++) {\n"
@@ -133,46 +203,59 @@ void WindowTools::runKWinScript( const QString& action )
         "    }\n"
         "}\n" ).arg( WINDOW_MATCH, action );
 
+    if ( loadKWinScript( KWIN_SCRIPT_NAME, script ) )
+        unloadKWinScript( KWIN_SCRIPT_NAME );
+}
+
+bool WindowTools::loadKWinScript( const QString& name, const QString& script )
+{
+    // KWin only loads scripts from files, so the script is written to the private runtime directory
     const QString scriptPath = QStandardPaths::writableLocation( QStandardPaths::RuntimeLocation )
-                               + "/birdtray-lite-kwin.js";
+                               + "/" + name + "-kwin.js";
     QFile f( scriptPath );
     if ( !f.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
     {
-        Log::debug("runKWinScript: failed to write script" );
-        return;
+        Log::debug("loadKWinScript: failed to write script" );
+        return false;
     }
     f.write( script.toUtf8() );
     f.close();
 
-    QDBusConnection bus = QDBusConnection::sessionBus();
-    QDBusMessage unload = QDBusMessage::createMethodCall(
-        "org.kde.KWin", "/Scripting", "org.kde.kwin.Scripting", "unloadScript" );
-    unload << KWIN_SCRIPT_NAME;
-
     // Unload a leftover script first, KWin refuses to load a name twice
-    bus.call( unload, QDBus::Block, 2000 );
+    unloadKWinScript( name );
 
+    QDBusConnection bus = QDBusConnection::sessionBus();
     QDBusMessage load = QDBusMessage::createMethodCall(
         "org.kde.KWin", "/Scripting", "org.kde.kwin.Scripting", "loadScript" );
-    load << scriptPath << KWIN_SCRIPT_NAME;
+    load << scriptPath << name;
     const QDBusMessage reply = bus.call( load, QDBus::Block, 2000 );
 
     const QList<QVariant> args = reply.arguments();
     const int scriptId = args.isEmpty() ? -1 : args.first().toInt();
     if ( reply.type() != QDBusMessage::ReplyMessage || scriptId < 0 )
     {
-        Log::debug("runKWinScript: loadScript failed: %s", qPrintable( reply.errorMessage() ) );
+        Log::debug("loadKWinScript: loadScript failed: %s", qPrintable( reply.errorMessage() ) );
         QFile::remove( scriptPath );
-        return;
+        return false;
     }
 
-    // KWin replies once the script has run, so it is safe to clean up afterwards
+    // KWin replies once the script has run, so it is safe to remove the file afterwards
     const QDBusMessage run = bus.call( QDBusMessage::createMethodCall(
         "org.kde.KWin", QString("/Scripting/Script%1").arg( scriptId ), "org.kde.kwin.Script", "run" ),
         QDBus::Block, 2000 );
-    if ( run.type() != QDBusMessage::ReplyMessage )
-        Log::debug("runKWinScript: run failed: %s", qPrintable( run.errorMessage() ) );
-
-    bus.call( unload, QDBus::Block, 2000 );
     QFile::remove( scriptPath );
+    if ( run.type() != QDBusMessage::ReplyMessage )
+    {
+        Log::debug("loadKWinScript: run failed: %s", qPrintable( run.errorMessage() ) );
+        return false;
+    }
+    return true;
+}
+
+void WindowTools::unloadKWinScript( const QString& name )
+{
+    QDBusMessage unload = QDBusMessage::createMethodCall(
+        "org.kde.KWin", "/Scripting", "org.kde.kwin.Scripting", "unloadScript" );
+    unload << name;
+    QDBusConnection::sessionBus().call( unload, QDBus::Block, 2000 );
 }

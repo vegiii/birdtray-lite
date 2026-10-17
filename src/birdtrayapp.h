@@ -49,6 +49,21 @@ public Q_SLOTS:
      */
     Q_SCRIPTABLE void runCommand(const QString &command);
 
+    /**
+     * Called over D-Bus by the KWin watcher script when a Thunderbird window opens.
+     */
+    Q_SCRIPTABLE void thunderbirdWindowAdded();
+
+    /**
+     * Called over D-Bus by the KWin watcher script when it hid the minimized Thunderbird window.
+     */
+    Q_SCRIPTABLE void thunderbirdWindowHidden();
+
+    /**
+     * Called over D-Bus by the KWin watcher script when the hidden Thunderbird window was shown.
+     */
+    Q_SCRIPTABLE void thunderbirdWindowShown();
+
 private:
     /**
      * The Birdtray settings.

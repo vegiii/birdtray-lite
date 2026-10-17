@@ -35,6 +35,8 @@ TrayIcon::TrayIcon(bool showSettings)
     if (mWinTools) {
         connect(mWinTools, &WindowTools::onWindowShown, this, &TrayIcon::onThunderbirdWindowShown);
         connect(mWinTools, &WindowTools::onWindowHidden, this, &TrayIcon::onThunderbirdWindowHidden);
+        connect(mWinTools, &WindowTools::onWindowAdded, this, &TrayIcon::onThunderbirdWindowAdded);
+        mWinTools->startWatcher(settings->mHideWhenMinimized);
     }
     createMenu();
 
@@ -216,13 +218,6 @@ void TrayIcon::updateState()
 
             if ( !mMenuShowHideThunderbird->isEnabled() )
                 mMenuShowHideThunderbird->setEnabled( true );
-
-            // Hide the window if requested
-            if ( mThunderbirdWindowHide )
-            {
-                mThunderbirdWindowHide = false;
-                hideThunderbird();
-            }
         }
         else
         {
@@ -231,7 +226,7 @@ void TrayIcon::updateState()
             if (settings->mKeepThunderbirdRunning && !mThunderbirdProcess) {
                 startThunderbird();
 
-                // Hide after?
+                // Hide once the window opens?
                 if (settings->mStartThunderbirdHidden) {
                     mThunderbirdWindowHide = true;
                 }
@@ -275,6 +270,9 @@ void TrayIcon::applySettings()
     BirdtrayApp::get()->getSettings()->resetNotificationIcon();
     createMenu();
     updateIcon();
+    if (mWinTools) {
+        mWinTools->startWatcher(BirdtrayApp::get()->getSettings()->mHideWhenMinimized);
+    }
     emit settingsChanged();
 }
 
@@ -406,6 +404,9 @@ void TrayIcon::tbProcessFinished(int, QProcess::ExitStatus)
 
 
 void TrayIcon::onQuit() {
+    if (mWinTools) {
+        mWinTools->stopWatcher();
+    }
     if (mWinTools && mWinTools->isHidden()) {
         mWinTools->show();
     }
@@ -422,6 +423,14 @@ void TrayIcon::onThunderbirdWindowShown() {
 
 void TrayIcon::onThunderbirdWindowHidden() {
     mMenuShowHideThunderbird->setText( tr("Show Thunderbird") );
+}
+
+void TrayIcon::onThunderbirdWindowAdded() {
+    // Hide the window we started hidden now that it exists
+    if (mThunderbirdWindowHide) {
+        mThunderbirdWindowHide = false;
+        hideThunderbird();
+    }
 }
 
 void TrayIcon::hideThunderbird()
