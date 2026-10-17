@@ -2,7 +2,7 @@
 
 A fork of [birdtray-wayland](https://github.com/stark1tty/birdtray-wayland), which is based on [Birdtray](https://github.com/gyunaev/birdtray).
 
-This fork is meant for my personal use on Fedora KDE Wayland and comes with no guarantee that it will work on other systems. This project is developed with the help of AI coding agents.
+This fork is meant for my personal use on Fedora KDE and is developed with the help of AI coding agents. It will probably work on any distribution with Plasma 6, but comes with no guarantees.
 
 ## Why this fork
 
@@ -15,11 +15,17 @@ This fork is meant for my personal use on Fedora KDE Wayland and comes with no g
 
 ## Install or update
 
-Installs missing build dependencies, builds in a temporary folder and installs to `~/.local`. Run the same command again to update.
+Requires KDE Plasma 6. On Fedora, missing build dependencies are installed automatically. On other distributions, install them first:
+
+- Debian, Ubuntu: `cmake g++ qt6-base-dev`
+- Arch: `cmake gcc qt6-base`
+- Other: CMake, a C++17 compiler and Qt 6.2 or newer
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/vegiii/birdtray-lite/main/install.sh | bash
 ```
+
+Builds and installs to `~/.local`. Run it again to update.
 
 ## Changes from upstream
 
@@ -66,7 +72,7 @@ curl -fsSL https://raw.githubusercontent.com/vegiii/birdtray-lite/main/install.s
 | Icons | 6 | – |
 | **Total** | **136** | **59,967** |
 
-In total 64,056 lines were removed and 1,755 added. The repository went from 159 to 34 files, and the C++ code from 8,173 to 3,525 lines.
+In total 64,054 lines were removed and 1,762 added. The repository went from 159 to 34 files, and the C++ code from 8,173 to 3,525 lines.
 
 ## Credits and license
 

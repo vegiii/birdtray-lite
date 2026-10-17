@@ -4,13 +4,16 @@
 set -e
 
 main() {
-    missing=()
-    for pkg in cmake gcc-c++ qt6-qtbase-devel; do
-        rpm -q "$pkg" >/dev/null 2>&1 || missing+=("$pkg")
-    done
-    if [ ${#missing[@]} -gt 0 ]; then
-        # stdin is the script when piped from curl, so read the confirmation from the terminal.
-        sudo dnf install "${missing[@]}" </dev/tty
+    # Install missing build dependencies on Fedora. Other distributions install them manually.
+    if command -v dnf >/dev/null; then
+        missing=()
+        for pkg in cmake gcc-c++ qt6-qtbase-devel; do
+            rpm -q "$pkg" >/dev/null 2>&1 || missing+=("$pkg")
+        done
+        if [ ${#missing[@]} -gt 0 ]; then
+            # stdin is the script when piped from curl, so read the confirmation from the terminal.
+            sudo dnf install "${missing[@]}" </dev/tty
+        fi
     fi
 
     if [ -f "$(dirname "${BASH_SOURCE[0]}")/CMakeLists.txt" ] && [ -f "${BASH_SOURCE[0]}" ]; then
