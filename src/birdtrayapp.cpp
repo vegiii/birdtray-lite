@@ -23,6 +23,8 @@ BirdtrayApp::BirdtrayApp(int &argc, char** argv) : QApplication(argc, argv)
 {
     QApplication::setWindowIcon(QIcon(QString::fromUtf8(":/res/birdtray.svg")));
     QCoreApplication::setApplicationName("birdtray-lite");
+    // Shown in the tray popup and window titles
+    QGuiApplication::setApplicationDisplayName("Birdtray Lite");
     QGuiApplication::setDesktopFileName("io.github.vegiii.BirdtrayLite");
     // Keep running when the settings or log window is closed
     QApplication::setQuitOnLastWindowClosed(false);

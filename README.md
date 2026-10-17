@@ -74,7 +74,7 @@ Compared with [birdtray-wayland at `2ac2016`](https://github.com/stark1tty/birdt
 | Icons | 6 | – |
 | **Total** | **136** | **59,967** |
 
-In total 64,047 lines were removed and 1,811 added. The repository went from 159 to 34 files, and the C++ code from 8,173 to 3,569 lines.
+In total 64,047 lines were removed and 1,813 added. The repository went from 159 to 34 files, and the C++ code from 8,173 to 3,571 lines.
 
 ## Credits and license
 
