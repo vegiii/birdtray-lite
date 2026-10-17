@@ -123,9 +123,12 @@ bool BirdtrayApp::startSingleInstanceServer() {
     }
     bus.unregisterObject(DBUS_OBJECT_PATH);
 
+    // Launched again without a command, e.g. from the app menu: show the settings
+    bool noCommand = commandLineParser.optionNames().isEmpty();
     for (const char* command : {TOGGLE_THUNDERBIRD_COMMAND, SHOW_THUNDERBIRD_COMMAND,
                                 HIDE_THUNDERBIRD_COMMAND, SETTINGS_COMMAND}) {
-        if (commandLineParser.isSet(command)) {
+        if (commandLineParser.isSet(command)
+                || (noCommand && command == QLatin1String(SETTINGS_COMMAND))) {
             QDBusMessage message = QDBusMessage::createMethodCall(
                     DBUS_SERVICE_NAME, DBUS_OBJECT_PATH, DBUS_SERVICE_NAME, "runCommand");
             message << QString(command);
