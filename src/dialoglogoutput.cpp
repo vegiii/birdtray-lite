@@ -11,10 +11,6 @@ DialogLogOutput::DialogLogOutput(QWidget *parent) :
     logViewer->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 }
 
-DialogLogOutput::~DialogLogOutput()
-{
-}
-
 void DialogLogOutput::add(const QString &line)
 {
     logViewer->appendPlainText( line );

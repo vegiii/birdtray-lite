@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>res/birdtray.png</file>
+        <file>res/icons/128/io.github.vegiii.BirdtrayLite.png</file>
         <file>res/birdtray.svg</file>
     </qresource>
 </RCC>

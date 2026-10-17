@@ -119,8 +119,7 @@ void Settings::fromJSON( const QJsonObject& settings )
     mNewEmailMenuEnabled = settings.value( "common/newemailEnabled" ).toBool( mNewEmailMenuEnabled );
     mShowHideThunderbird = settings.value( "common/showhidethunderbird" ).toBool( mShowHideThunderbird );
     mKeepThunderbirdRunning = settings.value( "common/keepthunderbirdrunning" ).toBool( mKeepThunderbirdRunning );
-    mStartThunderbirdHidden = settings.value( "common/startThunderbirdHidden" ).toBool(
-            settings.value( "common/hidewhenstarted" ).toBool( mStartThunderbirdHidden ) );
+    mStartThunderbirdHidden = settings.value( "common/startThunderbirdHidden" ).toBool( mStartThunderbirdHidden );
     mHideWhenMinimized = settings.value( "common/hidewhenminimized" ).toBool( mHideWhenMinimized );
     mExitThunderbirdWhenQuit = settings.value( "common/exitthunderbirdonquit" ).toBool( mExitThunderbirdWhenQuit );
     watchedMorkFiles.clear();
@@ -153,7 +152,7 @@ const QPixmap &Settings::getNotificationIcon() {
         }
     }
     if (mNotificationIcon.isNull()) {
-        if (!mNotificationIcon.load(":res/birdtray.png")) {
+        if (!mNotificationIcon.load(":res/icons/128/io.github.vegiii.BirdtrayLite.png")) {
             Log::fatal( tr("Cannot load default system tray icon.") );
         }
     }

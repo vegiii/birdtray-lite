@@ -71,7 +71,6 @@ class TrayIcon : public QSystemTrayIcon
         void    updateState();
 
         // Context menu actions
-        static void actionQuit();
         void    actionActivate();
         void    actionNewEmail();
 
@@ -149,10 +148,6 @@ class TrayIcon : public QSystemTrayIcon
 
         // State checking timer (once a second)
         QTimer          mStateTimer;
-
-        // If true, Thunderbird window existed anytime before, but not necessarily now
-        // (we use this to distinguish between start and restart)
-        bool            mThunderbirdWindowExisted;
 
         // If true, Thunderbird window exists right now
         bool            mThunderbirdWindowExists;

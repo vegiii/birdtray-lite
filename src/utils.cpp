@@ -3,10 +3,7 @@
 #include "birdtrayapp.h"
 #include "thunderbird.h"
 
-#include <QApplication>
-#include <QStringConverter>
 #include <QtCore/QDir>
-#include <QtCore/QBuffer>
 
 #include <wordexp.h>
 
@@ -51,14 +48,13 @@ QString Utils::getMailFolderName(const QFileInfo &morkFile) {
     if (morkBaseName == "INBOX") {
         morkBaseName = "Inbox";
     }
-    QString name = QCoreApplication::translate("EmailFolders", morkBaseName.toUtf8().constData());
+    QString name = morkBaseName;
     while ((dirName = parentDir.dirName()).endsWith(".sbd")) {
         dirName.chop(4);
         if (dirName == "INBOX") {
             dirName = "Inbox";
         }
-        name = QCoreApplication::translate(
-                "EmailFolders", dirName.toUtf8().constData()) + '/' + name;
+        name = dirName + '/' + name;
         if (!parentDir.cdUp()) {
             return QString();
         }

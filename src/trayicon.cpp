@@ -21,23 +21,20 @@ TrayIcon::TrayIcon(bool showSettings)
     mSystrayMenu = new QMenu();
     setContextMenu( mSystrayMenu );
 
-    mMenuShowHideThunderbird = 0;
+    mMenuShowHideThunderbird = nullptr;
     mThunderbirdProcess = nullptr;
     
     mThunderbirdWindowExists = false;
-    mThunderbirdWindowExisted = false;
     mThunderbirdWindowHide = false;
     connect(QApplication::instance(), &QApplication::aboutToQuit, this, &TrayIcon::onQuit);
 
     Settings* settings = BirdtrayApp::get()->getSettings();
 
     mWinTools = WindowTools::create();
-    if (mWinTools) {
-        connect(mWinTools, &WindowTools::onWindowShown, this, &TrayIcon::onThunderbirdWindowShown);
-        connect(mWinTools, &WindowTools::onWindowHidden, this, &TrayIcon::onThunderbirdWindowHidden);
-        connect(mWinTools, &WindowTools::onWindowAdded, this, &TrayIcon::onThunderbirdWindowAdded);
-        mWinTools->startWatcher(settings->mHideWhenMinimized);
-    }
+    connect(mWinTools, &WindowTools::onWindowShown, this, &TrayIcon::onThunderbirdWindowShown);
+    connect(mWinTools, &WindowTools::onWindowHidden, this, &TrayIcon::onThunderbirdWindowHidden);
+    connect(mWinTools, &WindowTools::onWindowAdded, this, &TrayIcon::onThunderbirdWindowAdded);
+    mWinTools->startWatcher(settings->mHideWhenMinimized);
     createMenu();
 
     // On the first start, start at login, monitor the inboxes of all Thunderbird accounts
@@ -194,7 +191,6 @@ void TrayIcon::updateIcon()
 
     p.end();
 
-    // FIXME: this is not very efficient, although at our icon sizes (128x128) is probably ok.
     if ( mLastDrawnIcon != temp.toImage() )
     {
         mLastDrawnIcon = temp.toImage();
@@ -205,47 +201,35 @@ void TrayIcon::updateIcon()
 
 void TrayIcon::updateState()
 {
-    if ( mWinTools )
+    mThunderbirdWindowExists = mWinTools->lookup();
+
+    // Is Thunderbird running?
+    if ( mThunderbirdWindowExists )
     {
-        mThunderbirdWindowExists = mWinTools->lookup();
+        if ( !mMenuShowHideThunderbird->isEnabled() )
+            mMenuShowHideThunderbird->setEnabled( true );
+    }
+    else
+    {
+        Settings* settings = BirdtrayApp::get()->getSettings();
+        // Thunderbird is not running. Start it, or restart it if it has run before
+        if (settings->mKeepThunderbirdRunning && !mThunderbirdProcess) {
+            startThunderbird();
 
-        // Is Thunderbird running?
-        if ( mThunderbirdWindowExists )
-        {
-            // If the window is found, we remember it
-            if ( !mThunderbirdWindowExisted )
-                mThunderbirdWindowExisted = true;
-
-            if ( !mMenuShowHideThunderbird->isEnabled() )
-                mMenuShowHideThunderbird->setEnabled( true );
-        }
-        else
-        {
-            Settings* settings = BirdtrayApp::get()->getSettings();
-            // Thunderbird is not running. Start it, or restart it if it has run before
-            if (settings->mKeepThunderbirdRunning && !mThunderbirdProcess) {
-                startThunderbird();
-
-                // Hide once the window opens?
-                if (settings->mStartThunderbirdHidden) {
-                    mThunderbirdWindowHide = true;
-                }
+            // Hide once the window opens?
+            if (settings->mStartThunderbirdHidden) {
+                mThunderbirdWindowHide = true;
             }
         }
-
-        // Update the menu text as the window can be hidden in wintools
-        if ( mWinTools->isHidden() )
-            mMenuShowHideThunderbird->setText( tr("Show Thunderbird") );
-        else
-            mMenuShowHideThunderbird->setText( tr("Hide Thunderbird") );
-
-        updateIcon();
     }
-}
 
-void TrayIcon::actionQuit()
-{
-    QApplication::quit();
+    // Update the menu text as the window can be hidden in wintools
+    if ( mWinTools->isHidden() )
+        mMenuShowHideThunderbird->setText( tr("Show Thunderbird") );
+    else
+        mMenuShowHideThunderbird->setText( tr("Hide Thunderbird") );
+
+    updateIcon();
 }
 
 void TrayIcon::showSettings()
@@ -270,17 +254,12 @@ void TrayIcon::applySettings()
     BirdtrayApp::get()->getSettings()->resetNotificationIcon();
     createMenu();
     updateIcon();
-    if (mWinTools) {
-        mWinTools->startWatcher(BirdtrayApp::get()->getSettings()->mHideWhenMinimized);
-    }
+    mWinTools->startWatcher(BirdtrayApp::get()->getSettings()->mHideWhenMinimized);
     emit settingsChanged();
 }
 
 void TrayIcon::actionActivate()
 {
-    if ( !mWinTools )
-        return;
-
     // Start Thunderbird if it is closed, and show it since the user asked for it
     if ( !mWinTools->lookup() && mThunderbirdProcess == nullptr ) {
         startThunderbird();
@@ -327,17 +306,17 @@ void TrayIcon::createMenu()
     mSystrayMenu->addSeparator();
 
     if (settings->mNewEmailMenuEnabled) {
-        mSystrayMenu->addAction(tr("New Email"), this, SLOT(actionNewEmail()));
+        mSystrayMenu->addAction(tr("New Email"), this, &TrayIcon::actionNewEmail);
         mSystrayMenu->addSeparator();
     }
 
     // Some generic actions
-    mSystrayMenu->addAction( tr("Settings..."), this, SLOT(showSettings()) );
+    mSystrayMenu->addAction( tr("Settings..."), this, &TrayIcon::showSettings );
 
     mSystrayMenu->addSeparator();
 
     // And exit
-    mSystrayMenu->addAction( tr("Quit"), this, SLOT(actionQuit()) );
+    mSystrayMenu->addAction( tr("Quit"), qApp, &QApplication::quit );
 }
 
 void TrayIcon::createUnreadCounterThread()
@@ -366,7 +345,7 @@ void TrayIcon::startThunderbird()
     Log::debug("Starting Thunderbird as '%s %s'", qPrintable(executable), qPrintable(args.join(' ')));
 
     mThunderbirdProcess = new QProcess();
-    connect( mThunderbirdProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(tbProcessFinished(int,QProcess::ExitStatus)) );
+    connect( mThunderbirdProcess, &QProcess::finished, this, &TrayIcon::tbProcessFinished );
 
     connect( mThunderbirdProcess, &QProcess::errorOccurred, this, &TrayIcon::tbProcessError );
 
@@ -404,16 +383,12 @@ void TrayIcon::tbProcessFinished(int, QProcess::ExitStatus)
 
 
 void TrayIcon::onQuit() {
-    if (mWinTools) {
-        mWinTools->stopWatcher();
-    }
-    if (mWinTools && mWinTools->isHidden()) {
+    mWinTools->stopWatcher();
+    if (mWinTools->isHidden()) {
         mWinTools->show();
     }
     if (BirdtrayApp::get()->getSettings()->mExitThunderbirdWhenQuit) {
-        if (mWinTools) {
-            mWinTools->closeWindow();
-        }
+        mWinTools->closeWindow();
     }
 }
 

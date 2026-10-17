@@ -22,7 +22,7 @@ BirdtrayApp::BirdtrayApp(int &argc, char** argv) : QApplication(argc, argv)
     QCoreApplication::setApplicationName("birdtray-lite");
     QGuiApplication::setDesktopFileName("io.github.vegiii.BirdtrayLite");
     QCoreApplication::setApplicationVersion(Utils::getBirdtrayVersion());
-    // This prevents exiting the application when the dialogs are closed on Gnome/XFCE
+    // Keep running when the settings or log window is closed
     QApplication::setQuitOnLastWindowClosed(false);
 
     parseCmdArguments();

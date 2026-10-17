@@ -10,7 +10,6 @@ class DialogLogOutput : public QDialog, public Ui::DialogLogOutput
 
     public:
         explicit DialogLogOutput(QWidget *parent = nullptr);
-        ~DialogLogOutput();
 
     public slots:
         void    add( const QString& line );

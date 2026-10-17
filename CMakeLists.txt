@@ -8,7 +8,6 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 6.2 CONFIG REQUIRED COMPONENTS Core Gui Widgets DBus)
-add_definitions(-DQT_DEPRECATED_WARNINGS)
 
 add_executable(birdtray-lite
         src/main.cpp

@@ -137,13 +137,10 @@ void MorkParser::parse()
     // Run over mork chars and parse each term
     char cur = nextChar();
 
-    int i = 0;
-
     while ( cur )
     {
         if ( !isWhiteSpace( cur ) )
         {
-            i++;
             // Figure out what a term
             switch ( cur )
             {
@@ -699,38 +696,6 @@ void MorkParser::parseMeta( char c )
     {
         cur = nextChar();
     }
-}
-
-//	=============================================================
-//	MorkParser::getTables
-
-MorkTableMap *MorkParser::getTables( int TableScope )
-{
-    TableScopeMap::iterator iter;
-    iter = mork_.find( TableScope );
-
-    if ( iter == mork_.end() )
-    {
-        return 0;
-    }
-
-    return &iter.value();
-}
-
-//	=============================================================
-//	MorkParser::getRows
-
-MorkRowMap *MorkParser::getRows( int RowScope, RowScopeMap *table )
-{
-    RowScopeMap::iterator iter;
-    iter = table->find( RowScope );
-
-    if ( iter == table->end() )
-    {
-        return 0;
-    }
-
-    return &iter.value();
 }
 
 const MorkRowMap * MorkParser::rows(int tablescope, int tableid, int rowscope )

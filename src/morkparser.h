@@ -56,28 +56,6 @@ const char MorkDictColumnMeta[] = "<(a=c)>";
 
 const char MorkDbFolderInfoScope[] = "ns:msg:db:row:scope:dbfolderinfo:all";
 
-// Error codes
-enum MorkErrors
-{
-    NoError = 0,
-    FailedToOpen,
-    UnsupportedVersion,
-    DefectedFormat
-};
-
-// Mork term types
-enum MorkTerm
-{
-    NoneTerm = 0,
-    DictTerm,
-    GroupTerm,
-    TableTerm,
-    RowTerm,
-    CellTerm,
-    CommentTerm,
-    LiteralTerm
-};
-
 
 /// Class MorkParser
 
@@ -96,16 +74,6 @@ public:
     /// Return error status
 
     QString errorMsg();
-
-    ///
-    /// Returns all tables of specified scope
-
-    MorkTableMap *getTables( int tableScope );
-
-    ///
-    /// Returns all rows under specified scope
-
-    MorkRowMap *getRows( int rowScope, RowScopeMap *table );
 
     // Returns all rows for a specific table scope, table ID and row scope.
     // Return an empty map if not found
