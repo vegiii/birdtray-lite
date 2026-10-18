@@ -26,7 +26,7 @@ TrayIcon::TrayIcon(bool showSettings)
     mThunderbirdProcess = nullptr;
     
     mThunderbirdWindowExists = false;
-    mThunderbirdWindowHide = false;
+    mStartupHideTimer.setSingleShot(true);
     connect(QApplication::instance(), &QApplication::aboutToQuit, this, &TrayIcon::onQuit);
 
     Settings* settings = BirdtrayApp::get()->getSettings();
@@ -241,14 +241,16 @@ void TrayIcon::updateState()
         Settings* settings = BirdtrayApp::get()->getSettings();
         // Thunderbird is not running. Start it, or restart it if it has run before
         if (settings->mKeepThunderbirdRunning && !mThunderbirdProcess) {
-            startThunderbird();
-
-            // Hide once the window opens?
+            // Arm hiding before launch, and retry for up to 30 seconds.
             if (settings->mStartThunderbirdHidden) {
-                mThunderbirdWindowHide = true;
+                mStartupHideTimer.start(30000);
             }
+            startThunderbird();
         }
     }
+
+    if (mStartupHideTimer.isActive())
+        hideThunderbird();
 
     // Update the menu text as the window can be hidden in wintools
     if ( mWinTools->isHidden() )
@@ -287,6 +289,12 @@ void TrayIcon::applySettings()
 
 void TrayIcon::actionActivate()
 {
+    // An explicit click while startup hiding is pending requests a visible window.
+    if (mStartupHideTimer.isActive()) {
+        showThunderbird();
+        return;
+    }
+
     // Start Thunderbird if it is closed, and show it since the user asked for it
     if ( !mWinTools->lookup() && mThunderbirdProcess == nullptr ) {
         startThunderbird();
@@ -381,6 +389,7 @@ void TrayIcon::startThunderbird()
 
 void TrayIcon::tbProcessError(QProcess::ProcessError error)
 {
+    mStartupHideTimer.stop();
     if (mThunderbirdProcess == nullptr) {
         Log::debug("Got Thunderbird process error %s, but mThunderbirdProcess was null", qPrintable(QVariant::fromValue(error).toString()));
         return;
@@ -410,6 +419,7 @@ void TrayIcon::tbProcessFinished(int, QProcess::ExitStatus)
 
 
 void TrayIcon::onQuit() {
+    mStartupHideTimer.stop();
     mWinTools->stopWatcher();
     if (mWinTools->isHidden()) {
         mWinTools->show();
@@ -420,17 +430,18 @@ void TrayIcon::onQuit() {
 }
 
 void TrayIcon::onThunderbirdWindowShown() {
+    mStartupHideTimer.stop();
     mMenuShowHideThunderbird->setText( tr("Hide Thunderbird") );
 }
 
 void TrayIcon::onThunderbirdWindowHidden() {
+    mStartupHideTimer.stop();
     mMenuShowHideThunderbird->setText( tr("Show Thunderbird") );
 }
 
 void TrayIcon::onThunderbirdWindowAdded() {
-    // Hide the window we started hidden now that it exists
-    if (mThunderbirdWindowHide) {
-        mThunderbirdWindowHide = false;
+    // Keep retrying until KWin confirms the window was hidden.
+    if (mStartupHideTimer.isActive()) {
         hideThunderbird();
     }
 }
@@ -442,6 +453,7 @@ void TrayIcon::hideThunderbird()
 
 void TrayIcon::showThunderbird()
 {
+    mStartupHideTimer.stop();
     mWinTools->show();
 }
 

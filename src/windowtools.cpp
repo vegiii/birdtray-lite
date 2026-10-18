@@ -92,20 +92,16 @@ bool WindowTools::show()
 
 bool WindowTools::hide()
 {
-    if ( mHidden )
-    {
-        Log::debug("Window already hidden, ignored" );
-        return false;
-    }
-
     // Minimize and remove from taskbar/pager
     runKWinScript(
         "w.skipTaskbar = true;\n"
         "w.skipPager = true;\n"
-        "w.minimized = true;\n" );
+        "w.minimized = true;\n"
+        "if (w.minimized && w.skipTaskbar && w.skipPager)\n"
+        "    callDBus(\"io.github.vegiii.BirdtrayLite\", \"/\", \"io.github.vegiii.BirdtrayLite\", \"thunderbirdWindowHidden\");\n" );
 
-    mHidden = true;
-    emit onWindowHidden();
+    // The D-Bus confirmation updates mHidden; a missing window or failed script
+    // must not make us believe Thunderbird was hidden.
     return true;
 }
 

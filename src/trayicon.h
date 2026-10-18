@@ -155,8 +155,8 @@ class TrayIcon : public QSystemTrayIcon
         // If true, Thunderbird window exists right now
         bool            mThunderbirdWindowExists;
 
-        // If true, it will hide Thunderbird window as soon as its shown
-        bool            mThunderbirdWindowHide;
+        // Startup hiding stays pending until confirmed, cancelled, or timed out
+        QTimer          mStartupHideTimer;
 
         // Window tools (show/hide)
         WindowTools *   mWinTools;
