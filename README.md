@@ -60,21 +60,11 @@ Builds and installs to `~/.local`. Run it again to update.
 - Qt Network, Qt Svg and libX11 dependencies.
 - Tests, CI, the Windows installer and other upstream tooling.
 
-### Deleted
+### Scope and size
 
-Compared with [birdtray-wayland at `2ac2016`](https://github.com/stark1tty/birdtray-wayland/tree/2ac2016200c6b8ba8333f46e4be6103dc4d49e12).
+Upstream supports a wider range of platforms and features. This fork focuses on Plasma 6 on Wayland, so that narrower scope also makes the codebase smaller.
 
-| Part | Files | Lines |
-|---|---:|---:|
-| Tests and test data | 17 | 34,898 |
-| Translations | 42 | 17,251 |
-| Source files | 43 | 4,421 |
-| Windows installer | 11 | 2,039 |
-| CI, IDE files, contrib and screenshots | 17 | 1,358 |
-| Icons | 6 | – |
-| **Total** | **136** | **59,967** |
-
-In total 64,047 lines were removed and 1,813 added. The repository went from 159 to 34 files, and the C++ code from 8,173 to 3,571 lines.
+Compared with [birdtray-wayland at `2ac2016`](https://github.com/stark1tty/birdtray-wayland/tree/2ac2016200c6b8ba8333f46e4be6103dc4d49e12), 64,047 lines were removed and 1,813 added. The repository went from 159 to 34 files, and the C++ code from 8,173 to 3,571 lines.
 
 ## Credits and license
 
