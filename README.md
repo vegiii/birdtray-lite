@@ -2,7 +2,7 @@
 
 A fork of [birdtray-wayland](https://github.com/stark1tty/birdtray-wayland), which is based on [Birdtray](https://github.com/gyunaev/birdtray).
 
-This fork is meant for my personal use on Fedora KDE and is developed with the help of AI coding agents. It will probably work on any distribution with Plasma 6, but comes with no guarantees.
+This fork is meant for my personal use on Fedora KDE and is developed with the help of AI coding agents. It will probably work on any distribution with Plasma 6 on Wayland, but comes with no guarantees.
 
 ## Why this fork
 
