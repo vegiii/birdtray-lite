@@ -15,7 +15,7 @@ This fork is meant for my personal use on Fedora KDE and is developed with the h
 
 ## Install or update
 
-Requires KDE Plasma 6. On Fedora, missing build dependencies are installed automatically. On other distributions, install them first:
+Requires KDE Plasma 6 on Wayland. On Fedora, missing build dependencies are installed automatically. On other distributions, install them first:
 
 - Debian, Ubuntu: `cmake g++ make qt6-base-dev`
 - Arch: `cmake gcc make qt6-base`
