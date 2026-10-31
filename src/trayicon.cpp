@@ -54,6 +54,11 @@ TrayIcon::TrayIcon(bool showSettings)
     connect( &mStateTimer, &QTimer::timeout, this, &TrayIcon::updateState );
     mStateTimer.setInterval( 1000 );
     mStateTimer.start();
+
+    // Also hide Thunderbird if it was already starting when Birdtray started.
+    if (settings->mStartThunderbirdHidden) {
+        mStartupHideTimer.start(30000);
+    }
     
     // Update the state and icon when everything is settled
     updateState();
