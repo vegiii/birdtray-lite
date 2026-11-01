@@ -9,8 +9,7 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 6.2 CONFIG REQUIRED COMPONENTS Core Gui Widgets DBus)
 
-add_executable(birdtray-lite
-        src/birdtrayapp.cpp
+set(BIRDTRAY_SOURCES
         src/dialogsettings.cpp
         src/foldertree.cpp
         src/log.cpp
@@ -19,12 +18,26 @@ add_executable(birdtray-lite
         src/thunderbird.cpp
         src/trayicon.cpp
         src/unreadmonitor.cpp
-        src/windowtools.cpp
         src/dialogsettings.ui
         src/resources.qrc)
+add_executable(birdtray-lite src/birdtrayapp.cpp src/windowtools.cpp ${BIRDTRAY_SOURCES})
 target_include_directories(birdtray-lite PRIVATE src)
 target_link_libraries(birdtray-lite PRIVATE
         Qt6::Core Qt6::Gui Qt6::Widgets Qt6::DBus)
+
+option(BUILD_TESTING "Build regression tests" OFF)
+if(BUILD_TESTING)
+    enable_testing()
+    add_executable(startup-hide-test tests/startuphide.cpp
+            src/birdtrayapp.h src/windowtools.h ${BIRDTRAY_SOURCES})
+    target_include_directories(startup-hide-test PRIVATE src)
+    target_link_libraries(startup-hide-test PRIVATE
+            Qt6::Core Qt6::Gui Qt6::Widgets Qt6::DBus)
+    add_test(NAME startup-hide COMMAND startup-hide-test)
+    set_tests_properties(startup-hide PROPERTIES
+            ENVIRONMENT "QT_QPA_PLATFORM=offscreen;DBUS_SESSION_BUS_ADDRESS=unix:path=/nonexistent/birdtray-test-bus"
+            TIMEOUT 45)
+endif()
 
 include(GNUInstallDirs)
 set(APP_ID io.github.vegiii.BirdtrayLite)

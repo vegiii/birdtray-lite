@@ -435,17 +435,17 @@ void TrayIcon::onQuit() {
 }
 
 void TrayIcon::onThunderbirdWindowShown() {
-    mStartupHideTimer.stop();
+    // Thunderbird can raise its window again while it is still starting.
+    // Only an explicit show request cancels the startup hide period.
     mMenuShowHideThunderbird->setText( tr("Hide Thunderbird") );
 }
 
 void TrayIcon::onThunderbirdWindowHidden() {
-    mStartupHideTimer.stop();
     mMenuShowHideThunderbird->setText( tr("Show Thunderbird") );
 }
 
 void TrayIcon::onThunderbirdWindowAdded() {
-    // Keep retrying until KWin confirms the window was hidden.
+    // Hide new windows throughout the startup hide period.
     if (mStartupHideTimer.isActive()) {
         hideThunderbird();
     }
