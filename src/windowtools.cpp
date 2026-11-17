@@ -78,10 +78,11 @@ bool WindowTools::lookup()
 
 bool WindowTools::show()
 {
-    // Restore to taskbar, un-minimize and focus
+    // Restore to taskbar and window switcher, un-minimize and focus
     runKWinScript(
         "w.skipTaskbar = false;\n"
         "w.skipPager = false;\n"
+        "w.skipSwitcher = false;\n"
         "w.minimized = false;\n"
         "workspace.activeWindow = w;\n" );
 
@@ -92,12 +93,13 @@ bool WindowTools::show()
 
 bool WindowTools::hide()
 {
-    // Minimize and remove from taskbar/pager
+    // Minimize and remove from taskbar, pager and window switcher
     runKWinScript(
         "w.skipTaskbar = true;\n"
         "w.skipPager = true;\n"
+        "w.skipSwitcher = true;\n"
         "w.minimized = true;\n"
-        "if (w.minimized && w.skipTaskbar && w.skipPager)\n"
+        "if (w.minimized && w.skipTaskbar && w.skipPager && w.skipSwitcher)\n"
         "    callDBus(\"io.github.vegiii.BirdtrayLite\", \"/\", \"io.github.vegiii.BirdtrayLite\", \"thunderbirdWindowHidden\");\n" );
 
     // The D-Bus confirmation updates mHidden; a missing window or failed script
@@ -123,7 +125,7 @@ void WindowTools::startWatcher( bool hideWhenMinimized )
 {
     // Tells Birdtray Lite over D-Bus when a Thunderbird window opens, and hides Thunderbird
     // when it is minimized. A window shown by something else, such as a notification,
-    // gets its taskbar entry back.
+    // gets its taskbar and window switcher entries back.
     const QString script = QString(
         "var hideWhenMinimized = %1;\n"
         "var seen = {};\n"
@@ -148,10 +150,12 @@ void WindowTools::startWatcher( bool hideWhenMinimized )
         "        if (w.minimized && hideWhenMinimized && !w.skipTaskbar) {\n"
         "            w.skipTaskbar = true;\n"
         "            w.skipPager = true;\n"
+        "            w.skipSwitcher = true;\n"
         "            notify(\"thunderbirdWindowHidden\");\n"
         "        } else if (!w.minimized && w.skipTaskbar) {\n"
         "            w.skipTaskbar = false;\n"
         "            w.skipPager = false;\n"
+        "            w.skipSwitcher = false;\n"
         "            notify(\"thunderbirdWindowShown\");\n"
         "        }\n"
         "    });\n"
