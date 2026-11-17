@@ -15,17 +15,30 @@ This fork is meant for my personal use on Fedora KDE and is developed with the h
 
 ## Install or update
 
-Requires KDE Plasma 6 on Wayland. On Fedora, missing build dependencies are installed automatically. On other distributions, install them first:
+```bash
+gh repo clone vegiii/birdtray-lite ~/Documents/Git/birdtray-lite &&
+~/Documents/Git/birdtray-lite/install.sh
+```
 
-- Debian, Ubuntu: `cmake g++ make qt6-base-dev`
-- Arch: `cmake gcc make qt6-base`
-- Other: CMake, a C++17 compiler and Qt 6.2 or newer
+To update an existing checkout:
+
+```bash
+cd ~/Documents/Git/birdtray-lite &&
+git pull --ff-only &&
+./install.sh
+```
+
+Run as your normal user. The installer installs missing Fedora dependencies using `sudo` and installs under `~/.local`.
+
+For setup scripts, use `./install.sh --yes --no-restart` to accept dependency installation prompts without launching apps or restarting apps, services, or Plasma. Necessary stops still happen safely. Run `./install.sh --help` for options.
+
+Requires KDE Plasma 6 on Wayland. The download installer remains available:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/vegiii/birdtray-lite/main/install.sh | bash
 ```
 
-Builds and installs to `~/.local`. Run it again to update.
+On other distributions, install CMake, Make, a C++17 compiler, Qt 6.2+ development packages, procps and util-linux manually.
 
 ## Changes from upstream
 
