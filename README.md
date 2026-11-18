@@ -15,6 +15,8 @@ This fork is meant for my personal use on Fedora KDE and is developed with the h
 
 ## Install or update
 
+Installed path: `~/.local/bin/birdtray-lite`
+
 ```bash
 gh repo clone vegiii/birdtray-lite ~/Documents/Git/birdtray-lite &&
 ~/Documents/Git/birdtray-lite/install.sh
