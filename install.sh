@@ -52,6 +52,24 @@ main() {
         cd "$src"
     fi
 
+    # Snapshot the working source without changing the checkout's index or object store.
+    install_source=null
+    if [[ -e .git ]] && fingerprint=$(
+        scratch=$(mktemp -d) || exit 1
+        trap 'rm -rf -- "$scratch"' EXIT
+        index=$(git rev-parse --git-path index) &&
+        objects=$(git rev-parse --path-format=absolute --git-path objects) &&
+        mkdir -p -- "$scratch/objects/info" &&
+        printf '%s\n' "$objects" >"$scratch/objects/info/alternates" || exit 1
+        export GIT_INDEX_FILE="$scratch/index" GIT_OBJECT_DIRECTORY="$scratch/objects"
+        if [[ -f "$index" ]]; then
+            cp -- "$index" "$GIT_INDEX_FILE" || exit 1
+        fi
+        git add -A -- . && git write-tree
+    ) && [[ "$fingerprint" =~ ^[0-9a-f]{40}$ ]]; then
+        install_source=\"$fingerprint\"
+    fi
+
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$HOME/.local"
     cmake --build build --parallel "$(nproc)"
     cmake --install build
@@ -71,6 +89,18 @@ main() {
             exit 1
         fi
         setsid -f "$HOME/.local/bin/birdtray-lite" >/dev/null 2>&1
+    fi
+    # Publish the installed revision after the app files are in place.
+    install_state="${XDG_STATE_HOME:-$HOME/.local/state}/birdtray-lite"
+    if ! (
+        umask 077
+        mkdir -p -- "$install_state" &&
+        record=$(mktemp "$install_state/.install.XXXXXXXX") &&
+        trap 'rm -f -- "$record"' EXIT &&
+        printf '{"source": %s}\n' "$install_source" >"$record" &&
+        mv -fT -- "$record" "$install_state/install.json"
+    ); then
+        printf 'Could not record the installed revision.\n' >&2
     fi
     printf 'Installed Birdtray Lite.\n'
 }
