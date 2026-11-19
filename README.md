@@ -18,14 +18,14 @@ This fork is meant for my personal use on Fedora KDE and is developed with the h
 Installed path: `~/.local/bin/birdtray-lite`
 
 ```bash
-gh repo clone vegiii/birdtray-lite ~/Documents/Git/birdtray-lite &&
-~/Documents/Git/birdtray-lite/install.sh
+gh repo clone vegiii/birdtray-lite ~/Projects/Git/birdtray-lite &&
+~/Projects/Git/birdtray-lite/install.sh
 ```
 
 To update an existing checkout:
 
 ```bash
-cd ~/Documents/Git/birdtray-lite &&
+cd ~/Projects/Git/birdtray-lite &&
 git pull --ff-only &&
 ./install.sh
 ```
